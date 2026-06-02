@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if printf '%s\n' "$staged_files" | grep -q '^apps/web/'; then
+  echo "Running frontend staged-file checks..."
+  (cd apps/web && pnpm lint-staged)
+fi
+
+if printf '%s\n' "$staged_files" | grep -q '^apps/api/.*\.py$'; then
+  echo "Running backend staged-file checks..."
+  api_files=$(printf '%s\n' "$staged_files" | grep '^apps/api/.*\.py$' | sed 's#^apps/api/##')
+  (cd apps/api && printf '%s\n' "$api_files" | xargs .venv/bin/ruff format && printf '%s\n' "$api_files" | xargs .venv/bin/ruff check --fix)
+  printf '%s\n' "$staged_files" | grep '^apps/api/.*\.py$' | xargs git add
+fi

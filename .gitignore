@@ -8,6 +8,11 @@
 # Logs
 *.log
 
+# Local environment files
+.env
+.env.*
+!.env.example
+
 # Dependencies and build output placeholders for future tooling
 node_modules/
 dist/

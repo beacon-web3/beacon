@@ -1,0 +1,81 @@
+{
+  "seo": {
+    "title": "Beacon | Stake Behind Recommendations",
+    "description": "Beacon is a decentralized discovery marketplace where people stake money behind recommendations they believe in."
+  },
+  "nav": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "joinWaitlist": "Join the waitlist"
+  },
+  "footer": {
+    "copyright": "Beacon"
+  },
+  "home": {
+    "badge": "In a world of infinite content, conviction matters",
+    "title": "Find signal through the noise.",
+    "description": "AI is making content abundant. Attention is becoming scarce. Beacon helps readers discover books worth their time by rewarding people who back their recommendations with real conviction. No empty likes. No engagement farming. Just stronger signals.",
+    "principle": "Discovery is cheap. Conviction isn't.",
+    "tagline": "Put your money where your mouth is.",
+    "primaryCta": "Sign up for early access",
+    "secondaryCta": "Log in",
+    "stats": {
+      "stake": {
+        "value": "0.2 SOL",
+        "label": "Locked to publish a recommendation."
+      },
+      "support": {
+        "value": "0.01 SOL",
+        "label": "To support a recommendation you believe in."
+      },
+      "period": {
+        "value": "14 Days",
+        "label": "Minimum commitment period for curators."
+      }
+    },
+    "signalCard": {
+      "eyebrow": "Featured signal",
+      "title": "Tomorrow's favorite book, discovered today",
+      "commitmentLabel": "Curator commitment",
+      "commitmentValue": "0.2 SOL",
+      "badge": "High conviction",
+      "description": "Anyone can recommend a book. Few are willing to commit capital behind it. Beacon rewards conviction and helps readers separate genuine belief from empty promotion.",
+      "supportersLabel": "Early supporters",
+      "supportersValue": "128",
+      "scoreLabel": "Discovery score",
+      "scoreValue": "94%"
+    },
+    "stepsSection": {
+      "title": "Put your money where your mouth is",
+      "description": "Likes are free. Recommendations are everywhere. Beacon rewards people who are willing to back their opinions with real commitment."
+    },
+    "steps": {
+      "recommend": {
+        "title": "Recommend with conviction",
+        "description": "Publish a book recommendation by locking a stake. The stake is returned after the commitment period, proving you are serious about what you recommend."
+      },
+      "support": {
+        "title": "Support early discoveries",
+        "description": "Spend a small amount to back recommendations you believe deserve more attention. Your support helps quality rise above the noise."
+      },
+      "earn": {
+        "title": "Earn for great taste",
+        "description": "When recommendations gain traction, rewards flow to the curators and early supporters who recognized quality before the crowd."
+      }
+    },
+    "cta": {
+      "title": "Join the first marketplace for conviction-driven discovery.",
+      "description": "Beacon starts with books because great recommendations matter. Over time, the same model can help people discover films, games, podcasts, courses, products, and ideas worth their attention. Join early and help define how discovery works in an age of infinite content.",
+      "primary": "Create your account",
+      "secondary": "Already invited? Log in"
+    }
+  },
+  "auth": {
+    "comingSoon": "Coming soon",
+    "signupTitle": "Beacon signup is not open yet.",
+    "signupDescription": "This page is a placeholder for the future account creation flow.",
+    "loginTitle": "Beacon login is not available yet.",
+    "loginDescription": "This page is a placeholder for the future authentication flow.",
+    "backHome": "Back to landing page"
+  }
+}
