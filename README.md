@@ -125,6 +125,16 @@ Early planning and architecture phase.
 
 No production code has been implemented yet.
 
+## Development Workflow
+
+Local frontend tooling is currently managed in `apps/web/` with pnpm. Local backend tooling is currently managed in `apps/api/` with a Python virtual environment.
+
+Fast pre-commit checks are configured through the tracked hook at `.husky/pre-commit`. See `docs/development/git-hooks.md` for setup and usage details.
+
+Testing is split by workspace. Frontend E2E tests use Playwright in `apps/web/`; backend tests use pytest in `apps/api/`. See `docs/development/testing.md` for commands and scope.
+
+Local backend development can run through Docker Compose in `apps/api/`, including the Django API and PostgreSQL database. See `docs/development/database.md` for setup commands.
+
 ## Core Principle
 
 In a world of infinite content, attention becomes the scarce resource.
