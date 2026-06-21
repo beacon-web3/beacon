@@ -20,7 +20,11 @@ Current frontend test files live in:
 apps/web/tests/e2e/
 ```
 
-The current E2E tests verify that the home page loads in Chromium, the Persian route sets RTL direction, and signup/login forms submit to the auth API. Playwright starts the Nuxt dev server automatically through `playwright.config.ts`.
+The current E2E tests verify that the home page loads in Chromium, the landing
+page fits narrow mobile screens without horizontal overflow, the French route
+loads with LTR direction, and signup/login forms submit to the email-only auth
+API. Playwright starts the Nuxt dev server automatically through
+`playwright.config.ts`.
 
 ## Backend
 

@@ -26,8 +26,6 @@ Changelog. Use date-based entries until formal versioning starts.
 - Redesigned the homepage as a sparse early-adopter landing page with a short
   Nuxt UI hero badge, live signal preview, focused reasons, simplified product
   loop, ledger clarity, and final early-access CTA.
-- Updated the login and signup pages to use the same minimal Beacon visual
-  system, early-access copy, and shared email access panel.
 - Reframed web starter copy toward books-first discovery and public reputation,
   avoiding passive-yield, guaranteed-return, and profit-first language.
 - Replaced the Persian web locale with French and updated localized navigation,
@@ -51,3 +49,5 @@ Changelog. Use date-based entries until formal versioning starts.
 
 - Updated project guidance to frame Beacon as a discovery and reputation network
   rather than a passive yield or guaranteed-return product.
+- Updated the login and signup pages to use the same minimal Beacon visual
+  system, early-access copy, and shared email access panel.
