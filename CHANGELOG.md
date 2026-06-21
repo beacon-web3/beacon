@@ -8,6 +8,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+## 2026-06-21
+
 ### Added
 
 - Added product documentation for Beacon's books-first discovery marketplace,
