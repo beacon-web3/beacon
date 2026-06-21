@@ -1,0 +1,359 @@
+{
+  "version": 1,
+  "skills": {
+    "api-and-interface-design": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-and-interface-design/SKILL.md",
+      "computedHash": "3cf54553433e55875c664baf78f9c769820bdfac155f09bf2989d70e20e6e147"
+    },
+    "backend-development-api-design-principles": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/backend-development-api-design-principles/SKILL.md",
+      "computedHash": "9ff7e786161f9df66e413a5457d094cc44e5e8055b175efee96307fbcffcd300"
+    },
+    "backend-development-architecture-patterns": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/backend-development-architecture-patterns/SKILL.md",
+      "computedHash": "b4f68908b6d7340a7d88b3d31f900b308dc58c84b99a26e1f7ca4d5ba31fa0ce"
+    },
+    "browser-testing-with-devtools": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/browser-testing-with-devtools/SKILL.md",
+      "computedHash": "a0211c49f6b842d264b46e37ba4bc803e0e1c13511909b8bb3801aa29d0917ee"
+    },
+    "ci-cd-and-automation": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ci-cd-and-automation/SKILL.md",
+      "computedHash": "578b098a7d2352ccdac8b8abdc40eb6803538e81cf8382f138da6188a655087c"
+    },
+    "cicd-automation-deployment-pipeline-design": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cicd-automation-deployment-pipeline-design/SKILL.md",
+      "computedHash": "c37816b7b3340d2d5da82cbdd1af57ebd79d717e4757986b72e31b1ae4bcaa31"
+    },
+    "cicd-automation-github-actions-templates": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cicd-automation-github-actions-templates/SKILL.md",
+      "computedHash": "f3a9ef376d397353439f316c0bf137331eaa87e17f813525f86209c2ca75c774"
+    },
+    "cicd-automation-secrets-management": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cicd-automation-secrets-management/SKILL.md",
+      "computedHash": "80a586d18a211189711cf860f8fa147a38ef9d4436df1b58f3a68b170f15a4b5"
+    },
+    "code-review-and-quality": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-review-and-quality/SKILL.md",
+      "computedHash": "83931d7416bcff73c24d976c1e45f09f80259541d33e9fdfe3ee521d39b27428"
+    },
+    "code-simplification": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-simplification/SKILL.md",
+      "computedHash": "7973e746e8e2ea5004d520da970c15a106824b8d6be1bcff48908aec021f3677"
+    },
+    "context-engineering": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/context-engineering/SKILL.md",
+      "computedHash": "bb8864454c5a24636cab86c4b3c4b29e7e7431c80485bfd7c9c0a19a01936510"
+    },
+    "create-adaptable-composable": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-adaptable-composable/SKILL.md",
+      "computedHash": "2f215126499d29a733be980ef9ce8f4ffb5f25a8831aec965d86c0cd21b2c5d2"
+    },
+    "database-design-postgresql": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/database-design-postgresql/SKILL.md",
+      "computedHash": "5a06f1264f729050ecf7670d81e3420370cf52e7135cf05a54e670786c54cad6"
+    },
+    "debugging-and-error-recovery": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/debugging-and-error-recovery/SKILL.md",
+      "computedHash": "0ca1c30d857089e10befc2386bb0b93b4eb9209eb104be80ade756c79dd45b0a"
+    },
+    "deprecation-and-migration": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/deprecation-and-migration/SKILL.md",
+      "computedHash": "ad5b7a0b67d5cd952aafd0069865c10c21e2f5fe179bfbc544e11b3c853953c2"
+    },
+    "developer-essentials-auth-implementation-patterns": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/developer-essentials-auth-implementation-patterns/SKILL.md",
+      "computedHash": "917deaf65c927bd619517a9a5c549a72b654a1c8de5a570658778a6d3988803a"
+    },
+    "developer-essentials-e2e-testing-patterns": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/developer-essentials-e2e-testing-patterns/SKILL.md",
+      "computedHash": "c35ec371af8f6087c49a75688b6d70917d5a7600ba7848b7825c06b8c2f99eb4"
+    },
+    "developer-essentials-sql-optimization-patterns": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/developer-essentials-sql-optimization-patterns/SKILL.md",
+      "computedHash": "8604582b6c32116ff58570e4a9680f71b606c49b8a2c1d96e410f1451584bdc5"
+    },
+    "django-backend-development": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/django-backend-development/SKILL.md",
+      "computedHash": "5a7d17851f6e344e9a7b7188777af2d3037bf756f613a1b3074e5399381dd78a"
+    },
+    "documentation-and-adrs": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/documentation-and-adrs/SKILL.md",
+      "computedHash": "1c1b33b3c8ff1d5f9fdcf9d8a7a67f82384b3224e88af567fd4688f3f2d9e85b"
+    },
+    "documentation-generation-openapi-spec-generation": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/documentation-generation-openapi-spec-generation/SKILL.md",
+      "computedHash": "ae1d9b21444cd2013b5276967a08a209b266d3a5dff263ea6f90ec8107c22853"
+    },
+    "doubt-driven-development": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/doubt-driven-development/SKILL.md",
+      "computedHash": "f6094460ebc9512285c85790e49f612081b9dd6a2b77d874fe2d960ef50a9ef1"
+    },
+    "frontend-development-tailwind-design-system": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-development-tailwind-design-system/SKILL.md",
+      "computedHash": "469f7d4030fb53927a60a5b8f4c9de477e5998f3d646c7a72f7c6ca81698db3c"
+    },
+    "frontend-ui-engineering": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-ui-engineering/SKILL.md",
+      "computedHash": "d6a84d1d0514f845e60110febbd92f5092a485e5d4d71c69d11609d4ae602df0"
+    },
+    "git-workflow-and-versioning": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/git-workflow-and-versioning/SKILL.md",
+      "computedHash": "3e7b8cf28456abda4d7dc8cf95f0443f9ebb148dd00118361083a286d0916f90"
+    },
+    "idea-refine": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/idea-refine/SKILL.md",
+      "computedHash": "926e51c45782a7a1074ee15558993966770e6c4ac52ea466a5de14638d151a12"
+    },
+    "incremental-implementation": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/incremental-implementation/SKILL.md",
+      "computedHash": "c9c35951841b2fb34cd7b64e1d318643ac6eebf74c419978280acc1bf690dd91"
+    },
+    "interview-me": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/interview-me/SKILL.md",
+      "computedHash": "efded91ac7f7626239b338ce8622afeb557151b86532b632f3c9eb5b2ff9048f"
+    },
+    "nuxt": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nuxt/SKILL.md",
+      "computedHash": "288552fa723c1a26b9505e160ca970b0db51a455ecdf4eca4067b66d383c57a7"
+    },
+    "nuxt-ui": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nuxt-ui/SKILL.md",
+      "computedHash": "b3ba85b7feb136070e24592c0f0a2d66cd1f9d3d4422f6f88b4653ad949b014f"
+    },
+    "observability-and-instrumentation": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/observability-and-instrumentation/SKILL.md",
+      "computedHash": "4ad6285eb6d07411f08715e036bafa1fa82498a5032a321bf532e50b7f85e3ec"
+    },
+    "observability-monitoring-slo-implementation": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/observability-monitoring-slo-implementation/SKILL.md",
+      "computedHash": "ca4931b732d11433e89b208a5da83593a11d1c5dc0670bd1b79e3252dc5a45b9"
+    },
+    "performance-optimization": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/performance-optimization/SKILL.md",
+      "computedHash": "087baf94f788bd6a70ba8ec0aa0246f93808251fe2d24e1fd7a3df81896d2367"
+    },
+    "planning-and-task-breakdown": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/planning-and-task-breakdown/SKILL.md",
+      "computedHash": "6ee11641fc8d8f299a6acb3a10976e7e50719ad012290123e11ec34a525b4cc0"
+    },
+    "python-development-python-code-style": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-code-style/SKILL.md",
+      "computedHash": "740cf410aa0eece440f763580eb12089982a40afff5d15983e1cf3e8e836a0a5"
+    },
+    "python-development-python-configuration": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-configuration/SKILL.md",
+      "computedHash": "f1fc31ee65c2fef95e1f7878f51abe36cb8ceaa2596e30d8e4a8d065b6b63b9c"
+    },
+    "python-development-python-error-handling": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-error-handling/SKILL.md",
+      "computedHash": "1b437c02185f66d5572295d256dc52517527d29b42585b42ef488a46e33e41b2"
+    },
+    "python-development-python-observability": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-observability/SKILL.md",
+      "computedHash": "8f3a8d7dd28584f01109bf82db1061b7b5552bc38dc9224df06605cac7b84f8a"
+    },
+    "python-development-python-project-structure": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-project-structure/SKILL.md",
+      "computedHash": "8479cfebdcb9b033e43611f2948159d9038e4d5e54c4378930f63dbdb559310b"
+    },
+    "python-development-python-resilience": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-resilience/SKILL.md",
+      "computedHash": "4f83a97e9522d682c348540b15880bac05b00a4b1fab0c2891b156d20db265b8"
+    },
+    "python-development-python-resource-management": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-resource-management/SKILL.md",
+      "computedHash": "83d45090fb764d9b2b8fcb8a4e1a13d4fc9d6c56aad027873edcaf37be711f44"
+    },
+    "python-development-python-testing-patterns": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-testing-patterns/SKILL.md",
+      "computedHash": "7cd3c1b84ede4860d497fcfc6dcdbac1aa9bd0d1356018e2aba62d7156a01e6c"
+    },
+    "python-development-python-type-safety": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-python-type-safety/SKILL.md",
+      "computedHash": "d7ec09936a966c1825e19c747efe44b1a9327fb0b21f411e4c44bbf1f8c5b198"
+    },
+    "python-development-uv-package-manager": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/python-development-uv-package-manager/SKILL.md",
+      "computedHash": "94630977fdeccf82b40f4e6b59b5899414668332c9628f24ec555a21868d4630"
+    },
+    "security-and-hardening": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-and-hardening/SKILL.md",
+      "computedHash": "911bd75218fcde93e50586fe5449c370370f5e983ec0ba2181c30b3056cafac3"
+    },
+    "security-scanning-sast-configuration": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-scanning-sast-configuration/SKILL.md",
+      "computedHash": "7647da74527d208da069763df969c19373694eae1e74f93e82af83e8b95e0699"
+    },
+    "security-scanning-security-requirement-extraction": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-scanning-security-requirement-extraction/SKILL.md",
+      "computedHash": "6428a0fe1eb2712421ac3b4a56809ebde6698d9e1ad2719cc21fe551207d0324"
+    },
+    "security-scanning-threat-mitigation-mapping": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-scanning-threat-mitigation-mapping/SKILL.md",
+      "computedHash": "76915c5b721c8f81a74c5bfd922efe904816fbe433bef54e93875064ab13ab8f"
+    },
+    "shipping-and-launch": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipping-and-launch/SKILL.md",
+      "computedHash": "3cd9f8154c7aa578cf7db15c43b54e358bbe7da03c633d289b0302acf4a83028"
+    },
+    "solana-dev": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/solana-dev/SKILL.md",
+      "computedHash": "51ba37080e2377cd57f278db8702dc9cfcd1f7520a42cbcca8f83924d59b0560"
+    },
+    "source-driven-development": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/source-driven-development/SKILL.md",
+      "computedHash": "235fb43569e9b21ec5d209818ff1ad3da9682be33c4e464ffa89ed348e7094a0"
+    },
+    "spec-driven-development": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spec-driven-development/SKILL.md",
+      "computedHash": "c29c9fe28235431984e1f8d5f5a578fc03184d6da17131574f16b240f7c93c3f"
+    },
+    "test-driven-development": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "2a541c517efcf3ebc1c0fb8cb644bab1690724fb9d2f67bb6d075d6a73876ba8"
+    },
+    "using-agent-skills": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/using-agent-skills/SKILL.md",
+      "computedHash": "2f320de21a00000ed45edc993ef783ff0425fc66f8ea187068cc97394be27958"
+    },
+    "vue-best-practices": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-best-practices/SKILL.md",
+      "computedHash": "3df585ad31aec78fe55c56c1411262737e6b231677a3153dec512a882fde80cd"
+    },
+    "vue-debug-guides": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-debug-guides/SKILL.md",
+      "computedHash": "fa7b31c32a6717ae47cd2ea208773e27536225ad053a564effe656bf927fe9ef"
+    },
+    "vue-pinia-best-practices": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-pinia-best-practices/SKILL.md",
+      "computedHash": "d4ba913bec21910b8e37b2115cd964df2dc43ad62346b981c7b88d4ddc8cf792"
+    },
+    "vue-testing-best-practices": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-testing-best-practices/SKILL.md",
+      "computedHash": "58d365899f54be9e5fa2c2e455093f9567620600578ae92aaa2f31d9b19a59ad"
+    },
+    "vueuse-functions": {
+      "source": "mohsenpak370/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vueuse-functions/SKILL.md",
+      "computedHash": "9b6b0afdbc577317e8c29e6ac0ee6890a2ec95d5ad7c8ce66247c1a62b95621d"
+    }
+  }
+}
