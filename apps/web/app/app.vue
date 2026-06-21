@@ -2,10 +2,13 @@
 const { t, locale, localeProperties } = useI18n()
 const localePath = useLocalePath()
 
+const homeSectionPath = (hash: string) => `${localePath('/')}${hash}`
+
 const navLinks = computed(() => [
-  { label: t('nav.discover'), to: localePath('/') },
-  { label: t('nav.reputation'), to: localePath('/') },
-  { label: t('nav.treasury'), to: localePath('/') }
+  { label: t('nav.problem'), to: homeSectionPath('#problem') },
+  { label: t('nav.howItWorks'), to: homeSectionPath('#how-it-works') },
+  { label: t('nav.roadmap'), to: homeSectionPath('#roadmap') },
+  { label: t('nav.ledger'), to: homeSectionPath('#ledger') }
 ])
 
 const htmlLang = computed(() => String(localeProperties.value.iso || locale.value || 'en'))

@@ -5,9 +5,10 @@
   },
   "nav": {
     "home": "Beacon home",
-    "discover": "Discover",
-    "reputation": "Reputation",
-    "treasury": "Treasury",
+    "problem": "Problem",
+    "howItWorks": "How it works",
+    "roadmap": "Roadmap",
+    "ledger": "Ledger",
     "login": "Log in",
     "signup": "Join early access",
     "joinWaitlist": "Join the waitlist",
@@ -18,55 +19,148 @@
   },
   "home": {
     "badge": "Books first. Reputation second. Ledger always visible.",
-    "title": "A quieter market for better book discovery.",
-    "description": "Beacon helps readers find books through public curation signals: what was recommended, who stood behind it, and how early supporters recorded conviction. The interface keeps books in front and mechanics legible before any wallet action.",
+    "title": "Beacon helps people discover valuable books before they become obvious.",
+    "description": "Most discovery tools reward popularity, ads, or engagement. Beacon is a public record for book recommendations where curators stand behind their taste and supporters can show early conviction.",
     "primaryCta": "Join early access",
-    "secondaryCta": "View the ledger model",
+    "secondaryCta": "See how it works",
     "metrics": {
-      "books": {
-        "value": "Books",
-        "label": "Primary artifact"
+      "problem": {
+        "value": "Noisy feeds",
+        "label": "The problem"
       },
-      "curators": {
+      "mechanism": {
+        "value": "Conviction",
+        "label": "The signal"
+      },
+      "outcome": {
         "value": "Reputation",
-        "label": "Public signal"
-      },
-      "ledger": {
-        "value": "Clarity",
-        "label": "Before signing"
+        "label": "The record"
       }
     },
     "book": {
-      "eyebrow": "Featured book",
+      "eyebrow": "Example book",
+      "recommendationLabel": "Canonical recommendation",
       "title": "The Long Attention",
       "author": "Mira Voss",
       "thesis": "A patient argument for reading as a civic skill, and a useful counterweight to algorithmic drift.",
+      "curatorLabel": "Curator",
       "curator": "Ari Chen",
+      "reputationLabel": "Reputation",
       "reputation": "Early reader",
+      "supportersLabel": "Supporters",
       "supporters": "128 recorded"
     },
-    "principles": {
-      "eyebrow": "System language",
-      "title": "Designed to feel literary, not speculative.",
-      "description": "The design system separates editorial content from participation mechanics so readers can understand what matters without being pushed toward hype or yield framing.",
-      "books": {
-        "title": "Book-first hierarchy",
-        "description": "Recommendation pages lead with title, author, curator thesis, and reading context before any stake or support mechanics."
-      },
-      "reputation": {
-        "title": "Reputation as context",
-        "description": "Curator history, discovery timing, and support records are visible as trust signals, not as leaderboard spectacle."
-      },
-      "ledger": {
-        "title": "Mechanics in plain view",
-        "description": "Every economic action is presented as a clear record: action, recipient, amount, fee payer, and network cluster."
+    "problem": {
+      "eyebrow": "Why Beacon exists",
+      "title": "Finding a good book should not depend on what the loudest algorithm is pushing this week.",
+      "description": "Search works when you already know what you want. Social feeds optimize attention. Review sites can drift toward popularity contests, review bombing, and shallow ratings. Beacon is built for the earlier moment: when someone thoughtful finds a book and wants that discovery to be publicly legible.",
+      "items": {
+        "feeds": {
+          "title": "Feeds reward engagement",
+          "description": "Popular content keeps getting amplified, while quieter books often need a trusted reader to explain why they matter."
+        },
+        "reviews": {
+          "title": "Ratings miss context",
+          "description": "A star score rarely shows who discovered the book early, what their thesis was, or why other readers found it worth supporting."
+        },
+        "ai": {
+          "title": "Content supply is exploding",
+          "description": "As creation gets easier, attention becomes the scarce resource. Beacon focuses on public taste, timing, and discovery history."
+        }
+      }
+    },
+    "solution": {
+      "eyebrow": "What Beacon is",
+      "title": "A discovery ledger for books, taste, and early conviction.",
+      "description": "Beacon gives each recommended book a canonical page. The first valid curator receives public discoverer credit, supporters can record conviction, and the page shows the visible history instead of hiding the signal inside a private algorithm.",
+      "points": {
+        "canonical": "One durable page per book recommendation, centered on title, author, curator thesis, and discovery context.",
+        "stake": "Curators lock a documented stake as a spam-resistant signal that they stand behind the recommendation.",
+        "support": "Supporters contribute a small amount to record participation and may become eligible for badges, reputation, and documented milestone mechanics.",
+        "ledger": "Wallet actions are explained before signing so users know what is being recorded and on which network."
+      }
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "The core loop is simple: recommend, support, inspect the public record.",
+      "description": "Beacon keeps the financial layer conservative and readable. The main product is not yield; it is a public reputation trail for discovering and supporting books early.",
+      "steps": {
+        "recommend": {
+          "number": "01",
+          "title": "A curator recommends a book",
+          "description": "They create the canonical recommendation page with book metadata, a curator note, and a locked stake shown with its duration and unlock context."
+        },
+        "support": {
+          "number": "02",
+          "title": "Readers support the recommendation",
+          "description": "A supporter records conviction with a small contribution. Support is not a refundable vote; it is a participation signal tied to the recommendation."
+        },
+        "reputation": {
+          "number": "03",
+          "title": "Discovery history becomes visible",
+          "description": "Pages and profiles show who discovered the book, who supported early, and how the recommendation progressed through documented milestones."
+        },
+        "governance": {
+          "number": "04",
+          "title": "Policy changes stay explicit",
+          "description": "Major economic, treasury, governance, and expansion decisions are documented and reviewed instead of being hidden in the interface."
+        }
+      }
+    },
+    "vision": {
+      "eyebrow": "Vision",
+      "title": "Beacon starts with books, but the larger idea is a reputation network for discovery.",
+      "description": "The long-term thesis is that people need better ways to recognize taste before popularity makes it obvious. Books are the focused MVP because they are rich enough for real curation and constrained enough to test the model responsibly.",
+      "notice": "Beacon should feel like a cultural discovery network, not a casino, investment product, or passive income dashboard. Rewards, badges, treasury mechanics, and governance remain governed by documented assumptions, reviews, and community decisions."
+    },
+    "roadmap": {
+      "eyebrow": "Roadmap",
+      "title": "A staged path from documented assumptions to a books-only public beta.",
+      "description": "This roadmap is a planning document, not a delivery promise. Each phase exists to reduce ambiguity before Beacon asks users to rely on the system.",
+      "phases": {
+        "phase0": {
+          "phase": "Phase 0",
+          "title": "Spec foundation",
+          "description": "Document the product thesis, risks, governance boundaries, treasury model, assumptions, and open questions before implementation hardens them."
+        },
+        "phase1": {
+          "phase": "Phase 1",
+          "title": "Local prototype",
+          "description": "Build local recommendation records, canonical pages, support counts, and tested frontend/API contracts without relying on production chain behavior."
+        },
+        "phase2": {
+          "phase": "Phase 2",
+          "title": "Books MVP",
+          "description": "Implement curator stake flow, support contribution flow, approved badge or reputation mechanics, and a public treasury dashboard."
+        },
+        "phase3": {
+          "phase": "Phase 3",
+          "title": "Solana devnet validation",
+          "description": "Validate programs, signing flows, account checks, event indexing, and accounting reconciliation on local validator or devnet."
+        },
+        "phase4": {
+          "phase": "Phase 4",
+          "title": "Economic, legal, and security review",
+          "description": "Review reward assumptions, Sybil risks, positioning, staking, badges, treasury handling, and smart-contract/security findings before public reliance."
+        },
+        "phase5": {
+          "phase": "Phase 5",
+          "title": "Public beta",
+          "description": "Launch a books-only beta with clear disclaimers, treasury visibility, governance eligibility, proposal process, and abuse monitoring."
+        },
+        "phase6": {
+          "phase": "Phase 6",
+          "title": "Category expansion review",
+          "description": "Use books MVP evidence to decide whether Beacon should expand beyond books, and document the metadata, ranking, and governance changes required."
+        }
       }
     },
     "ledger": {
       "eyebrow": "Pre-signing clarity",
-      "title": "Every wallet action gets a readable receipt before it is signed.",
-      "description": "Beacon should make participation understandable before commitment. Support is a public conviction record and may affect badges, reputation, and milestone eligibility according to the documented model.",
+      "title": "Every wallet action should be understandable before it is signed.",
+      "description": "Beacon shows what action is happening, what amount is involved, which program or account receives it, and which network is being used. That clarity matters because the ledger is part of the product experience, not a hidden implementation detail.",
       "notice": "Support is not presented as a refundable vote, guaranteed return, or passive yield product. The interface must explain what the user is doing and what the ledger will record.",
+      "previewEyebrow": "Ledger preview",
       "previewTitle": "Support recommendation",
       "previewDescription": "Representative preview for a future support flow.",
       "rows": {

@@ -7,6 +7,10 @@ defineProps<{
   curator: string
   reputation: string
   supporters: string
+  recommendationLabel: string
+  curatorLabel: string
+  reputationLabel: string
+  supportersLabel: string
 }>()
 </script>
 
@@ -33,7 +37,7 @@ defineProps<{
 
       <div class="p-6 sm:p-7">
         <p class="beacon-kicker">
-          Canonical recommendation
+          {{ recommendationLabel }}
         </p>
         <blockquote class="mt-4 font-serif text-2xl leading-8 tracking-[-0.03em] text-ink sm:text-3xl sm:leading-10">
           {{ thesis }}
@@ -42,7 +46,7 @@ defineProps<{
         <dl class="mt-7 grid gap-4 border-t border-rule pt-5 sm:grid-cols-3">
           <div>
             <dt class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-              Curator
+              {{ curatorLabel }}
             </dt>
             <dd class="mt-1 font-semibold text-ink">
               {{ curator }}
@@ -50,7 +54,7 @@ defineProps<{
           </div>
           <div>
             <dt class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-              Reputation
+              {{ reputationLabel }}
             </dt>
             <dd class="mt-1 font-semibold text-reputation">
               {{ reputation }}
@@ -58,7 +62,7 @@ defineProps<{
           </div>
           <div>
             <dt class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-              Supporters
+              {{ supportersLabel }}
             </dt>
             <dd class="mt-1 font-semibold text-ink">
               {{ supporters }}

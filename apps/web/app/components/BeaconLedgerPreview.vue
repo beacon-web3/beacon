@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{
+  eyebrow: string
   title: string
   description: string
   rows: Array<{
@@ -21,7 +22,7 @@ defineProps<{
       </div>
       <div>
         <p class="beacon-kicker">
-          Ledger preview
+          {{ eyebrow }}
         </p>
         <h2 class="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
           {{ title }}
