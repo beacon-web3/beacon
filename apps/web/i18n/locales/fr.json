@@ -5,7 +5,7 @@
   },
   "nav": {
     "home": "Accueil Beacon",
-    "problem": "Problème",
+    "problem": "Signal",
     "howItWorks": "Fonctionnement",
     "roadmap": "Feuille de route",
     "ledger": "Registre",
@@ -18,148 +18,77 @@
     "description": "Beacon est un réseau de découverte et de réputation centré sur les livres. La participation enregistre une conviction et un historique de curation ; ce n'est pas une promesse de profit ni de rendement passif."
   },
   "home": {
-    "badge": "Les livres d'abord. La réputation ensuite. Le registre toujours visible.",
-    "title": "Beacon aide à découvrir des livres précieux avant qu'ils ne deviennent évidents.",
-    "description": "La plupart des outils de découverte récompensent la popularité, la publicité ou l'engagement. Beacon est un registre public de recommandations de livres où les curateurs assument leur goût et où les soutiens peuvent montrer une conviction précoce.",
+    "badge": "Signaux livres précoces",
+    "title": "Trouvez les livres avant tout le monde.",
+    "description": "Beacon est un réseau de découverte en accès anticipé pour les lecteurs qui aiment essayer les nouvelles idées en premier. Les curateurs ouvrent des signaux de livres, les soutiens enregistrent leur conviction, et la réputation se forme publiquement.",
     "primaryCta": "Rejoindre l'accès anticipé",
-    "secondaryCta": "Voir le fonctionnement",
-    "metrics": {
-      "problem": {
-        "value": "Flux bruyants",
-        "label": "Le problème"
-      },
-      "mechanism": {
-        "value": "Conviction",
-        "label": "Le signal"
-      },
-      "outcome": {
-        "value": "Réputation",
-        "label": "La trace"
-      }
-    },
-    "book": {
-      "eyebrow": "Livre exemple",
-      "recommendationLabel": "Recommandation canonique",
-      "title": "L'Attention longue",
-      "author": "Mira Voss",
-      "thesis": "Un argument patient pour la lecture comme compétence civique, et un contrepoids utile à la dérive algorithmique.",
-      "curatorLabel": "Curateur",
-      "curator": "Ari Chen",
-      "reputationLabel": "Réputation",
-      "reputation": "Lecteur précoce",
-      "supportersLabel": "Soutiens",
-      "supporters": "128 enregistrés"
-    },
-    "problem": {
-      "eyebrow": "Pourquoi Beacon existe",
-      "title": "Trouver un bon livre ne devrait pas dépendre de ce que l'algorithme le plus bruyant pousse cette semaine.",
-      "description": "La recherche fonctionne quand vous savez déjà ce que vous voulez. Les flux sociaux optimisent l'attention. Les sites d'avis peuvent dériver vers des concours de popularité, des campagnes de notes et des évaluations superficielles. Beacon se concentre sur le moment d'avant : quand une personne attentive trouve un livre et veut rendre cette découverte publiquement lisible.",
-      "items": {
-        "feeds": {
-          "title": "Les flux récompensent l'engagement",
-          "description": "Le contenu populaire est amplifié encore et encore, tandis que les livres plus discrets ont souvent besoin d'un lecteur de confiance pour expliquer pourquoi ils comptent."
+    "secondaryCta": "Voir le signal",
+    "signal": {
+      "ariaLabel": "Exemple de signal livre Beacon",
+      "eyebrow": "Aperçu du signal",
+      "title": "Guide de l'attention longue",
+      "thesis": "Un livre étrange et utile pour celles et ceux qui pensent que l'attention devient une infrastructure.",
+      "meta": "Curaté par Ari Chen. Le soutien est un signal de participation, pas un vote remboursable ni une promesse de rendement.",
+      "stats": {
+        "stake": {
+          "value": "0,2 SOL",
+          "label": "Mise curateur"
         },
-        "reviews": {
-          "title": "Les notes manquent de contexte",
-          "description": "Une note en étoiles montre rarement qui a découvert le livre tôt, quelle était sa thèse ou pourquoi d'autres lecteurs l'ont trouvé digne d'être soutenu."
+        "support": {
+          "value": "128",
+          "label": "Soutiens"
         },
-        "ai": {
-          "title": "L'offre de contenu explose",
-          "description": "À mesure que créer devient plus facile, l'attention devient la ressource rare. Beacon met l'accent sur le goût public, le timing et l'historique de découverte."
+        "record": {
+          "value": "Devnet",
+          "label": "Réseau"
         }
       }
     },
-    "solution": {
-      "eyebrow": "Ce qu'est Beacon",
-      "title": "Un registre de découverte pour les livres, le goût et la conviction précoce.",
-      "description": "Beacon donne à chaque livre recommandé une page canonique. Le premier curateur valide reçoit un crédit public de découvreur, les soutiens peuvent enregistrer leur conviction, et la page affiche l'historique visible au lieu de cacher le signal dans un algorithme privé.",
-      "points": {
-        "canonical": "Une page durable par recommandation de livre, centrée sur le titre, l'auteur, la thèse du curateur et le contexte de découverte.",
-        "stake": "Les curateurs verrouillent une mise documentée comme signal anti-spam indiquant qu'ils assument la recommandation.",
-        "support": "Les soutiens contribuent un petit montant pour enregistrer leur participation et peuvent devenir éligibles à des badges, à de la réputation et à des mécanismes de jalons documentés.",
-        "ledger": "Les actions de portefeuille sont expliquées avant signature afin que les utilisateurs sachent ce qui est enregistré et sur quel réseau."
+    "reasons": {
+      "eyebrow": "Pourquoi essayer tôt",
+      "title": "Pour les lecteurs qui aiment trouver le signal en premier.",
+      "items": {
+        "early": {
+          "title": "Devancer le flux",
+          "description": "Suivez les livres avant que popularité, publicité ou algorithmes les rendent évidents."
+        },
+        "public": {
+          "title": "Construire une trace de goût",
+          "description": "Votre soutien et votre curation précoces deviennent une réputation visible, pas une donnée privée d'application."
+        },
+        "constrained": {
+          "title": "Commencer par les livres",
+          "description": "Beacon reste volontairement centré sur les livres pour garder l'expérience ciblée, lisible et vérifiable."
+        }
       }
     },
     "how": {
       "eyebrow": "Comment ça marche",
-      "title": "La boucle centrale est simple : recommander, soutenir, inspecter la trace publique.",
-      "description": "Beacon garde la couche financière prudente et lisible. Le produit principal n'est pas le rendement ; c'est une trace de réputation publique pour découvrir et soutenir des livres tôt.",
+      "title": "Ouvrir un signal. Soutenir une thèse. Laisser une trace.",
+      "description": "Beacon garde la boucle assez simple pour être comprise avant de connecter un portefeuille.",
       "steps": {
         "recommend": {
           "number": "01",
-          "title": "Un curateur recommande un livre",
-          "description": "Il crée la page canonique de recommandation avec les métadonnées du livre, une note de curation et une mise verrouillée affichée avec sa durée et son contexte de déverrouillage."
+          "title": "Curater",
+          "description": "Un curateur crée le signal canonique du livre et verrouille une mise SOL documentée derrière la recommandation."
         },
         "support": {
           "number": "02",
-          "title": "Les lecteurs soutiennent la recommandation",
-          "description": "Un soutien enregistre sa conviction avec une petite contribution. Le soutien n'est pas un vote remboursable ; c'est un signal de participation lié à la recommandation."
+          "title": "Soutenir",
+          "description": "Les lecteurs soutiennent avec une petite contribution SOL pour enregistrer conviction précoce et ordre de participation."
         },
         "reputation": {
           "number": "03",
-          "title": "L'historique de découverte devient visible",
-          "description": "Les pages et profils montrent qui a découvert le livre, qui l'a soutenu tôt et comment la recommandation progresse à travers des jalons documentés."
-        },
-        "governance": {
-          "number": "04",
-          "title": "Les changements de règles restent explicites",
-          "description": "Les décisions économiques, de trésorerie, de gouvernance et d'expansion importantes sont documentées et revues au lieu d'être cachées dans l'interface."
-        }
-      }
-    },
-    "vision": {
-      "eyebrow": "Vision",
-      "title": "Beacon commence par les livres, mais l'idée plus large est un réseau de réputation pour la découverte.",
-      "description": "La thèse à long terme est que les personnes ont besoin de meilleures façons de reconnaître le goût avant que la popularité ne le rende évident. Les livres sont le MVP ciblé parce qu'ils sont assez riches pour une vraie curation et assez contraints pour tester le modèle de manière responsable.",
-      "notice": "Beacon doit ressembler à un réseau de découverte culturelle, pas à un casino, un produit d'investissement ou un tableau de bord de revenu passif. Les récompenses, badges, mécanismes de trésorerie et règles de gouvernance restent encadrés par des hypothèses documentées, des revues et des décisions communautaires."
-    },
-    "roadmap": {
-      "eyebrow": "Feuille de route",
-      "title": "Un chemin par étapes, des hypothèses documentées à une bêta publique centrée sur les livres.",
-      "description": "Cette feuille de route est un document de planification, pas une promesse de livraison. Chaque phase sert à réduire l'ambiguïté avant que Beacon demande aux utilisateurs de s'appuyer sur le système.",
-      "phases": {
-        "phase0": {
-          "phase": "Phase 0",
-          "title": "Fondation des spécifications",
-          "description": "Documenter la thèse produit, les risques, les limites de gouvernance, le modèle de trésorerie, les hypothèses et les questions ouvertes avant de les figer dans l'implémentation."
-        },
-        "phase1": {
-          "phase": "Phase 1",
-          "title": "Prototype local",
-          "description": "Construire des enregistrements locaux de recommandations, des pages canoniques, des compteurs de soutien et des contrats frontend/API testés sans dépendre d'un comportement de chaîne en production."
-        },
-        "phase2": {
-          "phase": "Phase 2",
-          "title": "MVP livres",
-          "description": "Implémenter le flux de mise du curateur, le flux de contribution de soutien, les mécanismes de badge ou de réputation approuvés, et un tableau de bord public de trésorerie."
-        },
-        "phase3": {
-          "phase": "Phase 3",
-          "title": "Validation Solana devnet",
-          "description": "Valider les programmes, flux de signature, contrôles de comptes, indexation d'événements et réconciliation comptable sur validateur local ou devnet."
-        },
-        "phase4": {
-          "phase": "Phase 4",
-          "title": "Revue économique, juridique et sécurité",
-          "description": "Examiner les hypothèses de récompense, les risques Sybil, le positionnement, le staking, les badges, la trésorerie et les conclusions de sécurité avant toute dépendance publique."
-        },
-        "phase5": {
-          "phase": "Phase 5",
-          "title": "Bêta publique",
-          "description": "Lancer une bêta limitée aux livres avec avertissements clairs, visibilité de trésorerie, éligibilité de gouvernance, processus de propositions et surveillance des abus."
-        },
-        "phase6": {
-          "phase": "Phase 6",
-          "title": "Revue d'expansion de catégories",
-          "description": "Utiliser les preuves du MVP livres pour décider si Beacon doit s'étendre au-delà des livres, et documenter les changements de métadonnées, de classement et de gouvernance nécessaires."
+          "title": "Se souvenir",
+          "description": "La page montre qui a découvert tôt et qui a soutenu le signal quand la recommandation était encore sous le radar."
         }
       }
     },
     "ledger": {
       "eyebrow": "Clarté avant signature",
-      "title": "Chaque action de portefeuille doit être compréhensible avant d'être signée.",
-      "description": "Beacon montre quelle action se produit, quel montant est concerné, quel programme ou compte le reçoit et quel réseau est utilisé. Cette clarté compte parce que le registre fait partie de l'expérience produit, ce n'est pas un détail technique caché.",
-      "notice": "Le soutien n'est pas présenté comme un vote remboursable, un rendement garanti ou un produit de revenu passif. L'interface doit expliquer ce que fait l'utilisateur et ce que le registre enregistrera.",
+      "title": "Le moment portefeuille doit être clairement ennuyeux.",
+      "description": "Avant signature, Beacon montre l'action, le montant, la route destinataire et le réseau. Le registre fait partie de l'expérience produit, ce n'est pas un détail caché.",
+      "notice": "Le soutien n'est pas présenté comme un vote remboursable, un rendement garanti ou un produit de revenu passif.",
       "previewEyebrow": "Aperçu du registre",
       "previewTitle": "Soutenir la recommandation",
       "previewDescription": "Aperçu représentatif pour un futur flux de soutien.",
@@ -167,7 +96,7 @@
         "action": {
           "label": "Action",
           "value": "Enregistrer le soutien",
-          "note": "Ajoute un signal public de participation à cette recommandation."
+          "note": "Ajoute une participation publique à ce signal livre."
         },
         "recipient": {
           "label": "Destinataire",
@@ -177,7 +106,7 @@
         "amount": {
           "label": "Montant",
           "value": "0,01 SOL",
-          "note": "Le montant de contribution et les frais réseau sont listés séparément."
+          "note": "Montant de contribution ; les frais réseau sont listés séparément."
         },
         "cluster": {
           "label": "Réseau",
@@ -185,14 +114,48 @@
           "note": "Le contexte réseau est explicite pour éviter les actions mainnet accidentelles."
         }
       }
+    },
+    "final": {
+      "eyebrow": "Accès anticipé",
+      "title": "Essayez le réseau de découverte de livres avant qu'il devienne évident.",
+      "cta": "Rejoindre l'accès anticipé"
     }
   },
   "auth": {
+    "badge": "Accès anticipé Beacon",
+    "panelEyebrow": "Accès email",
+    "panelTitle": "Continuer avec email",
+    "emailLabel": "Adresse email",
+    "emailPlaceholder": "Adresse email",
+    "emailHelp": "Nous utilisons l'email pour préparer l'accès au compte. La connexion portefeuille viendra plus tard, avant toute action Solana.",
+    "submitting": "Envoi...",
+    "signupTitle": "Rejoignez les premiers lecteurs qui testent Beacon.",
+    "signupDescription": "Créez votre accès anticipé au réseau de découverte centré sur les livres. Commencez avec l'email aujourd'hui ; l'accueil portefeuille et les flux de réputation publique suivront à l'ouverture du produit.",
+    "signupSubmit": "Créer un compte",
+    "signupSuccess": "Compte créé pour {email}.",
+    "signupError": "Nous n'avons pas pu créer ce compte.",
+    "signupLink": "Besoin d'un accès ? S'inscrire",
+    "loginTitle": "Retournez à votre compte Beacon.",
+    "loginDescription": "Connectez-vous pour garder votre place dans le réseau de découverte en accès anticipé et préparer les futurs flux curateur, soutien et portefeuille.",
+    "loginSubmit": "Connexion",
+    "loginSuccess": "Connecté en tant que {email}.",
+    "loginError": "Nous n'avons pas pu vous connecter.",
+    "loginLink": "Déjà un accès ? Connexion",
+    "context": {
+      "bookFirst": {
+        "label": "Portée",
+        "value": "Livres d'abord"
+      },
+      "wallet": {
+        "label": "Portefeuille",
+        "value": "Plus tard, avant signature"
+      },
+      "status": {
+        "label": "Étape",
+        "value": "Accès anticipé"
+      }
+    },
     "comingSoon": "Bientôt disponible",
-    "signupTitle": "L'accès anticipé n'est pas encore ouvert.",
-    "signupDescription": "Cette page deviendra le flux de création de compte et d'accueil portefeuille pour les lecteurs, curateurs et soutiens.",
-    "loginTitle": "La connexion Beacon n'est pas encore disponible.",
-    "loginDescription": "Cette page deviendra le futur flux d'authentification pour les participants qui reviennent.",
     "backHome": "Retour à l'accueil"
   }
 }

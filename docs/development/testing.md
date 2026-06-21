@@ -20,7 +20,11 @@ Current frontend test files live in:
 apps/web/tests/e2e/
 ```
 
-The current smoke test verifies that the home page loads in Chromium. Playwright starts the Nuxt dev server automatically through `playwright.config.ts`.
+The current E2E tests verify that the home page loads in Chromium, the landing
+page fits narrow mobile screens without horizontal overflow, the French route
+loads with LTR direction, and signup/login forms submit to the email-only auth
+API. Playwright starts the Nuxt dev server automatically through
+`playwright.config.ts`.
 
 ## Backend
 
@@ -46,7 +50,7 @@ Current backend test files live in:
 apps/api/tests/
 ```
 
-The current backend smoke tests verify that Django settings load, PostgreSQL is configured, and Django REST Framework is installed. Real model and API tests should be added as soon as backend domain apps are created.
+The current backend tests verify Django settings, PostgreSQL configuration, Django REST Framework installation, and the email-only signup/login API behavior.
 
 ## What To Test Later
 

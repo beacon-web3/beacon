@@ -30,10 +30,12 @@ Current pages:
 
 - `/`: Beacon landing page explaining the discovery marketplace concept.
 - `/fr`: French version of the Beacon landing page.
-- `/signup`: Placeholder for the future signup flow.
-- `/login`: Placeholder for the future login flow.
+- `/signup`: Email-based early-access signup page.
+- `/login`: Email-based login page for returning early-access accounts.
 
-The signup and login buttons on the landing page route to placeholder pages until authentication is implemented.
+The signup and login pages use the same minimal Beacon visual system as the
+landing page. Current access is email-only; wallet onboarding comes later before
+any Solana signing flow.
 
 ## Internationalization
 
@@ -93,7 +95,7 @@ pnpm test:e2e
 pnpm test:e2e:ui
 ```
 
-The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
+The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, and signup/login email form behavior. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
 
 ## Formatting
 

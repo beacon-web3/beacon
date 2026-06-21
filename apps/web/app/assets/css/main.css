@@ -5,7 +5,7 @@
 
 @theme static {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+  --font-serif: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   --radius-xs: 0.1875rem;
   --radius-sm: 0.3125rem;
@@ -14,58 +14,57 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
 
-  --shadow-ledger:
-    0 1px 0 rgb(47 37 28 / 0.06), 0 18px 48px rgb(47 37 28 / 0.08);
+  --shadow-ledger: 0 1px 0 rgb(5 18 28 / 0.05), 0 18px 44px rgb(5 18 28 / 0.08);
   --shadow-ledger-dark:
-    0 1px 0 rgb(255 247 235 / 0.05), 0 18px 48px rgb(0 0 0 / 0.28);
+    0 1px 0 rgb(181 232 255 / 0.06), 0 24px 58px rgb(0 0 0 / 0.44);
 
-  --color-beacon-50: #fbf6ed;
-  --color-beacon-100: #f3ead8;
-  --color-beacon-200: #e5d2ac;
-  --color-beacon-300: #d2b176;
-  --color-beacon-400: #bd9147;
-  --color-beacon-500: #a87632;
-  --color-beacon-600: #865928;
-  --color-beacon-700: #664323;
-  --color-beacon-800: #49311d;
-  --color-beacon-900: #302113;
-  --color-beacon-950: #1c140d;
+  --color-beacon-50: #effcff;
+  --color-beacon-100: #d6f8ff;
+  --color-beacon-200: #afeeff;
+  --color-beacon-300: #74e0ff;
+  --color-beacon-400: #22d3ee;
+  --color-beacon-500: #06b6d4;
+  --color-beacon-600: #0891b2;
+  --color-beacon-700: #0e7490;
+  --color-beacon-800: #155e75;
+  --color-beacon-900: #164e63;
+  --color-beacon-950: #083344;
 
-  --color-ledger-50: #f3f6f7;
-  --color-ledger-100: #e4ebee;
-  --color-ledger-200: #c9d7dd;
-  --color-ledger-300: #a6bac4;
-  --color-ledger-400: #829aa7;
-  --color-ledger-500: #607987;
-  --color-ledger-600: #48616d;
-  --color-ledger-700: #364a54;
-  --color-ledger-800: #293942;
-  --color-ledger-900: #1f2e35;
-  --color-ledger-950: #111b20;
+  --color-ledger-50: #f3f8fb;
+  --color-ledger-100: #e3eef5;
+  --color-ledger-200: #c8deea;
+  --color-ledger-300: #9fc5d8;
+  --color-ledger-400: #6fa5c0;
+  --color-ledger-500: #4d89a7;
+  --color-ledger-600: #3b6f8a;
+  --color-ledger-700: #325a70;
+  --color-ledger-800: #2d4c5d;
+  --color-ledger-900: #293f4d;
+  --color-ledger-950: #172a36;
 
-  --color-canvas: #f7f1e8;
-  --color-paper: #fffaf1;
-  --color-vellum: #f2e7d6;
-  --color-rule: #dccbb5;
-  --color-ink: #241d17;
-  --color-ink-muted: #75685c;
-  --color-ink-faint: #a19385;
-  --color-reputation: #6b5b95;
-  --color-reputation-muted: #ede9f6;
-  --color-ledger-line: #d4dde1;
+  --color-canvas: #fafaf7;
+  --color-paper: #ffffff;
+  --color-vellum: #f1f5f4;
+  --color-rule: #dbe5e4;
+  --color-ink: #071114;
+  --color-ink-muted: #435358;
+  --color-ink-faint: #7a8b90;
+  --color-reputation: #10b981;
+  --color-reputation-muted: #e7fff5;
+  --color-ledger-line: #d4dfdf;
 }
 
 .dark {
-  --color-canvas: #11100e;
-  --color-paper: #191713;
-  --color-vellum: #242019;
-  --color-rule: #40372c;
-  --color-ink: #f4eadc;
-  --color-ink-muted: #b9aa99;
-  --color-ink-faint: #897b6d;
-  --color-reputation: #b8aadf;
-  --color-reputation-muted: #292334;
-  --color-ledger-line: #33414a;
+  --color-canvas: #050b10;
+  --color-paper: #09131a;
+  --color-vellum: #101c24;
+  --color-rule: #20313b;
+  --color-ink: #f4fbfd;
+  --color-ink-muted: #adc0c6;
+  --color-ink-faint: #71868e;
+  --color-reputation: #34d399;
+  --color-reputation-muted: #0d2d25;
+  --color-ledger-line: #263a45;
 }
 
 @layer base {
@@ -76,20 +75,14 @@
 
   body {
     min-width: 320px;
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--color-vellum) 36%, transparent),
-        transparent 20rem
-      ),
-      var(--color-canvas);
+    background: var(--color-canvas);
     color: var(--color-ink);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--color-beacon-300) 42%, transparent);
-    color: var(--color-beacon-950);
+    background: color-mix(in srgb, var(--color-beacon-300) 46%, transparent);
+    color: var(--color-ink);
   }
 
   a {
@@ -103,11 +96,10 @@
     width: min(100% - 2rem, 72rem);
   }
 
-  .beacon-editorial-title {
-    font-family: var(--font-serif);
-    font-weight: 650;
-    letter-spacing: -0.045em;
-    line-height: 0.94;
+  .beacon-display {
+    font-weight: 720;
+    letter-spacing: -0.07em;
+    line-height: 0.88;
   }
 
   .beacon-kicker {

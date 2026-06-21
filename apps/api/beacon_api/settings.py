@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
+    CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -27,18 +28,24 @@ environ.Env.read_env(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("DJANGO_SECRET_KEY", default="change-me-in-development")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DJANGO_DEBUG")
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env(
+    "DJANGO_SECRET_KEY",
+    default="change-me-in-development" if DEBUG else environ.Env.NOTSET,
+)
+
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "accounts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "beacon_api.middleware.LocalCorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

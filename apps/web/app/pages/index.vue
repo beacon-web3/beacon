@@ -2,44 +2,34 @@
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-const metrics = computed(() => [
+const signalStats = computed(() => [
   {
-    value: t('home.metrics.problem.value'),
-    label: t('home.metrics.problem.label')
+    value: t('home.signal.stats.stake.value'),
+    label: t('home.signal.stats.stake.label')
   },
   {
-    value: t('home.metrics.mechanism.value'),
-    label: t('home.metrics.mechanism.label')
+    value: t('home.signal.stats.support.value'),
+    label: t('home.signal.stats.support.label')
   },
   {
-    value: t('home.metrics.outcome.value'),
-    label: t('home.metrics.outcome.label')
+    value: t('home.signal.stats.record.value'),
+    label: t('home.signal.stats.record.label')
   }
 ])
 
-const problems = computed(() => [
+const reasons = computed(() => [
   {
-    icon: 'i-lucide-radio-tower',
-    title: t('home.problem.items.feeds.title'),
-    description: t('home.problem.items.feeds.description')
+    title: t('home.reasons.items.early.title'),
+    description: t('home.reasons.items.early.description')
   },
   {
-    icon: 'i-lucide-star-half',
-    title: t('home.problem.items.reviews.title'),
-    description: t('home.problem.items.reviews.description')
+    title: t('home.reasons.items.public.title'),
+    description: t('home.reasons.items.public.description')
   },
   {
-    icon: 'i-lucide-sparkles',
-    title: t('home.problem.items.ai.title'),
-    description: t('home.problem.items.ai.description')
+    title: t('home.reasons.items.constrained.title'),
+    description: t('home.reasons.items.constrained.description')
   }
-])
-
-const solutionPoints = computed(() => [
-  t('home.solution.points.canonical'),
-  t('home.solution.points.stake'),
-  t('home.solution.points.support'),
-  t('home.solution.points.ledger')
 ])
 
 const steps = computed(() => [
@@ -57,49 +47,6 @@ const steps = computed(() => [
     number: t('home.how.steps.reputation.number'),
     title: t('home.how.steps.reputation.title'),
     description: t('home.how.steps.reputation.description')
-  },
-  {
-    number: t('home.how.steps.governance.number'),
-    title: t('home.how.steps.governance.title'),
-    description: t('home.how.steps.governance.description')
-  }
-])
-
-const roadmapPhases = computed(() => [
-  {
-    phase: t('home.roadmap.phases.phase0.phase'),
-    title: t('home.roadmap.phases.phase0.title'),
-    description: t('home.roadmap.phases.phase0.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase1.phase'),
-    title: t('home.roadmap.phases.phase1.title'),
-    description: t('home.roadmap.phases.phase1.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase2.phase'),
-    title: t('home.roadmap.phases.phase2.title'),
-    description: t('home.roadmap.phases.phase2.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase3.phase'),
-    title: t('home.roadmap.phases.phase3.title'),
-    description: t('home.roadmap.phases.phase3.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase4.phase'),
-    title: t('home.roadmap.phases.phase4.title'),
-    description: t('home.roadmap.phases.phase4.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase5.phase'),
-    title: t('home.roadmap.phases.phase5.title'),
-    description: t('home.roadmap.phases.phase5.description')
-  },
-  {
-    phase: t('home.roadmap.phases.phase6.phase'),
-    title: t('home.roadmap.phases.phase6.title'),
-    description: t('home.roadmap.phases.phase6.description')
   }
 ])
 
@@ -108,11 +55,6 @@ const ledgerRows = computed(() => [
     label: t('home.ledger.rows.action.label'),
     value: t('home.ledger.rows.action.value'),
     note: t('home.ledger.rows.action.note')
-  },
-  {
-    label: t('home.ledger.rows.recipient.label'),
-    value: t('home.ledger.rows.recipient.value'),
-    note: t('home.ledger.rows.recipient.note')
   },
   {
     label: t('home.ledger.rows.amount.label'),
@@ -129,24 +71,24 @@ const ledgerRows = computed(() => [
 
 <template>
   <div>
-    <section class="beacon-container grid gap-12 py-16 sm:py-24 lg:grid-cols-[minmax(0,0.92fr)_minmax(28rem,1.08fr)] lg:items-center">
+    <section class="beacon-container grid min-h-[calc(100vh-4rem)] gap-12 py-16 sm:py-24 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.72fr)] lg:items-center">
       <div>
         <UBadge
+          :label="t('home.badge')"
           color="primary"
           variant="subtle"
-          icon="i-lucide-library"
-          :label="t('home.badge')"
+          size="lg"
         />
 
-        <h1 class="beacon-editorial-title mt-7 max-w-4xl text-5xl text-ink sm:text-7xl lg:text-8xl">
+        <h1 class="beacon-display mt-8 max-w-4xl text-6xl text-ink sm:text-7xl lg:text-8xl">
           {{ t('home.title') }}
         </h1>
 
-        <p class="mt-7 max-w-2xl text-lg leading-8 text-ink-muted">
+        <p class="mt-8 max-w-2xl text-lg leading-8 text-ink-muted sm:text-xl sm:leading-9">
           {{ t('home.description') }}
         </p>
 
-        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <div class="mt-10 flex flex-col gap-3 sm:flex-row">
           <UButton
             :to="localePath('/signup')"
             size="xl"
@@ -155,113 +97,99 @@ const ledgerRows = computed(() => [
             class="justify-center"
           />
           <UButton
-            :to="`${localePath('/')}#how-it-works`"
+            :to="`${localePath('/')}#signal`"
             size="xl"
             :label="t('home.secondaryCta')"
             color="neutral"
-            variant="outline"
+            variant="ghost"
             class="justify-center"
           />
         </div>
+      </div>
 
-        <dl class="mt-12 grid gap-3 sm:grid-cols-3">
+      <aside
+        id="signal"
+        class="beacon-panel p-5 sm:p-6"
+        :aria-label="t('home.signal.ariaLabel')"
+      >
+        <div class="flex items-center justify-between gap-4 border-b border-rule pb-5">
+          <div>
+            <p class="beacon-kicker">
+              {{ t('home.signal.eyebrow') }}
+            </p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-[-0.04em] text-ink">
+              {{ t('home.signal.title') }}
+            </h2>
+          </div>
+          <UIcon
+            name="i-lucide-book-open-check"
+            class="size-6 shrink-0 text-beacon-600 dark:text-beacon-300"
+          />
+        </div>
+
+        <blockquote class="mt-6 text-2xl font-medium leading-9 tracking-[-0.04em] text-ink sm:text-3xl sm:leading-10">
+          {{ t('home.signal.thesis') }}
+        </blockquote>
+
+        <p class="mt-4 text-sm font-medium leading-6 text-ink-muted">
+          {{ t('home.signal.meta') }}
+        </p>
+
+        <dl class="mt-8 grid gap-3">
           <div
-            v-for="metric in metrics"
-            :key="metric.label"
-            class="rounded-lg border border-rule bg-paper/72 p-4"
+            v-for="stat in signalStats"
+            :key="stat.label"
+            class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 border-t border-rule pt-3"
           >
             <dt class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-              {{ metric.label }}
+              {{ stat.label }}
             </dt>
-            <dd class="mt-2 font-serif text-2xl font-semibold tracking-[-0.04em] text-ink">
-              {{ metric.value }}
+            <dd class="text-sm font-semibold text-ink">
+              {{ stat.value }}
             </dd>
           </div>
         </dl>
-      </div>
-
-      <BeaconBookCard
-        :eyebrow="t('home.book.eyebrow')"
-        :recommendation-label="t('home.book.recommendationLabel')"
-        :title="t('home.book.title')"
-        :author="t('home.book.author')"
-        :thesis="t('home.book.thesis')"
-        :curator-label="t('home.book.curatorLabel')"
-        :curator="t('home.book.curator')"
-        :reputation-label="t('home.book.reputationLabel')"
-        :reputation="t('home.book.reputation')"
-        :supporters-label="t('home.book.supportersLabel')"
-        :supporters="t('home.book.supporters')"
-      />
+      </aside>
     </section>
 
-    <section
-      id="problem"
-      class="border-y border-rule bg-paper/62 py-16 sm:py-20"
-    >
-      <div class="beacon-container">
-        <div class="max-w-3xl">
+    <section class="beacon-container border-t border-rule py-16 sm:py-20">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] lg:items-start">
+        <div>
           <p class="beacon-kicker">
-            {{ t('home.problem.eyebrow') }}
+            {{ t('home.reasons.eyebrow') }}
           </p>
-          <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
-            {{ t('home.problem.title') }}
+          <h2 class="mt-4 max-w-xl text-4xl font-semibold tracking-[-0.055em] text-ink sm:text-5xl">
+            {{ t('home.reasons.title') }}
           </h2>
-          <p class="mt-5 text-base leading-8 text-ink-muted">
-            {{ t('home.problem.description') }}
-          </p>
         </div>
 
-        <div class="mt-10 grid gap-4 md:grid-cols-3">
-          <BeaconProblemCard
-            v-for="problem in problems"
-            :key="problem.title"
-            :icon="problem.icon"
-            :title="problem.title"
-            :description="problem.description"
-          />
+        <div class="grid gap-4 sm:grid-cols-3 lg:gap-6">
+          <article
+            v-for="reason in reasons"
+            :key="reason.title"
+            class="border-t border-rule pt-5"
+          >
+            <h3 class="text-lg font-semibold tracking-[-0.03em] text-ink">
+              {{ reason.title }}
+            </h3>
+            <p class="mt-3 text-sm leading-7 text-ink-muted">
+              {{ reason.description }}
+            </p>
+          </article>
         </div>
       </div>
-    </section>
-
-    <section class="beacon-container grid gap-10 py-16 sm:py-24 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,0.85fr)] lg:items-start">
-      <div>
-        <p class="beacon-kicker">
-          {{ t('home.solution.eyebrow') }}
-        </p>
-        <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
-          {{ t('home.solution.title') }}
-        </h2>
-        <p class="mt-5 text-base leading-8 text-ink-muted">
-          {{ t('home.solution.description') }}
-        </p>
-      </div>
-
-      <ul class="grid gap-3">
-        <li
-          v-for="point in solutionPoints"
-          :key="point"
-          class="flex gap-3 rounded-xl border border-rule bg-vellum/70 p-5 text-sm leading-7 text-ink-muted"
-        >
-          <UIcon
-            name="i-lucide-check-circle-2"
-            class="mt-1 size-5 shrink-0 text-beacon-700 dark:text-beacon-200"
-          />
-          <span>{{ point }}</span>
-        </li>
-      </ul>
     </section>
 
     <section
       id="how-it-works"
-      class="border-y border-rule bg-paper/62 py-16 sm:py-20"
+      class="border-y border-rule bg-paper/58 py-16 sm:py-20"
     >
       <div class="beacon-container">
         <div class="max-w-3xl">
           <p class="beacon-kicker">
             {{ t('home.how.eyebrow') }}
           </p>
-          <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
+          <h2 class="mt-4 text-4xl font-semibold tracking-[-0.055em] text-ink sm:text-5xl">
             {{ t('home.how.title') }}
           </h2>
           <p class="mt-5 text-base leading-8 text-ink-muted">
@@ -269,95 +197,43 @@ const ledgerRows = computed(() => [
           </p>
         </div>
 
-        <div class="mt-10 grid gap-4 lg:grid-cols-2">
-          <BeaconHowItWorksStep
+        <div class="mt-12 grid gap-5 md:grid-cols-3">
+          <article
             v-for="step in steps"
             :key="step.number"
-            :number="step.number"
-            :title="step.title"
-            :description="step.description"
-          />
-        </div>
-      </div>
-    </section>
-
-    <section class="beacon-container py-16 sm:py-24">
-      <div class="beacon-panel overflow-hidden">
-        <div class="grid gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.7fr)]">
-          <div class="p-7 sm:p-10">
-            <p class="beacon-kicker">
-              {{ t('home.vision.eyebrow') }}
+            class="rounded-xl border border-rule bg-canvas p-5"
+          >
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-beacon-700 dark:text-beacon-300">
+              {{ step.number }}
             </p>
-            <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
-              {{ t('home.vision.title') }}
-            </h2>
-            <p class="mt-5 text-base leading-8 text-ink-muted">
-              {{ t('home.vision.description') }}
+            <h3 class="mt-6 text-xl font-semibold tracking-[-0.04em] text-ink">
+              {{ step.title }}
+            </h3>
+            <p class="mt-3 text-sm leading-7 text-ink-muted">
+              {{ step.description }}
             </p>
-          </div>
-
-          <div class="border-t border-rule bg-vellum/70 p-7 sm:p-10 lg:border-s lg:border-t-0">
-            <div class="flex gap-3">
-              <UIcon
-                name="i-lucide-shield-check"
-                class="mt-1 size-5 shrink-0 text-beacon-700 dark:text-beacon-200"
-              />
-              <p class="text-sm leading-7 text-ink-muted">
-                {{ t('home.vision.notice') }}
-              </p>
-            </div>
-          </div>
+          </article>
         </div>
-      </div>
-    </section>
-
-    <section
-      id="roadmap"
-      class="border-y border-rule bg-paper/62 py-16 sm:py-20"
-    >
-      <div class="beacon-container grid gap-10 lg:grid-cols-[minmax(0,0.66fr)_minmax(0,0.9fr)] lg:items-start">
-        <div class="lg:sticky lg:top-24">
-          <p class="beacon-kicker">
-            {{ t('home.roadmap.eyebrow') }}
-          </p>
-          <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
-            {{ t('home.roadmap.title') }}
-          </h2>
-          <p class="mt-5 text-base leading-8 text-ink-muted">
-            {{ t('home.roadmap.description') }}
-          </p>
-        </div>
-
-        <BeaconRoadmapTimeline :phases="roadmapPhases" />
       </div>
     </section>
 
     <section
       id="ledger"
-      class="beacon-container grid gap-10 py-16 sm:py-24 lg:grid-cols-[minmax(0,0.85fr)_minmax(22rem,0.65fr)] lg:items-start"
+      class="beacon-container grid gap-10 py-16 sm:py-24 lg:grid-cols-[minmax(0,0.78fr)_minmax(20rem,0.62fr)] lg:items-start"
     >
       <div>
         <p class="beacon-kicker">
           {{ t('home.ledger.eyebrow') }}
         </p>
-        <h2 class="mt-3 font-serif text-4xl font-semibold tracking-[-0.045em] text-ink sm:text-5xl">
+        <h2 class="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.055em] text-ink sm:text-5xl">
           {{ t('home.ledger.title') }}
         </h2>
         <p class="mt-5 max-w-2xl text-base leading-8 text-ink-muted">
           {{ t('home.ledger.description') }}
         </p>
-
-        <div class="mt-8 rounded-xl border border-rule bg-vellum/70 p-5">
-          <div class="flex gap-3">
-            <UIcon
-              name="i-lucide-shield-check"
-              class="mt-1 size-5 shrink-0 text-beacon-700 dark:text-beacon-200"
-            />
-            <p class="text-sm leading-7 text-ink-muted">
-              {{ t('home.ledger.notice') }}
-            </p>
-          </div>
-        </div>
+        <p class="mt-6 max-w-2xl text-sm leading-7 text-ink-faint">
+          {{ t('home.ledger.notice') }}
+        </p>
       </div>
 
       <BeaconLedgerPreview
@@ -366,6 +242,27 @@ const ledgerRows = computed(() => [
         :description="t('home.ledger.previewDescription')"
         :rows="ledgerRows"
       />
+    </section>
+
+    <section class="beacon-container pb-16 sm:pb-24">
+      <div class="rounded-2xl border border-rule bg-ink p-7 text-paper sm:p-10 lg:flex lg:items-end lg:justify-between lg:gap-10">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-paper/70">
+            {{ t('home.final.eyebrow') }}
+          </p>
+          <h2 class="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.055em] sm:text-5xl">
+            {{ t('home.final.title') }}
+          </h2>
+        </div>
+        <UButton
+          :to="localePath('/signup')"
+          size="xl"
+          :label="t('home.final.cta')"
+          color="primary"
+          trailing-icon="i-lucide-arrow-right"
+          class="mt-8 justify-center lg:mt-0"
+        />
+      </div>
     </section>
   </div>
 </template>
