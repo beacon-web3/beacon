@@ -1,81 +1,104 @@
 {
   "seo": {
-    "title": "Beacon | Stake Behind Recommendations",
-    "description": "Beacon is a decentralized discovery marketplace where people stake money behind recommendations they believe in."
+    "title": "Beacon | Books-First Discovery Reputation",
+    "description": "Beacon is a books-first discovery and reputation network where curators make public recommendations and supporters record early conviction."
   },
   "nav": {
+    "home": "Beacon home",
+    "discover": "Discover",
+    "reputation": "Reputation",
+    "treasury": "Treasury",
     "login": "Log in",
-    "signup": "Sign up",
-    "joinWaitlist": "Join the waitlist"
+    "signup": "Join early access",
+    "joinWaitlist": "Join the waitlist",
+    "changeLanguage": "Change language"
   },
   "footer": {
-    "copyright": "Beacon"
+    "description": "Beacon is a books-first discovery and reputation network. Participation records conviction and curation history; it is not a promise of profit or passive yield."
   },
   "home": {
-    "badge": "In a world of infinite content, conviction matters",
-    "title": "Find signal through the noise.",
-    "description": "AI is making content abundant. Attention is becoming scarce. Beacon helps readers discover books worth their time by rewarding people who back their recommendations with real conviction. No empty likes. No engagement farming. Just stronger signals.",
-    "principle": "Discovery is cheap. Conviction isn't.",
-    "tagline": "Put your money where your mouth is.",
-    "primaryCta": "Sign up for early access",
-    "secondaryCta": "Log in",
-    "stats": {
-      "stake": {
-        "value": "0.2 SOL",
-        "label": "Locked to publish a recommendation."
+    "badge": "Books first. Reputation second. Ledger always visible.",
+    "title": "A quieter market for better book discovery.",
+    "description": "Beacon helps readers find books through public curation signals: what was recommended, who stood behind it, and how early supporters recorded conviction. The interface keeps books in front and mechanics legible before any wallet action.",
+    "primaryCta": "Join early access",
+    "secondaryCta": "View the ledger model",
+    "metrics": {
+      "books": {
+        "value": "Books",
+        "label": "Primary artifact"
       },
-      "support": {
-        "value": "0.01 SOL",
-        "label": "To support a recommendation you believe in."
+      "curators": {
+        "value": "Reputation",
+        "label": "Public signal"
       },
-      "period": {
-        "value": "14 Days",
-        "label": "Minimum commitment period for curators."
+      "ledger": {
+        "value": "Clarity",
+        "label": "Before signing"
       }
     },
-    "signalCard": {
-      "eyebrow": "Featured signal",
-      "title": "Tomorrow's favorite book, discovered today",
-      "commitmentLabel": "Curator commitment",
-      "commitmentValue": "0.2 SOL",
-      "badge": "High conviction",
-      "description": "Anyone can recommend a book. Few are willing to commit capital behind it. Beacon rewards conviction and helps readers separate genuine belief from empty promotion.",
-      "supportersLabel": "Early supporters",
-      "supportersValue": "128",
-      "scoreLabel": "Discovery score",
-      "scoreValue": "94%"
+    "book": {
+      "eyebrow": "Featured book",
+      "title": "The Long Attention",
+      "author": "Mira Voss",
+      "thesis": "A patient argument for reading as a civic skill, and a useful counterweight to algorithmic drift.",
+      "curator": "Ari Chen",
+      "reputation": "Early reader",
+      "supporters": "128 recorded"
     },
-    "stepsSection": {
-      "title": "Put your money where your mouth is",
-      "description": "Likes are free. Recommendations are everywhere. Beacon rewards people who are willing to back their opinions with real commitment."
-    },
-    "steps": {
-      "recommend": {
-        "title": "Recommend with conviction",
-        "description": "Publish a book recommendation by locking a stake. The stake is returned after the commitment period, proving you are serious about what you recommend."
+    "principles": {
+      "eyebrow": "System language",
+      "title": "Designed to feel literary, not speculative.",
+      "description": "The design system separates editorial content from participation mechanics so readers can understand what matters without being pushed toward hype or yield framing.",
+      "books": {
+        "title": "Book-first hierarchy",
+        "description": "Recommendation pages lead with title, author, curator thesis, and reading context before any stake or support mechanics."
       },
-      "support": {
-        "title": "Support early discoveries",
-        "description": "Spend a small amount to back recommendations you believe deserve more attention. Your support helps quality rise above the noise."
+      "reputation": {
+        "title": "Reputation as context",
+        "description": "Curator history, discovery timing, and support records are visible as trust signals, not as leaderboard spectacle."
       },
-      "earn": {
-        "title": "Earn for great taste",
-        "description": "When recommendations gain traction, rewards flow to the curators and early supporters who recognized quality before the crowd."
+      "ledger": {
+        "title": "Mechanics in plain view",
+        "description": "Every economic action is presented as a clear record: action, recipient, amount, fee payer, and network cluster."
       }
     },
-    "cta": {
-      "title": "Join the first marketplace for conviction-driven discovery.",
-      "description": "Beacon starts with books because great recommendations matter. Over time, the same model can help people discover films, games, podcasts, courses, products, and ideas worth their attention. Join early and help define how discovery works in an age of infinite content.",
-      "primary": "Create your account",
-      "secondary": "Already invited? Log in"
+    "ledger": {
+      "eyebrow": "Pre-signing clarity",
+      "title": "Every wallet action gets a readable receipt before it is signed.",
+      "description": "Beacon should make participation understandable before commitment. Support is a public conviction record and may affect badges, reputation, and milestone eligibility according to the documented model.",
+      "notice": "Support is not presented as a refundable vote, guaranteed return, or passive yield product. The interface must explain what the user is doing and what the ledger will record.",
+      "previewTitle": "Support recommendation",
+      "previewDescription": "Representative preview for a future support flow.",
+      "rows": {
+        "action": {
+          "label": "Action",
+          "value": "Record support",
+          "note": "Adds a public participation signal to this recommendation."
+        },
+        "recipient": {
+          "label": "Recipient",
+          "value": "Beacon program",
+          "note": "The program route and accounts are shown before signing."
+        },
+        "amount": {
+          "label": "Amount",
+          "value": "0.01 SOL",
+          "note": "Contribution amount plus network fees are listed separately."
+        },
+        "cluster": {
+          "label": "Cluster",
+          "value": "Devnet",
+          "note": "Network context is explicit to avoid accidental mainnet actions."
+        }
+      }
     }
   },
   "auth": {
     "comingSoon": "Coming soon",
-    "signupTitle": "Beacon signup is not open yet.",
-    "signupDescription": "This page is a placeholder for the future account creation flow.",
+    "signupTitle": "Early access is not open yet.",
+    "signupDescription": "This placeholder will become the account creation and wallet onboarding flow for readers, curators, and supporters.",
     "loginTitle": "Beacon login is not available yet.",
-    "loginDescription": "This page is a placeholder for the future authentication flow.",
-    "backHome": "Back to landing page"
+    "loginDescription": "This placeholder will become the future authentication flow for returning participants.",
+    "backHome": "Back to home"
   }
 }

@@ -8,6 +8,17 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Added
+
+- Added the Beacon Editorial Ledger frontend design-system foundation for the
+  Nuxt app, including Tailwind CSS 4 tokens, Nuxt UI theme defaults, book-first
+  landing-page components, and restrained light/dark theme support.
+
+### Changed
+
+- Reframed web starter copy toward books-first discovery and public reputation,
+  avoiding passive-yield, guaranteed-return, and profit-first language.
+
 ## 2026-06-21
 
 ### Added
