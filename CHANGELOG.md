@@ -13,12 +13,19 @@ Changelog. Use date-based entries until formal versioning starts.
 - Added the Beacon Editorial Ledger frontend design-system foundation for the
   Nuxt app, including Tailwind CSS 4 tokens, Nuxt UI theme defaults, book-first
   landing-page components, and restrained light/dark theme support.
-- Added a clearer homepage narrative covering Beacon's discovery problem,
-  books-first mechanism, vision, roadmap, and pre-signing ledger clarity.
+- Added a clearer homepage narrative covering early book signals, the
+  books-first participation loop, public reputation, and pre-signing ledger
+  clarity.
 - Added French localization for the web app.
 
 ### Changed
 
+- Replaced the web app's warm parchment color system with a minimal digital
+  palette using off-white surfaces, deep navy ink, cyan accents, and clean
+  blue-black dark mode surfaces.
+- Redesigned the homepage as a sparse early-adopter landing page with a short
+  Nuxt UI hero badge, live signal preview, focused reasons, simplified product
+  loop, ledger clarity, and final early-access CTA.
 - Reframed web starter copy toward books-first discovery and public reputation,
   avoiding passive-yield, guaranteed-return, and profit-first language.
 - Replaced the Persian web locale with French and updated localized navigation,

@@ -5,9 +5,8 @@ const localePath = useLocalePath()
 const homeSectionPath = (hash: string) => `${localePath('/')}${hash}`
 
 const navLinks = computed(() => [
-  { label: t('nav.problem'), to: homeSectionPath('#problem') },
+  { label: t('nav.problem'), to: homeSectionPath('#signal') },
   { label: t('nav.howItWorks'), to: homeSectionPath('#how-it-works') },
-  { label: t('nav.roadmap'), to: homeSectionPath('#roadmap') },
   { label: t('nav.ledger'), to: homeSectionPath('#ledger') }
 ])
 

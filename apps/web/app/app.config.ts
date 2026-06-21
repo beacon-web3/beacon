@@ -3,7 +3,7 @@ export default defineAppConfig({
     colors: {
       primary: 'beacon',
       secondary: 'ledger',
-      neutral: 'stone'
+      neutral: 'slate'
     },
     icons: {
       loading: 'i-lucide-loader-circle',
