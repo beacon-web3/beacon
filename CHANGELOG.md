@@ -51,3 +51,5 @@ Changelog. Use date-based entries until formal versioning starts.
   rather than a passive yield or guaranteed-return product.
 - Updated the login and signup pages to use the same minimal Beacon visual
   system, early-access copy, and shared email access panel.
+- Pinned the frontend CI workflow to pnpm 11.5.0 so GitHub Actions can install
+  dependencies from the app-local web package metadata.
