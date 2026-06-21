@@ -10,7 +10,7 @@ The backend workspace at `apps/api/` has a local Python virtual environment, ins
 
 The frontend workspace at `apps/web/` has been initialized as a Nuxt app and currently keeps its pnpm package management inside `apps/web/`.
 
-The current frontend includes a Beacon-branded, i18n-backed landing page with signup and login calls to action. Signup and login pages are placeholders for future authentication work.
+The current frontend includes a Beacon-branded, i18n-backed landing page with signup and login calls to action. Signup and login pages submit email-only account requests to the Django API.
 
 ## Changes Made
 
@@ -53,7 +53,6 @@ The current frontend includes a Beacon-branded, i18n-backed landing page with si
 * Installed PostgreSQL/environment dependencies:
   * django-environ 0.13.0
   * psycopg 3.3.4
-  * psycopg-binary 3.3.4
 * Added environment-based Django settings using `apps/api/.env`.
 * Added `apps/api/.env.example` for local backend configuration.
 * Added `apps/api/compose.yaml` for a local PostgreSQL 16 database service.
@@ -64,7 +63,7 @@ The current frontend includes a Beacon-branded, i18n-backed landing page with si
 * Replaced the Nuxt starter landing page with a Beacon-specific landing page at `apps/web/app/pages/index.vue`.
 * Replaced the starter logo with a Beacon wordmark in `apps/web/app/components/AppLogo.vue`.
 * Updated the app shell metadata and navigation in `apps/web/app/app.vue`.
-* Added placeholder auth routes:
+* Added auth routes, later connected to the email-only backend API:
   * `apps/web/app/pages/signup.vue`
   * `apps/web/app/pages/login.vue`
 * Updated the frontend Playwright smoke test to assert Beacon landing content and auth links.
@@ -88,17 +87,18 @@ The current frontend includes a Beacon-branded, i18n-backed landing page with si
 * Git hooks live at the repository root, but delegate to app-local tooling.
 * Tests are not run from pre-commit hooks. They should be run manually and later in CI.
 * Docker Compose can now run both the local Django API service and PostgreSQL database.
-* No CI/CD workflows, Turborepo, Anchor, or domain-specific Django application code has been generated yet.
+* CI runs from the repository root and covers frontend lint/typecheck/E2E plus backend Ruff and pytest checks.
+* No Turborepo, Anchor, or recommendation-domain Django application code has been generated yet.
 
 ## Next Steps
 
 * Choose the initial API domain model for the MVP, likely centered on books, recommendations, stakes, and users.
 * Create the first Django app after deciding the initial MVP domain model.
 * Consider moving JavaScript package management to the repository root later when shared JS packages become active.
-* Add CI later so full lint, typecheck, tests, and builds run outside local pre-commit hooks.
-* Add real backend Django tests after domain apps are created.
+* Add build checks to CI when deployment targets are selected.
+* Add recommendation-domain Django tests after domain apps are created.
 * Expand frontend E2E coverage as real user flows are implemented.
-* Replace `/signup` and `/login` placeholder pages when authentication is designed.
+* Replace email-only signup/login with wallet or password authentication when authentication is designed.
 * Review Persian marketing copy with a native/product reviewer before launch.
 
 ## Useful Commands

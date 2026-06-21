@@ -140,3 +140,27 @@ Local backend development can run through Docker Compose in `apps/api/`, includi
 In a world of infinite content, attention becomes the scarce resource.
 
 Beacon rewards the people who help others discover what matters.
+
+## Product Documentation
+
+The project is being developed with a spec-driven workflow. Current product and economic assumptions are tracked in `docs/` so implementation can follow documented decisions instead of ad-hoc conversation.
+
+Key documents:
+
+* `docs/product/vision.md` - Long-term vision and positioning.
+* `docs/product/mvp.md` - Books-first MVP scope and exclusions.
+* `docs/product/user-stories.md` - User stories for curators, supporters, readers, and governance participants.
+* `docs/product/governance.md` - Draft governance model and voting boundaries.
+* `docs/product/treasury.md` - Draft treasury, operating reserve, and transparency model.
+* `docs/product/risks.md` - Product, economic, and trust risks to address before launch.
+* `docs/product/assumptions.md` - Draft assumptions and review status.
+* `docs/product/open-questions.md` - Central register of unresolved questions.
+* `docs/product/roadmap.md` - Phase-based product and launch roadmap.
+* `docs/product/whitepaper-outline.md` - Working outline for a future Beacon white paper.
+* `docs/tokenomics/rewards.md` - Draft reward and badge mechanics.
+* `docs/tokenomics/staking.md` - Draft staking model for treasury and locked SOL.
+* `docs/decisions/` - Business, product, and technical decision records.
+* `docs/plans/` - Implementation plans that break larger work into verifiable tasks.
+* `CHANGELOG.md` - Meaningful project changes by date or release.
+
+These documents are intentionally marked as drafts where the economics require simulation, legal review, security review, or community approval.
