@@ -59,68 +59,132 @@ async function submit() {
 </script>
 
 <template>
-  <div class="beacon-container py-20 sm:py-28">
-    <UCard class="mx-auto max-w-xl">
-      <h1 class="font-serif text-4xl font-semibold tracking-[-0.045em] text-ink">
-        {{ t(title) }}
-      </h1>
-      <p class="mt-4 leading-7 text-ink-muted">
-        {{ t(description) }}
-      </p>
+  <div class="beacon-container py-16 sm:py-24">
+    <section class="grid min-h-[calc(100vh-13rem)] gap-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(22rem,0.58fr)] lg:items-center">
+      <div>
+        <UBadge
+          :label="t('auth.badge')"
+          color="primary"
+          variant="subtle"
+          size="lg"
+        />
 
-      <form
-        class="mt-8 space-y-5"
-        @submit.prevent="submit"
-      >
-        <label
-          :for="inputId"
-          class="block text-sm font-semibold text-ink"
-        >
-          {{ t('auth.emailLabel') }}
-        </label>
-        <input
-          :id="inputId"
-          v-model="email"
-          name="email"
-          type="email"
-          required
-          autocomplete="email"
-          :placeholder="t('auth.emailPlaceholder')"
-          class="w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink shadow-sm outline-none transition placeholder:text-ink-faint focus:border-reputation focus:ring-4 focus:ring-reputation/15"
-        >
+        <h1 class="beacon-display mt-8 max-w-3xl text-5xl text-ink sm:text-6xl lg:text-7xl">
+          {{ t(title) }}
+        </h1>
 
-        <p
-          v-if="successText"
-          role="status"
-          class="rounded-xl border border-reputation/20 bg-reputation/10 px-4 py-3 text-sm font-medium text-reputation"
-        >
-          {{ successText }}
-        </p>
-        <p
-          v-if="errorText"
-          role="alert"
-          class="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:bg-red-950/30 dark:text-red-300"
-        >
-          {{ errorText }}
+        <p class="mt-7 max-w-2xl text-lg leading-8 text-ink-muted">
+          {{ t(description) }}
         </p>
 
-        <div class="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="submit"
-            :disabled="isSubmitting"
-            class="inline-flex justify-center rounded-xl bg-reputation px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-reputation/90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {{ isSubmitting ? t('auth.submitting') : t(submitLabel) }}
-          </button>
-          <UButton
-            :to="localePath(alternateTo)"
-            :label="t(alternateLabel)"
-            variant="outline"
-            color="neutral"
-            class="justify-center"
+        <div class="mt-10 grid max-w-2xl gap-4 sm:grid-cols-3">
+          <div class="border-t border-rule pt-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
+              {{ t('auth.context.bookFirst.label') }}
+            </p>
+            <p class="mt-2 text-sm font-semibold text-ink">
+              {{ t('auth.context.bookFirst.value') }}
+            </p>
+          </div>
+          <div class="border-t border-rule pt-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
+              {{ t('auth.context.wallet.label') }}
+            </p>
+            <p class="mt-2 text-sm font-semibold text-ink">
+              {{ t('auth.context.wallet.value') }}
+            </p>
+          </div>
+          <div class="border-t border-rule pt-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
+              {{ t('auth.context.status.label') }}
+            </p>
+            <p class="mt-2 text-sm font-semibold text-ink">
+              {{ t('auth.context.status.value') }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="beacon-panel p-5 sm:p-6">
+        <div class="flex items-start justify-between gap-5 border-b border-rule pb-5">
+          <div>
+            <p class="beacon-kicker">
+              {{ t('auth.panelEyebrow') }}
+            </p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-[-0.04em] text-ink">
+              {{ t('auth.panelTitle') }}
+            </h2>
+          </div>
+          <UIcon
+            name="i-lucide-mail-plus"
+            class="size-6 shrink-0 text-beacon-600 dark:text-beacon-300"
           />
         </div>
-      </form>
-    </UCard>
+
+        <form
+          class="mt-6 space-y-5"
+          @submit.prevent="submit"
+        >
+          <div>
+            <label
+              :for="inputId"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ t('auth.emailLabel') }}
+            </label>
+            <input
+              :id="inputId"
+              v-model="email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              :placeholder="t('auth.emailPlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
+          <p class="text-sm leading-6 text-ink-muted">
+            {{ t('auth.emailHelp') }}
+          </p>
+
+          <p
+            v-if="successText"
+            role="status"
+            class="rounded-xl border border-reputation/25 bg-reputation-muted px-4 py-3 text-sm font-medium text-ink"
+          >
+            {{ successText }}
+          </p>
+          <p
+            v-if="errorText"
+            role="alert"
+            class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/70 dark:bg-red-950/30 dark:text-red-300"
+          >
+            {{ errorText }}
+          </p>
+
+          <div class="grid gap-3">
+            <UButton
+              type="submit"
+              :loading="isSubmitting"
+              :disabled="isSubmitting"
+              :label="isSubmitting ? t('auth.submitting') : t(submitLabel)"
+              color="primary"
+              size="xl"
+              trailing-icon="i-lucide-arrow-right"
+              block
+            />
+            <UButton
+              :to="localePath(alternateTo)"
+              :label="t(alternateLabel)"
+              variant="ghost"
+              color="neutral"
+              size="lg"
+              block
+            />
+          </div>
+        </form>
+      </div>
+    </section>
   </div>
 </template>

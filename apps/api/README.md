@@ -174,7 +174,7 @@ Expected version:
 * Django project generated: yes, `beacon_api`
 * Ruff installed: yes
 * pytest installed: yes
-* Django apps generated: no
+* Django apps generated: yes, `accounts`
 * Database configured: yes, through `DATABASE_URL`
 
 ## Quality Checks
@@ -215,7 +215,7 @@ Or run them with `.venv`:
 .venv/bin/pytest
 ```
 
-The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, and Django REST Framework installation. As the backend grows, tests should cover models, serializers, API views, permissions, and core business rules.
+The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and email-only auth API behavior. As the backend grows, tests should cover models, serializers, API views, permissions, and core business rules.
 
 Backend tests are intentionally not part of the pre-commit hook. They should be run manually during development and later in CI.
 
@@ -241,4 +241,4 @@ docker compose down -v
 
 ## Next Backend Step
 
-Create the first Django app for the API domain model after deciding the initial MVP entities.
+Expand the API domain model after deciding the initial MVP entities beyond email-based account access.

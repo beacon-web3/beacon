@@ -122,11 +122,40 @@
     }
   },
   "auth": {
+    "badge": "Beacon early access",
+    "panelEyebrow": "Email access",
+    "panelTitle": "Continue with email",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Email address",
+    "emailHelp": "We use email to prepare account access. Wallet connection comes later, before any Solana action.",
+    "submitting": "Submitting...",
+    "signupTitle": "Join the first readers testing Beacon.",
+    "signupDescription": "Create early access for the books-first discovery network. Start with email today; wallet onboarding and public reputation flows will follow as the product opens.",
+    "signupSubmit": "Create account",
+    "signupSuccess": "Account created for {email}.",
+    "signupError": "We could not create that account.",
+    "signupLink": "Need early access? Sign up",
+    "loginTitle": "Return to your Beacon account.",
+    "loginDescription": "Log in to keep your place in the early-access discovery network and prepare for future curator, supporter, and wallet flows.",
+    "loginSubmit": "Log in",
+    "loginSuccess": "Logged in as {email}.",
+    "loginError": "We could not log you in.",
+    "loginLink": "Already have access? Log in",
+    "context": {
+      "bookFirst": {
+        "label": "Scope",
+        "value": "Books first"
+      },
+      "wallet": {
+        "label": "Wallet",
+        "value": "Later, before signing"
+      },
+      "status": {
+        "label": "Stage",
+        "value": "Early access"
+      }
+    },
     "comingSoon": "Coming soon",
-    "signupTitle": "Early access is not open yet.",
-    "signupDescription": "This placeholder will become the account creation and wallet onboarding flow for readers, curators, and supporters.",
-    "loginTitle": "Beacon login is not available yet.",
-    "loginDescription": "This placeholder will become the future authentication flow for returning participants.",
     "backHome": "Back to home"
   }
 }
