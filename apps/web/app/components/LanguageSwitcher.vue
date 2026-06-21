@@ -17,7 +17,7 @@ const items = computed(() =>
       variant="ghost"
       icon="i-lucide-languages"
       :label="locale.toUpperCase()"
-      aria-label="Change language"
+      :aria-label="$t('nav.changeLanguage')"
     />
   </UDropdownMenu>
 </template>

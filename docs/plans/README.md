@@ -56,3 +56,5 @@ Templates live in `docs/plans/templates/`.
 | ID | Plan | Status |
 | --- | --- | --- |
 | 0001 | [Documentation foundation](0001-documentation-foundation.md) | Completed |
+| 0002 | [Frontend design system foundation](0002-frontend-design-system.md) | Completed |
+| 0003 | [Homepage clarity and French localization](0003-homepage-clarity-localization.md) | Completed |

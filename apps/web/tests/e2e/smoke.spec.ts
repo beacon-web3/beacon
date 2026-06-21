@@ -6,10 +6,10 @@ test('home page loads', async ({ page }) => {
   await expect(page).toHaveTitle(/Beacon/i)
   await expect(
     page.getByRole('heading', {
-      name: 'Find signal through the noise.'
+      name: 'Beacon helps people discover valuable books before they become obvious.'
     })
   ).toBeVisible()
-  await expect(page.getByRole('link', { name: /sign up/i }).first()).toHaveAttribute(
+  await expect(page.getByRole('link', { name: /join early access/i }).first()).toHaveAttribute(
     'href',
     '/signup'
   )
@@ -19,9 +19,13 @@ test('home page loads', async ({ page }) => {
   )
 })
 
-test('persian home page loads with rtl direction', async ({ page }) => {
-  await page.goto('/fa')
+test('french home page loads with ltr direction', async ({ page }) => {
+  await page.goto('/fr')
 
-  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
-  await expect(page.getByRole('heading', { name: 'سیگنال را از میان نویز پیدا کن.' })).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
+  await expect(
+    page.getByRole('heading', {
+      name: /Beacon aide à découvrir des livres précieux avant qu'ils ne deviennent évidents\./
+    })
+  ).toBeVisible()
 })

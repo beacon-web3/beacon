@@ -36,11 +36,11 @@ export default defineNuxtConfig({
         dir: 'ltr'
       },
       {
-        code: 'fa',
-        iso: 'fa-IR',
-        name: 'فارسی',
-        file: 'fa.json',
-        dir: 'rtl'
+        code: 'fr',
+        iso: 'fr-FR',
+        name: 'Français',
+        file: 'fr.json',
+        dir: 'ltr'
       }
     ]
   }

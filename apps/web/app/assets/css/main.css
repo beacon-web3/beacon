@@ -1,18 +1,147 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --color-green-50: #effdf5;
-  --color-green-100: #d9fbe8;
-  --color-green-200: #b3f5d1;
-  --color-green-300: #75edae;
-  --color-green-400: #00dc82;
-  --color-green-500: #00c16a;
-  --color-green-600: #00a155;
-  --color-green-700: #007f45;
-  --color-green-800: #016538;
-  --color-green-900: #0a5331;
-  --color-green-950: #052e16;
+@theme static {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+
+  --radius-xs: 0.1875rem;
+  --radius-sm: 0.3125rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+
+  --shadow-ledger:
+    0 1px 0 rgb(47 37 28 / 0.06), 0 18px 48px rgb(47 37 28 / 0.08);
+  --shadow-ledger-dark:
+    0 1px 0 rgb(255 247 235 / 0.05), 0 18px 48px rgb(0 0 0 / 0.28);
+
+  --color-beacon-50: #fbf6ed;
+  --color-beacon-100: #f3ead8;
+  --color-beacon-200: #e5d2ac;
+  --color-beacon-300: #d2b176;
+  --color-beacon-400: #bd9147;
+  --color-beacon-500: #a87632;
+  --color-beacon-600: #865928;
+  --color-beacon-700: #664323;
+  --color-beacon-800: #49311d;
+  --color-beacon-900: #302113;
+  --color-beacon-950: #1c140d;
+
+  --color-ledger-50: #f3f6f7;
+  --color-ledger-100: #e4ebee;
+  --color-ledger-200: #c9d7dd;
+  --color-ledger-300: #a6bac4;
+  --color-ledger-400: #829aa7;
+  --color-ledger-500: #607987;
+  --color-ledger-600: #48616d;
+  --color-ledger-700: #364a54;
+  --color-ledger-800: #293942;
+  --color-ledger-900: #1f2e35;
+  --color-ledger-950: #111b20;
+
+  --color-canvas: #f7f1e8;
+  --color-paper: #fffaf1;
+  --color-vellum: #f2e7d6;
+  --color-rule: #dccbb5;
+  --color-ink: #241d17;
+  --color-ink-muted: #75685c;
+  --color-ink-faint: #a19385;
+  --color-reputation: #6b5b95;
+  --color-reputation-muted: #ede9f6;
+  --color-ledger-line: #d4dde1;
+}
+
+.dark {
+  --color-canvas: #11100e;
+  --color-paper: #191713;
+  --color-vellum: #242019;
+  --color-rule: #40372c;
+  --color-ink: #f4eadc;
+  --color-ink-muted: #b9aa99;
+  --color-ink-faint: #897b6d;
+  --color-reputation: #b8aadf;
+  --color-reputation-muted: #292334;
+  --color-ledger-line: #33414a;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-width: 320px;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-vellum) 36%, transparent),
+        transparent 20rem
+      ),
+      var(--color-canvas);
+    color: var(--color-ink);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-beacon-300) 42%, transparent);
+    color: var(--color-beacon-950);
+  }
+
+  a {
+    text-underline-offset: 0.18em;
+  }
+}
+
+@layer components {
+  .beacon-container {
+    margin-inline: auto;
+    width: min(100% - 2rem, 72rem);
+  }
+
+  .beacon-editorial-title {
+    font-family: var(--font-serif);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 0.94;
+  }
+
+  .beacon-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-beacon-700);
+  }
+
+  .dark .beacon-kicker {
+    color: var(--color-beacon-300);
+  }
+
+  .beacon-panel {
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-xl);
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    box-shadow: var(--shadow-ledger);
+  }
+
+  .dark .beacon-panel {
+    box-shadow: var(--shadow-ledger-dark);
+  }
+
+  .beacon-ledger-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-ledger-line);
+    padding-block: 0.875rem;
+  }
+
+  .beacon-ledger-row:last-child {
+    border-bottom: 0;
+  }
 }

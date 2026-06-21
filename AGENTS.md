@@ -96,7 +96,8 @@ acting.
 
 ## Skill Use Rules
 
-- This repository stores installable skills under `skills/`.
+- This repository stores project skills under `.agents/skills/` and
+  OpenCode-native installed skills under `.opencode/skills/`.
 - Always check whether an installed skill applies before acting.
 - If a skill clearly applies, use the `skill` tool before proceeding.
 - Do not skip required workflows from a loaded skill.
@@ -112,10 +113,15 @@ installed skills.
 Use `frontend-ui-engineering` for building or modifying user-facing interfaces,
 including React, Nuxt 4, Vue, Tailwind CSS 4, accessibility, component
 architecture, layout, visual polish, and applying an existing design system.
+Use `ui-ux-pro-max` for UI/UX design intelligence, visual direction, design
+system recommendations, style exploration, color palettes, typography pairing,
+UX guidelines, chart recommendations, and professional UI inspiration before or
+while building user-facing interfaces.
 Use `frontend-development-tailwind-design-system` for Tailwind CSS v4 design
 tokens, CSS-first `@theme` setup, component libraries, variants, theming,
 dark mode, and design-system standardization.
-Use both only when a task changes Tailwind design-system primitives and builds
+Use `frontend-ui-engineering` and `frontend-development-tailwind-design-system`
+together only when a task changes Tailwind design-system primitives and builds
 user-facing UI that depends on them.
 
 For Vue and Nuxt work:

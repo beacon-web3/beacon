@@ -29,7 +29,7 @@ The app starts at `http://localhost:3000` by default.
 Current pages:
 
 - `/`: Beacon landing page explaining the discovery marketplace concept.
-- `/fa`: Persian version of the Beacon landing page.
+- `/fr`: French version of the Beacon landing page.
 - `/signup`: Placeholder for the future signup flow.
 - `/login`: Placeholder for the future login flow.
 
@@ -40,12 +40,12 @@ The signup and login buttons on the landing page route to placeholder pages unti
 Nuxt i18n is configured with `prefix_except_default` routing:
 
 - English: default locale, no URL prefix.
-- Persian: `/fa` URL prefix and RTL document direction.
+- French: `/fr` URL prefix and LTR document direction.
 
 Translation files live in `i18n/locales/`:
 
 - `i18n/locales/en.json`
-- `i18n/locales/fa.json`
+- `i18n/locales/fr.json`
 
 Use translation keys for user-facing copy instead of hardcoding text in Vue templates.
 
@@ -108,4 +108,4 @@ ESLint auto-fixes staged JavaScript, TypeScript, and Vue files.
 - Root monorepo package manager: not configured yet
 - Pre-commit frontend checks: delegated from root `.husky/pre-commit`
 - E2E test runner: Playwright
-- Supported locales: English and Persian
+- Supported locales: English and French
