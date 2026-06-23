@@ -10,6 +10,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added a password-based Django session auth plan, API contract, and decision
+  record covering signup, email-or-username login, password reset, reCAPTCHA v2
+  Invisible, and reserved profile fields.
 - Added the Beacon Editorial Ledger frontend design-system foundation for the
   Nuxt app, including Tailwind CSS 4 tokens, Nuxt UI theme defaults, book-first
   landing-page components, and restrained light/dark theme support.

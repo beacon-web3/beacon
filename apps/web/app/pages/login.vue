@@ -1,5 +1,6 @@
 <template>
   <EmailAuthForm
+    mode="login"
     title="auth.loginTitle"
     description="auth.loginDescription"
     endpoint="/api/auth/login/"

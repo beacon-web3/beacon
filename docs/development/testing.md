@@ -22,8 +22,8 @@ apps/web/tests/e2e/
 
 The current E2E tests verify that the home page loads in Chromium, the landing
 page fits narrow mobile screens without horizontal overflow, the French route
-loads with LTR direction, and signup/login forms submit to the email-only auth
-API. Playwright starts the Nuxt dev server automatically through
+loads with LTR direction, and signup/login/password-reset forms submit to the
+password auth API contract. Playwright starts the Nuxt dev server automatically through
 `playwright.config.ts`.
 
 ## Backend
@@ -50,7 +50,9 @@ Current backend test files live in:
 apps/api/tests/
 ```
 
-The current backend tests verify Django settings, PostgreSQL configuration, Django REST Framework installation, and the email-only signup/login API behavior.
+The current backend tests verify Django settings, PostgreSQL configuration,
+Django REST Framework installation, password signup/login session behavior,
+password reset email and confirmation behavior, and captcha failure handling.
 
 ## What To Test Later
 

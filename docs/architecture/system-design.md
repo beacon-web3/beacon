@@ -35,6 +35,7 @@ Responsibilities:
 * Duplicate detection and moderation workflows.
 * Ranking and discovery algorithms.
 * Search and filtering.
+* Account authentication, sessions, and password reset flows.
 * User profiles and reputation aggregation.
 * Proposal drafts and governance metadata.
 * Treasury dashboard indexing from on-chain sources.
@@ -49,6 +50,7 @@ The frontend should make economic and governance actions understandable before u
 Responsibilities:
 
 * Browse and search book recommendations.
+* Signup, login, logout, and password reset flows.
 * Create recommendation flows.
 * Support/upvote flows.
 * Wallet connection.

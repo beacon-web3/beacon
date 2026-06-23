@@ -2,13 +2,23 @@
 
 ## Auth
 
-Current auth endpoints are intentionally minimal and email-only. They return an account envelope:
+Auth endpoints use Django session cookies for browser authentication. Mutating
+auth endpoints verify reCAPTCHA v2 Invisible tokens when captcha is enabled on
+the backend. Password reset emails build confirmation links from
+`FRONTEND_BASE_URL`.
+
+Account responses return a public account envelope:
 
 ```json
 {
   "account": {
     "id": 1,
     "email": "user@example.com",
+    "username": "readerone",
+    "display_name": "Reader One",
+    "wallet_address": null,
+    "reputation_score": "0.00",
+    "account_credit": "0.000000000",
     "created_at": "2026-06-03T00:00:00Z",
     "last_login_at": null
   }
@@ -23,28 +33,93 @@ Request body:
 
 ```json
 {
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "username": "readerone",
+  "display_name": "Reader One",
+  "password": "correct horse battery staple",
+  "recaptcha_token": "recaptcha-v2-invisible-token"
 }
 ```
 
 Responses:
 
 * `201 Created` with the account envelope.
-* `400 Bad Request` when the email is invalid or already exists.
+* `400 Bad Request` when input is invalid, the email or username already exists,
+  password validation fails, or captcha verification fails.
 
 ### `POST /api/auth/login/`
 
-Marks an existing account as logged in by updating `last_login_at`.
+Authenticates an existing account with email-or-username and password. On
+success, Django sets a session cookie.
 
 Request body:
 
 ```json
 {
-  "email": "user@example.com"
+  "identifier": "user@example.com",
+  "password": "correct horse battery staple",
+  "recaptcha_token": "recaptcha-v2-invisible-token"
 }
 ```
 
 Responses:
 
 * `200 OK` with the account envelope.
-* `400 Bad Request` when the email is invalid or no account exists.
+* `400 Bad Request` when credentials are invalid or captcha verification fails.
+
+### `POST /api/auth/logout/`
+
+Clears the current Django session.
+
+Responses:
+
+* `204 No Content`.
+
+### `GET /api/auth/me/`
+
+Returns the current authenticated account.
+
+Responses:
+
+* `200 OK` with the account envelope.
+* `403 Forbidden` when no authenticated session exists.
+
+### `POST /api/auth/password-reset/`
+
+Requests a password reset. When the email belongs to an account, Beacon sends a
+reset link to that address using Django's email backend. The response is
+intentionally generic and does not reveal whether an account exists for the
+email.
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "recaptcha_token": "recaptcha-v2-invisible-token"
+}
+```
+
+Responses:
+
+* `202 Accepted` with `{ "detail": "If an account exists, password reset instructions will be sent." }`.
+* `400 Bad Request` when input is invalid or captcha verification fails.
+
+### `POST /api/auth/password-reset/confirm/`
+
+Confirms a password reset using Django's uid/token pair and sets a new password.
+
+Request body:
+
+```json
+{
+  "uid": "MQ",
+  "token": "set-password-token",
+  "password": "new correct horse battery staple"
+}
+```
+
+Responses:
+
+* `200 OK` with `{ "detail": "Password has been reset." }`.
+* `400 Bad Request` when the token is invalid or password validation fails.

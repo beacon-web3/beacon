@@ -1,0 +1,15 @@
+<template>
+  <EmailAuthForm
+    mode="password-reset"
+    title="auth.resetTitle"
+    description="auth.resetDescription"
+    endpoint="/api/auth/password-reset/"
+    input-id="reset-email"
+    submit-label="auth.resetSubmit"
+    success-message="auth.resetSuccess"
+    error-message="auth.resetError"
+    alternate-to="/login"
+    alternate-label="auth.loginLink"
+    clear-on-success
+  />
+</template>
