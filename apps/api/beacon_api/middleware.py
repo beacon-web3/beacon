@@ -20,6 +20,9 @@ class LocalCorsMiddleware:
         if origin in settings.CORS_ALLOWED_ORIGINS:
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-            response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+            response["Access-Control-Allow-Headers"] = (
+                "Content-Type, Authorization, X-CSRFToken"
+            )
+            response["Access-Control-Allow-Credentials"] = "true"
 
         return response

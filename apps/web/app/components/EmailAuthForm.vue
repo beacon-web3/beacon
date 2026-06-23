@@ -3,10 +3,13 @@ type AuthResponse = {
   account: {
     id: number
     email: string
+    username: string
+    display_name: string
   }
 }
 
 const props = defineProps<{
+  mode: 'signup' | 'login' | 'password-reset' | 'password-reset-confirm'
   title: string
   description: string
   endpoint: string
@@ -16,6 +19,8 @@ const props = defineProps<{
   errorMessage: string
   alternateTo: string
   alternateLabel: string
+  resetUid?: string
+  resetToken?: string
   clearOnSuccess?: boolean
 }>()
 
@@ -30,9 +35,61 @@ const apiBaseUrl = computed(() => {
 })
 
 const email = ref('')
+const identifier = ref('')
+const username = ref('')
+const displayName = ref('')
+const password = ref('')
+const recaptchaToken = ref('')
 const isSubmitting = ref(false)
 const errorText = ref('')
 const successText = ref('')
+
+const isSignup = computed(() => props.mode === 'signup')
+const isLogin = computed(() => props.mode === 'login')
+const isPasswordReset = computed(() => props.mode === 'password-reset')
+const isPasswordResetConfirm = computed(() => props.mode === 'password-reset-confirm')
+
+function buildBody() {
+  if (isSignup.value) {
+    return {
+      email: email.value,
+      username: username.value,
+      display_name: displayName.value,
+      password: password.value,
+      recaptcha_token: recaptchaToken.value
+    }
+  }
+
+  if (isLogin.value) {
+    return {
+      identifier: identifier.value,
+      password: password.value,
+      recaptcha_token: recaptchaToken.value
+    }
+  }
+
+  if (isPasswordResetConfirm.value) {
+    return {
+      uid: props.resetUid,
+      token: props.resetToken,
+      password: password.value
+    }
+  }
+
+  return {
+    email: email.value,
+    recaptcha_token: recaptchaToken.value
+  }
+}
+
+function clearFields() {
+  email.value = ''
+  identifier.value = ''
+  username.value = ''
+  displayName.value = ''
+  password.value = ''
+  recaptchaToken.value = ''
+}
 
 async function submit() {
   errorText.value = ''
@@ -43,12 +100,16 @@ async function submit() {
     const response = await $fetch<AuthResponse>(props.endpoint, {
       baseURL: apiBaseUrl.value,
       method: 'POST',
-      body: { email: email.value }
+      credentials: 'include',
+      body: buildBody()
     })
 
-    successText.value = t(props.successMessage, { email: response.account.email })
+    successText.value = t(props.successMessage, {
+      email: response.account?.email ?? email.value,
+      username: response.account?.username ?? identifier.value
+    })
     if (props.clearOnSuccess) {
-      email.value = ''
+      clearFields()
     }
   } catch {
     errorText.value = t(props.errorMessage)
@@ -125,7 +186,45 @@ async function submit() {
           class="mt-6 space-y-5"
           @submit.prevent="submit"
         >
-          <div>
+          <div v-if="isSignup">
+            <label
+              for="signup-display-name"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ t('auth.displayNameLabel') }}
+            </label>
+            <input
+              id="signup-display-name"
+              v-model="displayName"
+              name="display_name"
+              type="text"
+              required
+              autocomplete="name"
+              :placeholder="t('auth.displayNamePlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
+          <div v-if="isSignup">
+            <label
+              for="signup-username"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ t('auth.usernameLabel') }}
+            </label>
+            <input
+              id="signup-username"
+              v-model="username"
+              name="username"
+              type="text"
+              required
+              autocomplete="username"
+              :placeholder="t('auth.usernamePlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
+          <div v-if="isSignup || isPasswordReset">
             <label
               :for="inputId"
               class="block text-sm font-semibold text-ink"
@@ -144,8 +243,50 @@ async function submit() {
             >
           </div>
 
+          <div v-if="isLogin">
+            <label
+              :for="inputId"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ t('auth.identifierLabel') }}
+            </label>
+            <input
+              :id="inputId"
+              v-model="identifier"
+              name="identifier"
+              type="text"
+              required
+              autocomplete="username"
+              :placeholder="t('auth.identifierPlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
+          <div v-if="isSignup || isLogin || isPasswordResetConfirm">
+            <label
+              for="auth-password"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ isPasswordResetConfirm ? t('auth.newPasswordLabel') : t('auth.passwordLabel') }}
+            </label>
+            <input
+              id="auth-password"
+              v-model="password"
+              name="password"
+              type="password"
+              required
+              :autocomplete="isLogin ? 'current-password' : 'new-password'"
+              :placeholder="isPasswordResetConfirm ? t('auth.newPasswordPlaceholder') : t('auth.passwordPlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
           <p class="text-sm leading-6 text-ink-muted">
-            {{ t('auth.emailHelp') }}
+            {{ t(isPasswordReset || isPasswordResetConfirm ? 'auth.passwordResetHelp' : 'auth.emailHelp') }}
+          </p>
+
+          <p class="text-xs leading-5 text-ink-faint">
+            {{ t('auth.recaptchaNotice') }}
           </p>
 
           <p
@@ -180,6 +321,15 @@ async function submit() {
               variant="ghost"
               color="neutral"
               size="lg"
+              block
+            />
+            <UButton
+              v-if="isLogin"
+              :to="localePath('/reset-password')"
+              :label="t('auth.forgotPasswordLink')"
+              variant="link"
+              color="neutral"
+              size="sm"
               block
             />
           </div>

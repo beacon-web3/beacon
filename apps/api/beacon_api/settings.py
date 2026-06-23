@@ -21,6 +21,11 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
+    CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
+    RECAPTCHA_ENABLED=(bool, False),
+    RECAPTCHA_SECRET_KEY=(str, ""),
+    RECAPTCHA_VERIFY_URL=(str, "https://www.google.com/recaptcha/api/siteverify"),
+    FRONTEND_BASE_URL=(str, "http://localhost:3000"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -40,6 +45,11 @@ SECRET_KEY = env(
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
+RECAPTCHA_ENABLED = env("RECAPTCHA_ENABLED")
+RECAPTCHA_SECRET_KEY = env("RECAPTCHA_SECRET_KEY")
+RECAPTCHA_VERIFY_URL = env("RECAPTCHA_VERIFY_URL")
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
 
 
 # Application definition
@@ -139,3 +149,16 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "accounts.Account"
+
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
