@@ -20,7 +20,7 @@ Required book metadata:
 * External reference link
 * Category or genre
 * Creation timestamp
-* Discoverer wallet or account
+* Discoverer Beacon account, with wallet linking before any Solana action
 
 Cover images and rich metadata can be added after licensing and data-source decisions are made.
 

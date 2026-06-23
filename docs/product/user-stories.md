@@ -1,5 +1,20 @@
 # User Stories
 
+## Account User
+
+As a reader, curator, or supporter, I want to create and access a Beacon account
+so that my discovery history can persist before wallet-based Solana actions are
+enabled.
+
+Acceptance criteria:
+
+* I can sign up with email, username, display name, and password.
+* I can log in with either email or username plus password.
+* I can log out and confirm my current authenticated account.
+* I can request a password reset without Beacon revealing whether an email has an
+  account.
+* I understand wallet connection comes later, before any on-chain action.
+
 ## Curator
 
 As a curator, I want to create a book recommendation by locking SOL so that my recommendation carries a stronger signal than a normal post.
