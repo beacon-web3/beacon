@@ -95,6 +95,37 @@ Revenue sources that should require approval include:
 * Publisher campaigns.
 * Any new platform fee.
 
+## Treasury And Upgrade Authority
+
+Governance should cover not only treasury spending, but also the authorities that
+can change how treasury and user funds move.
+
+Beacon should treat the following as governance-sensitive controls:
+
+* Community Treasury spending authority.
+* Program upgrade authority for contracts that custody user deposits, curator
+  locks, reward pools, treasury balances, or operating reserve splits.
+* Authority over protocol parameters that affect user rights, rewards, treasury
+  splits, lock periods, or withdrawal conditions.
+* Authority over future revenue activation.
+
+The upgrade authority problem must be explicit. A program-controlled treasury is
+not fully trust-minimized if a single admin can upgrade the program at any time
+to move funds differently. During the early stage, Beacon may keep upgrade
+authority under disclosed team or multisig control to ship safely, but that is a
+temporary trust assumption rather than mature decentralization.
+
+Beacon's target governance path is:
+
+* Early stage: disclosed team-controlled or multisig-controlled upgrades.
+* Growth stage: governance-approved upgrades with timelocked execution.
+* Mature stage: treasury execution and custody-affecting upgrades controlled by
+  governance or constrained by immutable protocol rules.
+
+Any proposal that can affect custody, balances, splits, rewards, lock periods,
+or user withdrawal rights should be treated as a high-impact governance action,
+not a routine operational change.
+
 ## Governance Anti-Patterns
 
 Avoid:
@@ -104,6 +135,8 @@ Avoid:
 * Governance token launch before product-market validation.
 * Hidden monetization followed by retroactive approval.
 * Proposals that are too vague to evaluate.
+* Claiming full decentralization while upgrade or treasury authorities remain
+  under undisclosed team control.
 
 ## Open Questions
 
@@ -112,3 +145,8 @@ Avoid:
 * What quorum is required for each decision type?
 * Should badge tier or curator reputation affect vote weight?
 * Which governance system should be used on Solana?
+* Which Solana multisig should control early upgrade authority?
+* What timelock duration should apply to treasury spending and program upgrades?
+* Which custody-affecting changes require supermajority approval?
+* When should Beacon transfer upgrade authority from team or multisig control to
+  governance control?

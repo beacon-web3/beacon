@@ -78,6 +78,54 @@ Mitigation directions:
 * Publish the operating reserve percentage before launch.
 * Require governance approval for new revenue models.
 * Use multisig or governance controls where appropriate.
+* Use program-controlled Solana accounts for trust-sensitive user deposits,
+  curator locks, reward pools, and Community Treasury balances wherever feasible.
+* Publicly disclose any authority that can move funds or change fund movement
+  rules.
+
+## Custody And Private-Key Risk
+
+Users may fear that developers, a company wallet, a backend server, or a
+compromised private key could drain pooled SOL.
+
+Mitigation directions:
+
+* Avoid storing user deposits and community-controlled funds in ordinary
+  externally owned wallets.
+* Prefer Solana program-controlled accounts, such as PDAs, where no private key
+  exists for the account.
+* Use multisig for any remaining human-controlled authority.
+* Publish treasury, program, multisig, governance, and upgrade authority
+  addresses.
+* Make custody/control status visible in the product dashboard.
+
+## Smart Contract Bug Risk
+
+Even if no person can directly steal funds, contract bugs can still cause loss,
+locked funds, incorrect rewards, or unauthorized movement.
+
+Mitigation directions:
+
+* Keep on-chain responsibilities limited to trust-sensitive economic state.
+* Keep contracts simple enough to audit and explain.
+* Open-source production contracts before public launch.
+* Obtain professional security review before contracts custody meaningful SOL.
+* Publish audit reports and known limitations.
+* Run localnet/devnet testing before production deployment.
+
+## Upgrade Authority Risk
+
+A program-controlled treasury can still require trust if an admin can upgrade the
+program at any time and change fund movement rules.
+
+Mitigation directions:
+
+* Treat upgrade authority as part of the custody model.
+* Disclose early-stage upgrade authority clearly.
+* Prefer multisig over single-signer upgrade authority.
+* Introduce timelocks before custody-affecting upgrades execute.
+* Move upgrade authority toward governance as Beacon matures.
+* Classify custody-affecting upgrades as high-impact governance actions.
 
 ## Staking Risk
 
@@ -120,3 +168,9 @@ Mitigation directions:
 * What content metadata source is safe for commercial use?
 * What abuse signals should be monitored from day one?
 * Which risks must block launch versus remain monitored post-launch?
+* Which contracts must be audited before public launch?
+* What level of formal verification or third-party review is required before
+  custodying significant SOL?
+* What multisig threshold and signer distribution are acceptable for early
+  authority control?
+* What timelock duration gives users enough time to inspect high-impact changes?

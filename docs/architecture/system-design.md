@@ -25,6 +25,24 @@ Potential on-chain responsibilities:
 
 On-chain programs must treat all account data and metadata as untrusted input.
 
+Trust-sensitive funds should be held in program-controlled Solana accounts, such
+as PDAs, rather than founder, company, or backend-controlled wallets. These
+accounts should have no private key and should move funds only through Beacon's
+documented program logic.
+
+The on-chain trust boundary should cover:
+
+* Custody of user deposits and support contributions before allocation.
+* Curator stake locking, release eligibility, and principal accounting.
+* Reward pool accounting and reward release conditions.
+* Community Treasury and Operating Reserve split accounting.
+* Governance-approved treasury execution where applicable.
+
+Program upgrade authority is part of the system's economic trust model. If an
+upgrade can change custody, balances, splits, rewards, lock periods, or
+withdrawal rights, that authority must be documented, publicly visible, and
+eventually constrained by governance or timelocks.
+
 ## Off-Chain Backend Responsibilities
 
 The backend should handle product logic that benefits from flexibility, indexing, and iteration speed.
@@ -42,6 +60,12 @@ Responsibilities:
 * Analytics for abuse detection and product learning.
 
 The backend can cache and index on-chain state, but it must not be the only source of truth for economic balances.
+
+The backend must not be the custody authority for user deposits, curator stake
+principal, reward pools, or Community Treasury funds. It may prepare transaction
+data, index chain events, and present dashboards, but user-signable transactions
+and program rules must remain the source of truth for trust-sensitive fund
+movement.
 
 ## Frontend Responsibilities
 
@@ -82,6 +106,10 @@ Core concepts for future specification:
 * Default to localnet or devnet during development.
 * Treat wallet history and balances as weak anti-abuse signals, not identity guarantees.
 * Prefer economic resistance to self-farming over invasive identity checks.
+* Do not route user economic deposits through team-controlled or server-controlled
+  wallets when a program-controlled account can enforce the required rules.
+* Treat upgrade authority, multisig configuration, and governance execution delay
+  as user-facing trust properties, not internal implementation details.
 
 ## Architecture Principle
 

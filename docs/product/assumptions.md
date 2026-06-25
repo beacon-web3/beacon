@@ -26,6 +26,10 @@ Status values:
 | Staking strategy | Prefer native SOL staking over DeFi yield | Proposed | Requires security/legal review before launch. |
 | Governance model | Participation-based governance, no launch token | Accepted | See `docs/decisions/0004-no-governance-token-at-launch.md`. |
 | Revenue changes | New revenue streams require community approval | Draft | Needs governance rules and implementation detail. |
+| User fund custody | Trust-sensitive user deposits, curator locks, reward pools, and Community Treasury balances should use program-controlled Solana accounts where feasible | Proposed | See `docs/decisions/0008-trust-minimized-protocol-custody.md`; requires contract design and security review. |
+| Early authority control | Upgrade authority or incomplete treasury automation may be team or multisig controlled only if publicly disclosed | Draft | Needs multisig threshold, signer distribution, and launch disclosure review. |
+| Mature authority control | Custody-affecting upgrades and Community Treasury execution should move toward governance control with timelocks | Draft | Needs governance design, timelock duration, and transfer milestone. |
+| Contract assurance | Production contracts custodying meaningful SOL should be open source, security-reviewed, and publicly documented before launch | Draft | Needs audit scope, budget, and launch-blocking criteria. |
 
 ## Maintenance Rules
 

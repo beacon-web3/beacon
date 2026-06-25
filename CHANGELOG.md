@@ -29,6 +29,9 @@ Changelog. Use date-based entries until formal versioning starts.
   endpoints.
 - Added a dedicated Nuxt email verification form with segmented OTP confirmation,
   resend, localized copy, and redirects from signup or unverified login.
+- Added trust-minimized protocol custody specs covering program-controlled
+  Solana accounts, upgrade authority risk, multisig/timelock staging, custody
+  dashboard requirements, and a proposed decision record.
 
 
 ### Changed
