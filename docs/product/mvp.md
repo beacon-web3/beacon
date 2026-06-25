@@ -67,12 +67,29 @@ At minimum:
 * Available liquidity
 * Lifetime recommendations
 * Lifetime support transactions
+* Custody/control status for major balances
+* Program, treasury, multisig, governance, and upgrade authority addresses where
+  applicable
+
+The MVP must not imply full decentralization if some authorities remain under
+team or multisig control. It should clearly distinguish balances controlled by
+Solana program rules from balances or authorities still controlled by humans.
 
 ### Basic Governance Eligibility
 
 At launch, governance should be limited to wallets that have interacted with Beacon.
 
 Initial governance can be off-chain or semi-on-chain while the rules are being validated, but the model should be designed for transparent public voting.
+
+### Trust-Minimized Custody
+
+The MVP should design user economic flows so trust-sensitive SOL is held in
+program-controlled accounts wherever feasible. This includes curator stake locks,
+support contribution accounting, reward pools, and Community Treasury balances.
+
+If any MVP flow still depends on team-controlled, company-controlled,
+server-controlled, or manually administered custody, that dependency must be
+visible in the spec, product copy, and launch risk review.
 
 ## Out of Scope for MVP
 
@@ -92,6 +109,8 @@ The MVP is successful if it demonstrates:
 * Users support recommendations even when financial rewards are uncertain.
 * NFT badges and curator profiles create non-financial motivation.
 * The treasury model is understandable and publicly verifiable.
+* Users can see whether key balances are program-controlled,
+  multisig-controlled, governance-controlled, or manually administered.
 * Abuse patterns are measurable and manageable before expansion.
 
 ## Open Questions
@@ -101,3 +120,5 @@ The MVP is successful if it demonstrates:
 * Should milestone rewards be step-based, continuous, or hybrid?
 * How should duplicate books be detected and resolved?
 * What metadata source should be used for book identity?
+* Which MVP balances and authorities must be program-controlled before launch?
+* Which early-stage authorities can remain under disclosed multisig control?

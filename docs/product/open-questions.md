@@ -40,6 +40,14 @@ implementation.
 - Which staking providers or validators are acceptable, and how should validator
   risk be communicated?
 - When can governance adjust the Operating Reserve percentage?
+- Which MVP balances must be program-controlled before launch, and which can
+  temporarily remain under disclosed multisig or manual administration?
+- Which Solana multisig or governance system should control early treasury and
+  upgrade authorities?
+- What multisig threshold and signer distribution are acceptable for early
+  authority control?
+- What timelock duration should apply before high-impact treasury spending or
+  protocol changes execute?
 
 ## Governance
 
@@ -48,6 +56,11 @@ implementation.
   stake-weighted, or hybrid?
 - Which decision categories require a supermajority?
 - Should early governance be off-chain, on-chain, or hybrid?
+- Which custody-affecting changes require governance approval?
+- When should Beacon transfer program upgrade authority from team or multisig
+  control to governance control?
+- What process lets users inspect and react to timelocked upgrades before
+  execution?
 
 ## Legal And Trust
 
@@ -57,6 +70,12 @@ implementation.
 - What disclosures are required for affiliate revenue, sponsored placement, or
   featured auctions?
 - What moderation policy is needed for book metadata, descriptions, and links?
+- What custody disclosures are required if any early-stage funds or authorities
+  remain under team or multisig control?
+- Which smart contracts must receive professional security review before public
+  launch?
+- What public audit report, source-code, and known-risk disclosures are required
+  before contracts custody meaningful SOL?
 
 ## Architecture
 
@@ -67,3 +86,10 @@ implementation.
   `apps/contracts`, and `packages/sdk`?
 - What observability is required for treasury, support, reward, and staking
   flows?
+- How should Solana PDAs and program-controlled accounts be structured for user
+  deposits, curator locks, reward pools, Community Treasury funds, and Operating
+  Reserve split accounting?
+- How should backend indexing prove that displayed treasury balances match
+  on-chain account state?
+- How should program upgrade authority be represented in the frontend and
+  treasury dashboard?

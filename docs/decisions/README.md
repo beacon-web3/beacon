@@ -36,6 +36,7 @@ Each record should include:
 | 0005 | [Treasury and operating reserve split](0005-treasury-operating-reserve-split.md) | Proposed |
 | 0006 | [Conservative native SOL staking preference](0006-conservative-native-sol-staking.md) | Proposed |
 | 0007 | [Password session auth foundation](0007-password-session-auth-foundation.md) | Accepted |
+| 0008 | [Trust-minimized protocol custody](0008-trust-minimized-protocol-custody.md) | Proposed |
 
 ## Maintenance Rules
 

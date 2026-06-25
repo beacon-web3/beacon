@@ -31,6 +31,11 @@ Curator stakes are locked for at least two weeks. During the lock period, Beacon
 
 The curator should not experience additional withdrawal uncertainty because their stake was staked by the protocol.
 
+Locked curator stake principal should remain under program-controlled rules, not
+under a founder, company, or backend-controlled wallet. If staking is introduced,
+the staking path must not create an alternate authority that can redirect or
+withdraw user principal outside the documented lock and release rules.
+
 ## Yield Allocation Options
 
 ### Option 1: All Yield to Treasury
@@ -80,6 +85,11 @@ For the MVP, Beacon should prefer conservative native SOL staking and avoid comp
 
 Native staking is easier for users to understand and has a clearer risk profile. DeFi yield farming introduces smart contract risk, liquidity risk, protocol risk, and reputational risk that are not necessary for validating the discovery marketplace.
 
+Any staking implementation must preserve clear custody boundaries. Treasury
+staking, curator stake staking, and reward-pool liquidity should be visibly
+separated in accounting and should not rely on undisclosed private-key control
+over user principal.
+
 ## Product Framing
 
 Staking should be framed as treasury management, not as a user-facing yield product.
@@ -109,6 +119,8 @@ The product should show:
 * Slashing and protocol-level risks must be understood for the chosen staking approach.
 * Users may misunderstand staking as a yield guarantee.
 * Treasury loss would damage platform trust.
+* Staking integrations may introduce new authority paths that weaken the
+  program-controlled custody model.
 
 ## Open Questions
 
@@ -117,3 +129,6 @@ The product should show:
 * Which validators or staking providers are acceptable?
 * Which staking decisions require governance approval?
 * What staking risk disclosures are required before launch?
+* How can native staking be implemented while preserving program-controlled
+  custody and timely curator stake withdrawal?
+* Which staking authority addresses must be visible in the treasury dashboard?
