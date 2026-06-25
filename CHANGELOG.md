@@ -8,13 +8,6 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
-### Added
-
-- Added backend email verification OTP support with hashed six-digit codes,
-  generic resend responses, login gating for unverified accounts, and API docs
-  for verification request and confirmation endpoints.
-- Added a dedicated Nuxt email verification form with segmented OTP confirmation,
-  resend, localized copy, and redirects from signup or unverified login.
 
 ## 2026-06-25
 
@@ -30,6 +23,13 @@ Changelog. Use date-based entries until formal versioning starts.
   books-first participation loop, public reputation, and pre-signing ledger
   clarity.
 - Added French localization for the web app.
+- Added backend email verification OTP support with hashed six-digit codes,
+  generic resend responses, configurable per-code attempt limits, login gating
+  for unverified accounts, and API docs for verification request and confirmation
+  endpoints.
+- Added a dedicated Nuxt email verification form with segmented OTP confirmation,
+  resend, localized copy, and redirects from signup or unverified login.
+
 
 ### Changed
 

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
@@ -169,6 +170,14 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
 
         if not account.email_verification_code_hash:
             raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        if (
+            account.email_verification_attempts
+            >= settings.EMAIL_VERIFICATION_MAX_ATTEMPTS
+        ):
+            raise serializers.ValidationError(
+                {"otp": "Too many verification attempts. Request a new code."}
+            )
 
         if (
             account.email_verification_code_expires_at is None

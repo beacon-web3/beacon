@@ -28,6 +28,8 @@ Relevant specs:
   when credentials are valid but the account email is unverified.
 - Use Nuxt UI's segmented `UPinInput` for the frontend OTP field while preserving
   the backend `{ email, otp }` string contract.
+- Enforce a configurable per-code verification attempt limit so a code must be
+  replaced after too many failed confirmation attempts.
 
 ## Tasks
 
@@ -35,6 +37,8 @@ Relevant specs:
   verification confirm, invalid OTP, expired OTP, and login gating.
 - [x] Add account email verification fields and migration.
 - [x] Add backend OTP generation, hashing, request, and confirmation logic.
+- [x] Add backend tests for malformed OTPs, resend invalidation, verified-account
+  resend behavior, and the configurable attempt limit.
 - [x] Update auth API docs and changelog.
 - [x] Add the Nuxt email verification form with email prefill, segmented OTP
   entry, and resend action.
@@ -49,7 +53,8 @@ Relevant specs:
   the normalized email.
 - Verification request returns `202 Accepted` with a generic response for both
   missing and existing accounts.
-- Verification confirmation rejects invalid or expired OTPs.
+- Verification confirmation rejects malformed, invalid, expired, or over-attempt
+  OTPs.
 - Verification confirmation marks the account email as verified and allows login.
 - The Nuxt verification page renders email and segmented OTP fields, prefills
   email from the query string, submits a six-digit OTP string to the backend, and
@@ -57,7 +62,7 @@ Relevant specs:
 
 ## Verification
 
-- `cd apps/api && DATABASE_URL="sqlite:////var/folders/rh/ry4y28kd61gf4q10kvtktnpr0000gn/T/opencode/beacon-email-verification-final.sqlite3" .venv/bin/pytest tests/test_auth_api.py` - passed, 24 tests.
+- `cd apps/api && DATABASE_URL="sqlite:////var/folders/rh/ry4y28kd61gf4q10kvtktnpr0000gn/T/opencode/beacon-email-verification-green.sqlite3" .venv/bin/pytest tests/test_auth_api.py` - passed, 32 tests.
 - `cd apps/api && .venv/bin/ruff check .` - passed.
 - `cd apps/web && pnpm typecheck` - passed.
 - `cd apps/web && pnpm lint` - passed.
@@ -66,5 +71,5 @@ Relevant specs:
 
 ## Open Questions
 
-- Production rate limits for OTP request and confirmation attempts should be
-  finalized before public launch.
+- Production IP/user throttles, cooldowns, and monitoring for OTP request volume
+  and failed confirmation attempts should be finalized before public launch.

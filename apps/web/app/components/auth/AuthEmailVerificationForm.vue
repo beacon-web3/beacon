@@ -131,6 +131,7 @@ async function resendCode() {
         type="email"
         required
         autocomplete="email"
+        size="xl"
         :placeholder="t('auth.emailPlaceholder')"
         class="w-full"
       />

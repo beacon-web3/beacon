@@ -94,9 +94,10 @@ Responses:
 
 ### `POST /api/auth/email-verification/confirm/`
 
-Confirms a pending email verification code. On success, Beacon marks the account
-email as verified, clears the stored OTP hash and expiry, and starts a Django
-session.
+Confirms a pending email verification code. Each code allows a configurable
+number of failed confirmation attempts before the user must request a new code.
+On success, Beacon marks the account email as verified, clears the stored OTP
+hash and expiry, and starts a Django session.
 
 Request body:
 
@@ -110,7 +111,8 @@ Request body:
 Responses:
 
 * `200 OK` with the account envelope.
-* `400 Bad Request` when the code is invalid, expired, missing, or malformed.
+* `400 Bad Request` when the code is invalid, expired, missing, malformed, or
+  has exceeded the configured verification attempt limit.
 
 ### `POST /api/auth/logout/`
 

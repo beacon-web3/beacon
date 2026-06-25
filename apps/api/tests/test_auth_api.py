@@ -363,6 +363,40 @@ def test_email_verification_request_sends_new_code(api_client, mailoutbox):
 
 
 @pytest.mark.django_db
+def test_email_verification_request_does_not_send_code_for_verified_account(
+    api_client, mailoutbox
+):
+    account = Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+        email_verified_at=timezone.now(),
+    )
+    account.email_verification_code_hash = "existing-hash"
+    account.email_verification_code_expires_at = timezone.now() + timezone.timedelta(
+        minutes=15
+    )
+    account.save(
+        update_fields=[
+            "email_verification_code_hash",
+            "email_verification_code_expires_at",
+        ]
+    )
+
+    response = api_client.post(
+        reverse("email-verification-request"),
+        {"email": "USER@example.com"},
+    )
+    account.refresh_from_db()
+
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    assert "If an account exists" in response.data["detail"]
+    assert mailoutbox == []
+    assert account.email_verification_code_hash == "existing-hash"
+
+
+@pytest.mark.django_db
 def test_email_verification_confirm_rejects_invalid_code(api_client, mailoutbox):
     Account.objects.create_user(
         email="user@example.com",
@@ -379,6 +413,30 @@ def test_email_verification_confirm_rejects_invalid_code(api_client, mailoutbox)
     response = api_client.post(
         reverse("email-verification-confirm"),
         {"email": "user@example.com", "otp": "000000"},
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "otp" in response.data
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("otp", ["12345", "1234567", "abcdef", "12 456", ""])
+def test_email_verification_confirm_rejects_malformed_code(api_client, mailoutbox, otp):
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+    api_client.post(
+        reverse("email-verification-request"),
+        {"email": "user@example.com"},
+    )
+    mailoutbox.clear()
+
+    response = api_client.post(
+        reverse("email-verification-confirm"),
+        {"email": "user@example.com", "otp": otp},
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -414,6 +472,75 @@ def test_email_verification_confirm_rejects_expired_code(api_client, mailoutbox)
 
 
 @pytest.mark.django_db
+def test_email_verification_confirm_rejects_old_code_after_resend(
+    api_client, mailoutbox
+):
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+    api_client.post(
+        reverse("email-verification-request"),
+        {"email": "user@example.com"},
+    )
+    old_otp = OTP_PATTERN.search(mailoutbox[0].body).group(1)
+    mailoutbox.clear()
+
+    api_client.post(
+        reverse("email-verification-request"),
+        {"email": "user@example.com"},
+    )
+    new_otp = OTP_PATTERN.search(mailoutbox[0].body).group(1)
+
+    old_response = api_client.post(
+        reverse("email-verification-confirm"),
+        {"email": "user@example.com", "otp": old_otp},
+    )
+    new_response = api_client.post(
+        reverse("email-verification-confirm"),
+        {"email": "user@example.com", "otp": new_otp},
+    )
+
+    assert old_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert new_response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_email_verification_confirm_enforces_attempt_limit(
+    api_client, mailoutbox, settings
+):
+    settings.EMAIL_VERIFICATION_MAX_ATTEMPTS = 2
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+    api_client.post(
+        reverse("email-verification-request"),
+        {"email": "user@example.com"},
+    )
+    otp = OTP_PATTERN.search(mailoutbox[0].body).group(1)
+
+    for _ in range(settings.EMAIL_VERIFICATION_MAX_ATTEMPTS):
+        response = api_client.post(
+            reverse("email-verification-confirm"),
+            {"email": "user@example.com", "otp": "000000"},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    locked_response = api_client.post(
+        reverse("email-verification-confirm"),
+        {"email": "user@example.com", "otp": otp},
+    )
+
+    assert locked_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "otp" in locked_response.data
+
+
+@pytest.mark.django_db
 def test_email_verification_confirm_verifies_account_and_allows_login(
     api_client, mailoutbox
 ):
@@ -440,6 +567,7 @@ def test_email_verification_confirm_verifies_account_and_allows_login(
     assert account.email_verified_at is not None
     assert account.email_verification_code_hash == ""
     assert account.email_verification_code_expires_at is None
+    assert account.email_verification_attempts == 0
 
     login_client = APIClient()
     login_response = login_client.post(
