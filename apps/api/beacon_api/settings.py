@@ -26,6 +26,7 @@ env = environ.Env(
     RECAPTCHA_SECRET_KEY=(str, ""),
     RECAPTCHA_VERIFY_URL=(str, "https://www.google.com/recaptcha/api/siteverify"),
     FRONTEND_BASE_URL=(str, "http://localhost:3000"),
+    EMAIL_VERIFICATION_MAX_ATTEMPTS=(int, 5),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -50,6 +51,7 @@ RECAPTCHA_ENABLED = env("RECAPTCHA_ENABLED")
 RECAPTCHA_SECRET_KEY = env("RECAPTCHA_SECRET_KEY")
 RECAPTCHA_VERIFY_URL = env("RECAPTCHA_VERIFY_URL")
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
+EMAIL_VERIFICATION_MAX_ATTEMPTS = env("EMAIL_VERIFICATION_MAX_ATTEMPTS")
 
 
 # Application definition

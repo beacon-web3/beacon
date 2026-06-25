@@ -13,6 +13,10 @@ const props = defineProps<{
   clearOnSuccess?: boolean
 }>()
 
+const emit = defineEmits<{
+  verificationRequired: [email: string]
+}>()
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 const showPassword = shallowRef(false)
@@ -30,7 +34,10 @@ const {
   isPasswordResetConfirm,
   activeSignupPasswordRequirement,
   submit
-} = useEmailAuthForm(props)
+} = useEmailAuthForm({
+  ...props,
+  onVerificationRequired: email => emit('verificationRequired', email)
+})
 </script>
 
 <template>
@@ -52,6 +59,7 @@ const {
         type="text"
         required
         autocomplete="name"
+        size="xl"
         :placeholder="t('auth.displayNamePlaceholder')"
         class="w-full"
       />
@@ -69,6 +77,7 @@ const {
         type="text"
         required
         autocomplete="username"
+        size="xl"
         :placeholder="t('auth.usernamePlaceholder')"
         class="w-full"
       />
@@ -86,6 +95,7 @@ const {
         type="email"
         required
         autocomplete="email"
+        size="xl"
         :placeholder="t('auth.emailPlaceholder')"
         class="w-full"
       />
@@ -103,6 +113,7 @@ const {
         type="text"
         required
         autocomplete="username"
+        size="xl"
         :placeholder="t('auth.identifierPlaceholder')"
         class="w-full"
       />
@@ -121,6 +132,7 @@ const {
         :type="showPassword ? 'text' : 'password'"
         required
         :autocomplete="isLogin ? 'current-password' : 'new-password'"
+        size="xl"
         :placeholder="isPasswordResetConfirm ? t('auth.newPasswordPlaceholder') : t('auth.passwordPlaceholder')"
         :ui="{ trailing: 'pe-1' }"
         class="w-full"
@@ -152,6 +164,7 @@ const {
         :type="showPasswordConfirmation ? 'text' : 'password'"
         required
         autocomplete="new-password"
+        size="xl"
         :placeholder="t('auth.passwordConfirmationPlaceholder')"
         :ui="{ trailing: 'pe-1' }"
         class="w-full"

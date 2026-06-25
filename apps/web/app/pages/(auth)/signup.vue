@@ -1,3 +1,15 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'auth'
+})
+
+const localePath = useLocalePath()
+
+async function goToVerification(email: string) {
+  await navigateTo(`${localePath('/verify-email')}?email=${encodeURIComponent(email)}`)
+}
+</script>
+
 <template>
   <AuthScreen
     mode="signup"
@@ -11,5 +23,6 @@
     alternate-to="/login"
     alternate-label="auth.loginLink"
     clear-on-success
+    @verification-required="goToVerification"
   />
 </template>

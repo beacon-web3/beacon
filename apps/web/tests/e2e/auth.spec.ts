@@ -80,6 +80,40 @@ test('login submits identifier and password to the auth api', async ({ page }) =
   )
 })
 
+test('email verification submits a six digit OTP to the auth api', async ({ page }) => {
+  await page.route('**/api/auth/email-verification/confirm/', async (route) => {
+    const request = route.request()
+
+    expect(request.method()).toBe('POST')
+    expect(request.postDataJSON()).toEqual({
+      email: 'user@example.com',
+      otp: '123456'
+    })
+
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 200,
+      body: JSON.stringify({
+        account: {
+          id: 1,
+          email: 'user@example.com',
+          username: 'readerone',
+          display_name: 'Reader One'
+        }
+      })
+    })
+  })
+
+  await page.goto('/verify-email?email=user%40example.com')
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('Verification code').fill('123456')
+  await page.getByRole('button', { name: 'Verify email' }).click()
+
+  await expect(page.getByRole('status')).toContainText(
+    'Email verified for user@example.com.'
+  )
+})
+
 test('signup shows api failures', async ({ page }) => {
   await page.route('**/api/auth/signup/', async (route) => {
     await route.fulfill({

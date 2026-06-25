@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
@@ -138,6 +141,74 @@ class PasswordResetRequestSerializer(RecaptchaSerializer):
 
     def validate_email(self, value: str) -> str:
         return value.strip().lower()
+
+
+class EmailVerificationRequestSerializer(RecaptchaSerializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value: str) -> str:
+        return value.strip().lower()
+
+
+class EmailVerificationConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.RegexField(
+        r"^\d{6}$",
+        error_messages={"invalid": "Enter a valid verification code."},
+    )
+    account: Account
+
+    def validate_email(self, value: str) -> str:
+        return value.strip().lower()
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        account = Account.objects.filter(email__iexact=attrs["email"]).first()
+
+        if account is None or account.email_verified_at is not None:
+            raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        if not account.email_verification_code_hash:
+            raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        if (
+            account.email_verification_attempts
+            >= settings.EMAIL_VERIFICATION_MAX_ATTEMPTS
+        ):
+            raise serializers.ValidationError(
+                {"otp": "Too many verification attempts. Request a new code."}
+            )
+
+        if (
+            account.email_verification_code_expires_at is None
+            or account.email_verification_code_expires_at <= timezone.now()
+        ):
+            account.email_verification_attempts += 1
+            account.save(update_fields=["email_verification_attempts"])
+            raise serializers.ValidationError({"otp": "Verification code has expired."})
+
+        if not check_password(attrs["otp"], account.email_verification_code_hash):
+            account.email_verification_attempts += 1
+            account.save(update_fields=["email_verification_attempts"])
+            raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        self.account = account
+        return attrs
+
+    def save(self) -> Account:
+        self.account.email_verified_at = timezone.now()
+        self.account.email_verification_code_hash = ""
+        self.account.email_verification_code_expires_at = None
+        self.account.email_verification_attempts = 0
+        self.account.save(
+            update_fields=[
+                "email_verified_at",
+                "email_verification_code_hash",
+                "email_verification_code_expires_at",
+                "email_verification_attempts",
+            ]
+        )
+        return self.account
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
