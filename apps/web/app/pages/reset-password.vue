@@ -1,5 +1,5 @@
 <template>
-  <AuthPage
+  <AuthScreen
     mode="password-reset"
     title="auth.resetTitle"
     description="auth.resetDescription"

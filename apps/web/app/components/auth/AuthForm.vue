@@ -20,6 +20,7 @@ const showPasswordConfirmation = shallowRef(false)
 
 const {
   form,
+  schema,
   isSubmitting,
   errorText,
   successText,
@@ -34,6 +35,7 @@ const {
 
 <template>
   <UForm
+    :schema="schema"
     :state="form"
     class="mt-6 space-y-5"
     @submit="submit"
@@ -41,7 +43,7 @@ const {
     <UFormField
       v-if="isSignup"
       :label="t('auth.displayNameLabel')"
-      name="display_name"
+      name="displayName"
     >
       <UInput
         id="signup-display-name"
@@ -141,7 +143,7 @@ const {
     <UFormField
       v-if="isSignup"
       :label="t('auth.passwordConfirmationLabel')"
-      name="password_confirmation"
+      name="passwordConfirmation"
     >
       <UInput
         id="auth-password-confirmation"

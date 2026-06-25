@@ -1,4 +1,19 @@
+import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from 'zod'
+
 type EmailAuthMode = 'signup' | 'login' | 'password-reset' | 'password-reset-confirm'
+
+type EmailAuthFormState = {
+  email: string
+  identifier: string
+  username: string
+  displayName: string
+  password: string
+  passwordConfirmation: string
+  recaptchaToken: string
+}
+
+type EmailAuthFormData = Partial<EmailAuthFormState>
 
 type UseEmailAuthFormOptions = {
   mode: EmailAuthMode
@@ -29,7 +44,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
   const config = useRuntimeConfig()
 
-  const form = reactive({
+  const form = reactive<EmailAuthFormState>({
     email: '',
     identifier: '',
     username: '',
@@ -54,58 +69,104 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const isPasswordReset = computed(() => options.mode === 'password-reset')
   const isPasswordResetConfirm = computed(() => options.mode === 'password-reset-confirm')
 
+  function getSignupPasswordRequirements(password: string): PasswordRequirement[] {
+    return [
+      {
+        key: 'length',
+        message: t('auth.passwordRequirementLength'),
+        passes: password.length > 8
+      },
+      {
+        key: 'lowercase',
+        message: t('auth.passwordRequirementLowercase'),
+        passes: /[a-z]/.test(password)
+      },
+      {
+        key: 'uppercase',
+        message: t('auth.passwordRequirementUppercase'),
+        passes: /[A-Z]/.test(password)
+      },
+      {
+        key: 'number',
+        message: t('auth.passwordRequirementNumber'),
+        passes: /\d/.test(password)
+      },
+      {
+        key: 'special',
+        message: t('auth.passwordRequirementSpecial'),
+        passes: /[^A-Za-z0-9]/.test(password)
+      }
+    ]
+  }
+
   const signupPasswordRequirements = computed<PasswordRequirement[]>(() => {
     if (!isSignup.value) {
       return []
     }
 
-    return [
-      {
-        key: 'length',
-        message: t('auth.passwordRequirementLength'),
-        passes: form.password.length > 8
-      },
-      {
-        key: 'lowercase',
-        message: t('auth.passwordRequirementLowercase'),
-        passes: /[a-z]/.test(form.password)
-      },
-      {
-        key: 'uppercase',
-        message: t('auth.passwordRequirementUppercase'),
-        passes: /[A-Z]/.test(form.password)
-      },
-      {
-        key: 'number',
-        message: t('auth.passwordRequirementNumber'),
-        passes: /\d/.test(form.password)
-      },
-      {
-        key: 'special',
-        message: t('auth.passwordRequirementSpecial'),
-        passes: /[^A-Za-z0-9]/.test(form.password)
-      }
-    ]
+    return getSignupPasswordRequirements(form.password)
   })
 
   const activeSignupPasswordRequirement = computed(() => {
     return signupPasswordRequirements.value.find(requirement => !requirement.passes)
   })
 
-  const signupValidationError = computed(() => {
-    if (!isSignup.value) {
-      return ''
+  const requiredString = computed(() => {
+    return z.string().min(1, t('auth.fieldRequired'))
+  })
+
+  const emailString = computed(() => {
+    return requiredString.value.email(t('auth.emailInvalid'))
+  })
+
+  const signupPasswordString = computed(() => {
+    return requiredString.value.superRefine((password, context) => {
+      const failedRequirement = getSignupPasswordRequirements(password).find(
+        requirement => !requirement.passes
+      )
+
+      if (failedRequirement) {
+        context.addIssue({
+          code: 'custom',
+          message: failedRequirement.message
+        })
+      }
+    })
+  })
+
+  const schema = computed(() => {
+    if (isSignup.value) {
+      return z.object({
+        displayName: requiredString.value,
+        username: requiredString.value,
+        email: emailString.value,
+        password: signupPasswordString.value,
+        passwordConfirmation: requiredString.value,
+        recaptchaToken: z.string().optional()
+      }).refine(data => data.password === data.passwordConfirmation, {
+        path: ['passwordConfirmation'],
+        message: t('auth.passwordConfirmationMismatch')
+      })
     }
 
-    if (activeSignupPasswordRequirement.value) {
-      return activeSignupPasswordRequirement.value.message
+    if (isLogin.value) {
+      return z.object({
+        identifier: requiredString.value,
+        password: requiredString.value,
+        recaptchaToken: z.string().optional()
+      })
     }
 
-    if (form.password !== form.passwordConfirmation) {
-      return t('auth.passwordConfirmationMismatch')
+    if (isPasswordResetConfirm.value) {
+      return z.object({
+        password: requiredString.value
+      })
     }
 
-    return ''
+    return z.object({
+      email: emailString.value,
+      recaptchaToken: z.string().optional()
+    })
   })
 
   function buildBody() {
@@ -152,14 +213,9 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     form.recaptchaToken = ''
   }
 
-  async function submit() {
+  async function submit(_event: FormSubmitEvent<EmailAuthFormData>) {
     errorText.value = ''
     successText.value = ''
-
-    if (signupValidationError.value) {
-      errorText.value = signupValidationError.value
-      return
-    }
 
     isSubmitting.value = true
 
@@ -187,6 +243,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
   return {
     form,
+    schema,
     isSubmitting,
     errorText,
     successText,

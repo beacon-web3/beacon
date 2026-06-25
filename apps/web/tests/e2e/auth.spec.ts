@@ -120,9 +120,9 @@ test('signup blocks weak passwords before calling the auth api', async ({ page }
   await page.getByLabel('Confirm password').fill('weak')
   await page.getByRole('button', { name: 'Create account' }).click()
 
-  await expect(page.getByRole('alert')).toContainText(
+  await expect(page.getByText(
     'Password must be longer than 8 characters'
-  )
+  )).toBeVisible()
   expect(signupRequested).toBe(false)
 })
 
@@ -194,7 +194,7 @@ test('signup blocks mismatched password confirmation', async ({ page }) => {
   await page.getByLabel('Confirm password').fill('Different-password-12345!')
   await page.getByRole('button', { name: 'Create account' }).click()
 
-  await expect(page.getByRole('alert')).toContainText('Passwords do not match')
+  await expect(page.getByText('Passwords do not match')).toBeVisible()
   expect(signupRequested).toBe(false)
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <AuthPage
+  <AuthScreen
     mode="signup"
     title="auth.signupTitle"
     description="auth.signupDescription"

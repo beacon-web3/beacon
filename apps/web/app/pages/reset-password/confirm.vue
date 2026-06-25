@@ -11,7 +11,7 @@ const resetToken = computed(() => {
 </script>
 
 <template>
-  <AuthPage
+  <AuthScreen
     mode="password-reset-confirm"
     title="auth.resetConfirmTitle"
     description="auth.resetConfirmDescription"

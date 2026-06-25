@@ -8,6 +8,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+## 2026-06-25
+
 ### Added
 
 - Added a password-based Django session auth plan, API contract, and decision
@@ -25,6 +27,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 - Updated the Nuxt email auth form to use Nuxt UI form controls, password
   visibility toggles, and form-field help text for signup password requirements.
+- Added Zod-backed Nuxt UI schema validation to auth forms, including field-level
+  required, email, signup password policy, and password confirmation checks.
 - Refactored the Nuxt email auth form to move submission state into a composable,
   remove reserved wallet/reputation helper copy from the form body, and show
   signup password requirements progressively.
