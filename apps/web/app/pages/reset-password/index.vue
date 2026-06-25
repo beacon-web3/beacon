@@ -1,3 +1,9 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'auth'
+})
+</script>
+
 <template>
   <AuthScreen
     mode="password-reset"
