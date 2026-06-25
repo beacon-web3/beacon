@@ -135,6 +135,8 @@
     "displayNamePlaceholder": "Lecteur Un",
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Mot de passe",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
     "passwordConfirmationLabel": "Confirmer le mot de passe",
     "passwordConfirmationPlaceholder": "Confirmer le mot de passe",
     "passwordConfirmationMismatch": "Les mots de passe ne correspondent pas.",

@@ -135,6 +135,8 @@
     "displayNamePlaceholder": "Reader One",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "passwordConfirmationLabel": "Confirm password",
     "passwordConfirmationPlaceholder": "Confirm password",
     "passwordConfirmationMismatch": "Passwords do not match.",

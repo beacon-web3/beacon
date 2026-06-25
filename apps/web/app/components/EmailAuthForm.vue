@@ -17,6 +17,8 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+const showPassword = shallowRef(false)
+const showPasswordConfirmation = shallowRef(false)
 
 const {
   form,
@@ -56,18 +58,17 @@ const {
           />
         </div>
 
-        <form
+        <UForm
+          :state="form"
           class="mt-6 space-y-5"
-          @submit.prevent="submit"
+          @submit="submit"
         >
-          <div v-if="isSignup">
-            <label
-              for="signup-display-name"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ t('auth.displayNameLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isSignup"
+            :label="t('auth.displayNameLabel')"
+            name="display_name"
+          >
+            <UInput
               id="signup-display-name"
               v-model="form.displayName"
               name="display_name"
@@ -75,18 +76,16 @@ const {
               required
               autocomplete="name"
               :placeholder="t('auth.displayNamePlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
-            >
-          </div>
+              class="w-full"
+            />
+          </UFormField>
 
-          <div v-if="isSignup">
-            <label
-              for="signup-username"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ t('auth.usernameLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isSignup"
+            :label="t('auth.usernameLabel')"
+            name="username"
+          >
+            <UInput
               id="signup-username"
               v-model="form.username"
               name="username"
@@ -94,18 +93,16 @@ const {
               required
               autocomplete="username"
               :placeholder="t('auth.usernamePlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
-            >
-          </div>
+              class="w-full"
+            />
+          </UFormField>
 
-          <div v-if="isSignup || isPasswordReset">
-            <label
-              :for="inputId"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ t('auth.emailLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isSignup || isPasswordReset"
+            :label="t('auth.emailLabel')"
+            name="email"
+          >
+            <UInput
               :id="inputId"
               v-model="form.email"
               name="email"
@@ -113,18 +110,16 @@ const {
               required
               autocomplete="email"
               :placeholder="t('auth.emailPlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
-            >
-          </div>
+              class="w-full"
+            />
+          </UFormField>
 
-          <div v-if="isLogin">
-            <label
-              :for="inputId"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ t('auth.identifierLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isLogin"
+            :label="t('auth.identifierLabel')"
+            name="identifier"
+          >
+            <UInput
               :id="inputId"
               v-model="form.identifier"
               name="identifier"
@@ -132,56 +127,72 @@ const {
               required
               autocomplete="username"
               :placeholder="t('auth.identifierPlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
-            >
-          </div>
+              class="w-full"
+            />
+          </UFormField>
 
-          <div v-if="isSignup || isLogin || isPasswordResetConfirm">
-            <label
-              for="auth-password"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ isPasswordResetConfirm ? t('auth.newPasswordLabel') : t('auth.passwordLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isSignup || isLogin || isPasswordResetConfirm"
+            :label="isPasswordResetConfirm ? t('auth.newPasswordLabel') : t('auth.passwordLabel')"
+            name="password"
+            :help="isSignup && !successText ? activeSignupPasswordRequirement?.message : undefined"
+          >
+            <UInput
               id="auth-password"
               v-model="form.password"
               name="password"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               required
               :autocomplete="isLogin ? 'current-password' : 'new-password'"
               :placeholder="isPasswordResetConfirm ? t('auth.newPasswordPlaceholder') : t('auth.passwordPlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+              :ui="{ trailing: 'pe-1' }"
+              class="w-full"
             >
-          </div>
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  :aria-label="showPassword ? t('auth.hidePassword') : t('auth.showPassword')"
+                  :aria-pressed="showPassword"
+                  aria-controls="auth-password"
+                  @click="showPassword = !showPassword"
+                />
+              </template>
+            </UInput>
+          </UFormField>
 
-          <div v-if="isSignup">
-            <label
-              for="auth-password-confirmation"
-              class="block text-sm font-semibold text-ink"
-            >
-              {{ t('auth.passwordConfirmationLabel') }}
-            </label>
-            <input
+          <UFormField
+            v-if="isSignup"
+            :label="t('auth.passwordConfirmationLabel')"
+            name="password_confirmation"
+          >
+            <UInput
               id="auth-password-confirmation"
               v-model="form.passwordConfirmation"
               name="password_confirmation"
-              type="password"
+              :type="showPasswordConfirmation ? 'text' : 'password'"
               required
               autocomplete="new-password"
               :placeholder="t('auth.passwordConfirmationPlaceholder')"
-              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+              :ui="{ trailing: 'pe-1' }"
+              class="w-full"
             >
-          </div>
-
-          <p
-            v-if="activeSignupPasswordRequirement && !successText"
-            role="status"
-            aria-label="Password requirement"
-            class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-200"
-          >
-            {{ activeSignupPasswordRequirement.message }}
-          </p>
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="showPasswordConfirmation ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  :aria-label="showPasswordConfirmation ? t('auth.hidePassword') : t('auth.showPassword')"
+                  :aria-pressed="showPasswordConfirmation"
+                  aria-controls="auth-password-confirmation"
+                  @click="showPasswordConfirmation = !showPasswordConfirmation"
+                />
+              </template>
+            </UInput>
+          </UFormField>
 
           <p
             v-if="isPasswordReset || isPasswordResetConfirm"
@@ -194,20 +205,20 @@ const {
             {{ t('auth.recaptchaNotice') }}
           </p>
 
-          <p
+          <UAlert
             v-if="successText"
             role="status"
-            class="rounded-xl border border-reputation/25 bg-reputation-muted px-4 py-3 text-sm font-medium text-ink"
-          >
-            {{ successText }}
-          </p>
-          <p
+            color="success"
+            variant="soft"
+            :title="successText"
+          />
+          <UAlert
             v-if="errorText"
             role="alert"
-            class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/70 dark:bg-red-950/30 dark:text-red-300"
-          >
-            {{ errorText }}
-          </p>
+            color="error"
+            variant="soft"
+            :title="errorText"
+          />
 
           <div class="grid gap-3">
             <UButton
@@ -238,8 +249,14 @@ const {
               block
             />
           </div>
-        </form>
+        </UForm>
       </div>
     </section>
   </div>
 </template>
+
+<style>
+input[type='password']::-ms-reveal {
+  display: none;
+}
+</style>

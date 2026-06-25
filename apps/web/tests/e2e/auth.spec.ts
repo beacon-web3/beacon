@@ -131,30 +131,50 @@ test('signup shows password requirements progressively', async ({ page }) => {
   await page.waitForLoadState('networkidle')
 
   const passwordInput = page.getByLabel('Password', { exact: true })
-  const passwordRequirements = page.getByRole('status', { name: 'Password requirement' })
 
-  await expect(passwordRequirements).toContainText(
+  await expect(page.getByText(
     'Password must be longer than 8 characters'
-  )
+  )).toBeVisible()
   await expect(page.getByText('Password must include a lowercase letter.')).toHaveCount(0)
 
   await passwordInput.fill('longpassword')
-  await expect(passwordRequirements).toContainText(
+  await expect(page.getByText(
     'Password must include an uppercase letter'
-  )
+  )).toBeVisible()
   await expect(page.getByText('Password must include a number.')).toHaveCount(0)
 
   await passwordInput.fill('Longpassword')
-  await expect(passwordRequirements).toContainText('Password must include a number')
+  await expect(page.getByText('Password must include a number')).toBeVisible()
   await expect(page.getByText('Password must include a special character.')).toHaveCount(0)
 
   await passwordInput.fill('Longpassword1')
-  await expect(passwordRequirements).toContainText(
+  await expect(page.getByText(
     'Password must include a special character'
-  )
+  )).toBeVisible()
 
   await passwordInput.fill(validPassword)
-  await expect(passwordRequirements).toHaveCount(0)
+  await expect(page.getByText('Password must include a special character.')).toHaveCount(0)
+})
+
+test('signup password fields can toggle visibility', async ({ page }) => {
+  await page.goto('/signup')
+  await page.waitForLoadState('networkidle')
+
+  const passwordInput = page.getByLabel('Password', { exact: true })
+  const passwordConfirmationInput = page.getByLabel('Confirm password')
+
+  await expect(passwordInput).toHaveAttribute('type', 'password')
+  await expect(passwordConfirmationInput).toHaveAttribute('type', 'password')
+
+  await page.getByRole('button', { name: 'Show password' }).first().click()
+  await expect(passwordInput).toHaveAttribute('type', 'text')
+  await page.getByRole('button', { name: 'Hide password' }).click()
+  await expect(passwordInput).toHaveAttribute('type', 'password')
+
+  await page.getByRole('button', { name: 'Show password' }).nth(1).click()
+  await expect(passwordConfirmationInput).toHaveAttribute('type', 'text')
+  await page.getByRole('button', { name: 'Hide password' }).click()
+  await expect(passwordConfirmationInput).toHaveAttribute('type', 'password')
 })
 
 test('signup blocks mismatched password confirmation', async ({ page }) => {
