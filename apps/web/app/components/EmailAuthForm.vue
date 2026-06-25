@@ -1,13 +1,4 @@
 <script setup lang="ts">
-type AuthResponse = {
-  account: {
-    id: number
-    email: string
-    username: string
-    display_name: string
-  }
-}
-
 const props = defineProps<{
   mode: 'signup' | 'login' | 'password-reset' | 'password-reset-confirm'
   title: string
@@ -26,97 +17,19 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const localePath = useLocalePath()
-const config = useRuntimeConfig()
 
-const apiBaseUrl = computed(() => {
-  return typeof config.public.apiBaseUrl === 'string'
-    ? config.public.apiBaseUrl
-    : undefined
-})
-
-const email = ref('')
-const identifier = ref('')
-const username = ref('')
-const displayName = ref('')
-const password = ref('')
-const recaptchaToken = ref('')
-const isSubmitting = ref(false)
-const errorText = ref('')
-const successText = ref('')
-
-const isSignup = computed(() => props.mode === 'signup')
-const isLogin = computed(() => props.mode === 'login')
-const isPasswordReset = computed(() => props.mode === 'password-reset')
-const isPasswordResetConfirm = computed(() => props.mode === 'password-reset-confirm')
-
-function buildBody() {
-  if (isSignup.value) {
-    return {
-      email: email.value,
-      username: username.value,
-      display_name: displayName.value,
-      password: password.value,
-      recaptcha_token: recaptchaToken.value
-    }
-  }
-
-  if (isLogin.value) {
-    return {
-      identifier: identifier.value,
-      password: password.value,
-      recaptcha_token: recaptchaToken.value
-    }
-  }
-
-  if (isPasswordResetConfirm.value) {
-    return {
-      uid: props.resetUid,
-      token: props.resetToken,
-      password: password.value
-    }
-  }
-
-  return {
-    email: email.value,
-    recaptcha_token: recaptchaToken.value
-  }
-}
-
-function clearFields() {
-  email.value = ''
-  identifier.value = ''
-  username.value = ''
-  displayName.value = ''
-  password.value = ''
-  recaptchaToken.value = ''
-}
-
-async function submit() {
-  errorText.value = ''
-  successText.value = ''
-  isSubmitting.value = true
-
-  try {
-    const response = await $fetch<AuthResponse>(props.endpoint, {
-      baseURL: apiBaseUrl.value,
-      method: 'POST',
-      credentials: 'include',
-      body: buildBody()
-    })
-
-    successText.value = t(props.successMessage, {
-      email: response.account?.email ?? email.value,
-      username: response.account?.username ?? identifier.value
-    })
-    if (props.clearOnSuccess) {
-      clearFields()
-    }
-  } catch {
-    errorText.value = t(props.errorMessage)
-  } finally {
-    isSubmitting.value = false
-  }
-}
+const {
+  form,
+  isSubmitting,
+  errorText,
+  successText,
+  isSignup,
+  isLogin,
+  isPasswordReset,
+  isPasswordResetConfirm,
+  activeSignupPasswordRequirement,
+  submit
+} = useEmailAuthForm(props)
 </script>
 
 <template>
@@ -195,7 +108,7 @@ async function submit() {
             </label>
             <input
               id="signup-display-name"
-              v-model="displayName"
+              v-model="form.displayName"
               name="display_name"
               type="text"
               required
@@ -214,7 +127,7 @@ async function submit() {
             </label>
             <input
               id="signup-username"
-              v-model="username"
+              v-model="form.username"
               name="username"
               type="text"
               required
@@ -233,7 +146,7 @@ async function submit() {
             </label>
             <input
               :id="inputId"
-              v-model="email"
+              v-model="form.email"
               name="email"
               type="email"
               required
@@ -252,7 +165,7 @@ async function submit() {
             </label>
             <input
               :id="inputId"
-              v-model="identifier"
+              v-model="form.identifier"
               name="identifier"
               type="text"
               required
@@ -271,7 +184,7 @@ async function submit() {
             </label>
             <input
               id="auth-password"
-              v-model="password"
+              v-model="form.password"
               name="password"
               type="password"
               required
@@ -281,8 +194,39 @@ async function submit() {
             >
           </div>
 
-          <p class="text-sm leading-6 text-ink-muted">
-            {{ t(isPasswordReset || isPasswordResetConfirm ? 'auth.passwordResetHelp' : 'auth.emailHelp') }}
+          <div v-if="isSignup">
+            <label
+              for="auth-password-confirmation"
+              class="block text-sm font-semibold text-ink"
+            >
+              {{ t('auth.passwordConfirmationLabel') }}
+            </label>
+            <input
+              id="auth-password-confirmation"
+              v-model="form.passwordConfirmation"
+              name="password_confirmation"
+              type="password"
+              required
+              autocomplete="new-password"
+              :placeholder="t('auth.passwordConfirmationPlaceholder')"
+              class="mt-2 w-full rounded-xl border border-rule bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-beacon-500 focus:ring-4 focus:ring-beacon-300/20"
+            >
+          </div>
+
+          <p
+            v-if="activeSignupPasswordRequirement && !successText"
+            role="status"
+            aria-label="Password requirement"
+            class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-200"
+          >
+            {{ activeSignupPasswordRequirement.message }}
+          </p>
+
+          <p
+            v-if="isPasswordReset || isPasswordResetConfirm"
+            class="text-sm leading-6 text-ink-muted"
+          >
+            {{ t('auth.passwordResetHelp') }}
           </p>
 
           <p class="text-xs leading-5 text-ink-faint">

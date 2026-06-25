@@ -23,6 +23,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Refactored the Nuxt email auth form to move submission state into a composable,
+  remove reserved wallet/reputation helper copy from the form body, and show
+  signup password requirements progressively.
 - Replaced the web app's warm parchment color system with a minimal digital
   palette using off-white surfaces, deep navy ink, cyan accents, and clean
   blue-black dark mode surfaces.
