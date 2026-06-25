@@ -7,7 +7,9 @@ auth endpoints verify reCAPTCHA v2 Invisible tokens when captcha is enabled on
 the backend. Password reset emails build confirmation links from
 `FRONTEND_BASE_URL`.
 
-Account responses return a public account envelope:
+Account responses return a public account envelope. Signup creates an unverified
+account and sends a six-digit email verification code; successful login requires
+the email address to be verified.
 
 ```json
 {
@@ -65,7 +67,50 @@ Request body:
 Responses:
 
 * `200 OK` with the account envelope.
+* `400 Bad Request` with `{ "code": "EMAIL_VERIFICATION_REQUIRED", "email": "user@example.com" }`
+  when credentials are valid but the account email is unverified.
 * `400 Bad Request` when credentials are invalid or captcha verification fails.
+
+### `POST /api/auth/email-verification/request/`
+
+Requests a new email verification code. When the email belongs to an unverified
+account, Beacon sends a six-digit numeric code that expires after 15 minutes.
+The response is intentionally generic and does not reveal whether an account
+exists for the email.
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "recaptcha_token": "recaptcha-v2-invisible-token"
+}
+```
+
+Responses:
+
+* `202 Accepted` with `{ "detail": "If an account exists, a verification code will be sent." }`.
+* `400 Bad Request` when input is invalid or captcha verification fails.
+
+### `POST /api/auth/email-verification/confirm/`
+
+Confirms a pending email verification code. On success, Beacon marks the account
+email as verified, clears the stored OTP hash and expiry, and starts a Django
+session.
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456"
+}
+```
+
+Responses:
+
+* `200 OK` with the account envelope.
+* `400 Bad Request` when the code is invalid, expired, missing, or malformed.
 
 ### `POST /api/auth/logout/`
 

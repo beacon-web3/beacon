@@ -8,6 +8,14 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Added
+
+- Added backend email verification OTP support with hashed six-digit codes,
+  generic resend responses, login gating for unverified accounts, and API docs
+  for verification request and confirmation endpoints.
+- Added a dedicated Nuxt email verification form with segmented OTP confirmation,
+  resend, localized copy, and redirects from signup or unverified login.
+
 ## 2026-06-25
 
 ### Added

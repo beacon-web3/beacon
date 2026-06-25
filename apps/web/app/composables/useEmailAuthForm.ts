@@ -23,6 +23,7 @@ type UseEmailAuthFormOptions = {
   resetUid?: string
   resetToken?: string
   clearOnSuccess?: boolean
+  onVerificationRequired?: (email: string) => void | Promise<void>
 }
 
 type AuthResponse = {
@@ -31,6 +32,13 @@ type AuthResponse = {
     email: string
     username: string
     display_name: string
+  }
+}
+
+type AuthFetchError = {
+  data?: {
+    code?: string
+    email?: string
   }
 }
 
@@ -234,7 +242,16 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       if (options.clearOnSuccess) {
         clearFields()
       }
-    } catch {
+      if (isSignup.value && response.account?.email) {
+        await options.onVerificationRequired?.(response.account.email)
+      }
+    } catch (error) {
+      const data = (error as AuthFetchError).data
+      if (data?.code === 'EMAIL_VERIFICATION_REQUIRED' && data.email) {
+        await options.onVerificationRequired?.(data.email)
+        return
+      }
+
       errorText.value = t(options.errorMessage)
     } finally {
       isSubmitting.value = false

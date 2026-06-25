@@ -13,6 +13,10 @@ const props = defineProps<{
   clearOnSuccess?: boolean
 }>()
 
+const emit = defineEmits<{
+  verificationRequired: [email: string]
+}>()
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 const showPassword = shallowRef(false)
@@ -30,7 +34,10 @@ const {
   isPasswordResetConfirm,
   activeSignupPasswordRequirement,
   submit
-} = useEmailAuthForm(props)
+} = useEmailAuthForm({
+  ...props,
+  onVerificationRequired: email => emit('verificationRequired', email)
+})
 </script>
 
 <template>

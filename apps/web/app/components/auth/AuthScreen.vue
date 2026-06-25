@@ -15,6 +15,10 @@ defineProps<{
   clearOnSuccess?: boolean
 }>()
 
+const emit = defineEmits<{
+  verificationRequired: [email: string]
+}>()
+
 const { t } = useI18n()
 </script>
 
@@ -54,6 +58,7 @@ const { t } = useI18n()
           :reset-uid="resetUid"
           :reset-token="resetToken"
           :clear-on-success="clearOnSuccess"
+          @verification-required="email => emit('verificationRequired', email)"
         />
       </div>
     </section>
