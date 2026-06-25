@@ -53,6 +53,9 @@ class SignupSerializer(RecaptchaSerializer):
     username = serializers.CharField(max_length=150)
     display_name = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True, trim_whitespace=False)
+    password_confirmation = serializers.CharField(
+        write_only=True, trim_whitespace=False
+    )
     username_validator = UnicodeUsernameValidator()
 
     def validate_email(self, value: str) -> str:
@@ -79,6 +82,16 @@ class SignupSerializer(RecaptchaSerializer):
     def validate_password(self, value: str) -> str:
         validate_password(value)
         return value
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        if attrs["password"] != attrs["password_confirmation"]:
+            raise serializers.ValidationError(
+                {"password_confirmation": "Passwords do not match."}
+            )
+
+        return attrs
 
     def save(self) -> Account:
         return Account.objects.create_user(

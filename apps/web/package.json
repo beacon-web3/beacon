@@ -19,7 +19,8 @@
     "@nuxt/ui": "^4.8.1",
     "@nuxtjs/i18n": "^10.4.0",
     "nuxt": "^4.4.6",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",

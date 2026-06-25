@@ -1,5 +1,5 @@
 <template>
-  <EmailAuthForm
+  <AuthScreen
     mode="login"
     title="auth.loginTitle"
     description="auth.loginDescription"

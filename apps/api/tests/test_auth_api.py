@@ -8,6 +8,8 @@ from rest_framework.test import APIClient
 
 from accounts.models import Account
 
+VALID_PASSWORD = "Strong-password-12345!"
+
 
 @pytest.fixture
 def api_client():
@@ -22,7 +24,8 @@ def test_signup_creates_account(api_client):
             "email": "USER@Example.COM",
             "username": "readerone",
             "display_name": "Reader One",
-            "password": "strong-password-12345",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
         },
     )
 
@@ -30,7 +33,53 @@ def test_signup_creates_account(api_client):
     assert response.data["account"]["email"] == "user@example.com"
     assert response.data["account"]["username"] == "readerone"
     account = Account.objects.get(email="user@example.com")
-    assert account.check_password("strong-password-12345")
+    assert account.check_password(VALID_PASSWORD)
+
+
+@pytest.mark.django_db
+def test_signup_rejects_mismatched_password_confirmation(api_client):
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "user@example.com",
+            "username": "readerone",
+            "display_name": "Reader One",
+            "password": VALID_PASSWORD,
+            "password_confirmation": "Different-password-12345!",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "password_confirmation" in response.data
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "weak_password",
+    [
+        "Short1!",
+        "missing-uppercase-123!",
+        "MISSING-LOWERCASE-123!",
+        "Missing-number!",
+        "MissingSpecial123",
+    ],
+)
+def test_signup_rejects_passwords_without_required_complexity(
+    api_client, weak_password
+):
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "user@example.com",
+            "username": "readerone",
+            "display_name": "Reader One",
+            "password": weak_password,
+            "password_confirmation": weak_password,
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "password" in response.data
 
 
 @pytest.mark.django_db
@@ -39,7 +88,7 @@ def test_signup_rejects_duplicate_email(api_client):
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
 
     response = api_client.post(
@@ -48,7 +97,8 @@ def test_signup_rejects_duplicate_email(api_client):
             "email": "user@example.com",
             "username": "readertwo",
             "display_name": "Reader Two",
-            "password": "strong-password-12345",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
         },
     )
 
@@ -62,12 +112,12 @@ def test_login_accepts_email_or_username(api_client):
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
 
     response = api_client.post(
         reverse("login"),
-        {"identifier": "readerone", "password": "strong-password-12345"},
+        {"identifier": "readerone", "password": VALID_PASSWORD},
     )
     account.refresh_from_db()
 
@@ -78,7 +128,7 @@ def test_login_accepts_email_or_username(api_client):
     second_client = APIClient()
     second_response = second_client.post(
         reverse("login"),
-        {"identifier": "user@example.com", "password": "strong-password-12345"},
+        {"identifier": "user@example.com", "password": VALID_PASSWORD},
     )
 
     assert second_response.status_code == status.HTTP_200_OK
@@ -88,7 +138,7 @@ def test_login_accepts_email_or_username(api_client):
 def test_login_rejects_unknown_email(api_client):
     response = api_client.post(
         reverse("login"),
-        {"identifier": "missing@example.com", "password": "strong-password-12345"},
+        {"identifier": "missing@example.com", "password": VALID_PASSWORD},
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -103,7 +153,8 @@ def test_auth_rejects_invalid_email(api_client):
             "email": "not-an-email",
             "username": "readerone",
             "display_name": "Reader One",
-            "password": "strong-password-12345",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
         },
     )
 
@@ -120,7 +171,7 @@ def test_me_requires_authenticated_session(api_client):
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
     api_client.force_login(account)
 
@@ -136,7 +187,7 @@ def test_logout_clears_session(api_client):
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
     api_client.force_login(account)
 
@@ -165,7 +216,7 @@ def test_password_reset_request_sends_reset_email(api_client, mailoutbox, settin
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
 
     response = api_client.post(
@@ -187,19 +238,19 @@ def test_password_reset_confirm_sets_new_password(api_client):
         email="user@example.com",
         username="readerone",
         display_name="Reader One",
-        password="strong-password-12345",
+        password=VALID_PASSWORD,
     )
     uid = urlsafe_base64_encode(force_bytes(account.pk))
     token = default_token_generator.make_token(account)
 
     response = api_client.post(
         reverse("password-reset-confirm"),
-        {"uid": uid, "token": token, "password": "new-strong-password-12345"},
+        {"uid": uid, "token": token, "password": "New-strong-password-12345!"},
     )
     account.refresh_from_db()
 
     assert response.status_code == status.HTTP_200_OK
-    assert account.check_password("new-strong-password-12345")
+    assert account.check_password("New-strong-password-12345!")
 
 
 @pytest.mark.django_db
@@ -213,7 +264,8 @@ def test_captcha_failure_blocks_signup(api_client, settings):
             "email": "user@example.com",
             "username": "readerone",
             "display_name": "Reader One",
-            "password": "strong-password-12345",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
             "recaptcha_token": "",
         },
     )
