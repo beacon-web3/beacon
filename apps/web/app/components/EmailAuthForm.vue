@@ -35,49 +35,10 @@ const {
 <template>
   <div class="beacon-container py-16 sm:py-24">
     <section class="grid min-h-[calc(100vh-13rem)] gap-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(22rem,0.58fr)] lg:items-center">
-      <div>
-        <UBadge
-          :label="t('auth.badge')"
-          color="primary"
-          variant="subtle"
-          size="lg"
-        />
-
-        <h1 class="beacon-display mt-8 max-w-3xl text-5xl text-ink sm:text-6xl lg:text-7xl">
-          {{ t(title) }}
-        </h1>
-
-        <p class="mt-7 max-w-2xl text-lg leading-8 text-ink-muted">
-          {{ t(description) }}
-        </p>
-
-        <div class="mt-10 grid max-w-2xl gap-4 sm:grid-cols-3">
-          <div class="border-t border-rule pt-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
-              {{ t('auth.context.bookFirst.label') }}
-            </p>
-            <p class="mt-2 text-sm font-semibold text-ink">
-              {{ t('auth.context.bookFirst.value') }}
-            </p>
-          </div>
-          <div class="border-t border-rule pt-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
-              {{ t('auth.context.wallet.label') }}
-            </p>
-            <p class="mt-2 text-sm font-semibold text-ink">
-              {{ t('auth.context.wallet.value') }}
-            </p>
-          </div>
-          <div class="border-t border-rule pt-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
-              {{ t('auth.context.status.label') }}
-            </p>
-            <p class="mt-2 text-sm font-semibold text-ink">
-              {{ t('auth.context.status.value') }}
-            </p>
-          </div>
-        </div>
-      </div>
+      <EmailAuthContextPanel
+        :title="title"
+        :description="description"
+      />
 
       <div class="beacon-panel p-5 sm:p-6">
         <div class="flex items-start justify-between gap-5 border-b border-rule pb-5">
