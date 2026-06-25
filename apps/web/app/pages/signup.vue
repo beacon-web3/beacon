@@ -1,5 +1,5 @@
 <template>
-  <EmailAuthForm
+  <AuthPage
     mode="signup"
     title="auth.signupTitle"
     description="auth.signupDescription"

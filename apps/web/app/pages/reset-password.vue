@@ -1,5 +1,5 @@
 <template>
-  <EmailAuthForm
+  <AuthPage
     mode="password-reset"
     title="auth.resetTitle"
     description="auth.resetDescription"
