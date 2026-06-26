@@ -10,6 +10,9 @@ Run these commands from `apps/web/`.
 
 This workspace uses pnpm. Do not run Yarn commands here; `package.json` intentionally declares `"packageManager": "pnpm@11.5.0"`.
 
+Use Node.js 24.16.0 for local development. The pinned version is recorded in
+`.nvmrc` for Node version managers.
+
 ### 1. Install Dependencies
 
 ```bash

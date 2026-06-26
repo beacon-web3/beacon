@@ -40,6 +40,8 @@ Changelog. Use date-based entries until formal versioning starts.
   parsing checks and PostgreSQL-backed tests passing.
 - Updated backend test tooling dependencies to pytest 9.1.1 and Ruff 0.15.20,
   with Ruff checks and PostgreSQL-backed tests passing.
+- Added explicit local runtime pins for the web Node.js version and API Python
+  version, with setup docs aligned to the completed dependency upgrades.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.

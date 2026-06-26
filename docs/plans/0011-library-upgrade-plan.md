@@ -515,6 +515,8 @@ Risk controls:
 
 ## Patch 7: Runtime Version Pinning
 
+Status: Completed on 2026-06-26.
+
 Description: Add explicit runtime version guidance after dependency patches are
 green so future installs are reproducible.
 
@@ -562,6 +564,19 @@ python manage.py check
 ```
 
 Dependencies: Patches 1 through 6.
+
+Execution notes:
+
+- Added `apps/web/.nvmrc` pinning Node.js 24.16.0, matching the local runtime
+  observed during planning and verification.
+- Added `apps/api/.python-version` pinning Python 3.10.10, matching the local
+  virtualenv runtime and the Python 3.10 Docker runtime family.
+- Updated frontend and backend README setup guidance so runtime pins and
+  dependency versions agree with the completed library upgrades.
+- Frontend verification passed with `pnpm install --frozen-lockfile` and
+  `pnpm build` from `apps/web`.
+- Backend verification passed with `.venv/bin/python -m pip install -r requirements-dev.txt`
+  and `.venv/bin/python manage.py check` from `apps/api`.
 
 Risk controls:
 
