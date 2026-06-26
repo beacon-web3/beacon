@@ -43,6 +43,8 @@ Relevant specs and docs:
   network failures, and `EMAIL_VERIFICATION_REQUIRED`.
 - [x] Reset failed reCAPTCHA script loads and ensure widget containers are cleaned
   up when render or execute fails synchronously.
+- [x] Keep arbitrary API `detail` responses hidden unless a caller explicitly opts
+  into exposing them.
 - [x] Update changelog and mark this plan complete after verification.
 
 ## Acceptance Criteria
@@ -58,6 +60,8 @@ Relevant specs and docs:
   verification confirmation, and password reset confirmation.
 - Frontend auth forms show a retry-later message for 429 responses and a network
   message for request failures without an HTTP status.
+- Frontend auth forms do not expose arbitrary backend `detail` strings for unsafe
+  auth failures such as CSRF or permission errors.
 - reCAPTCHA script load failure can be retried without reloading the page, and
   hidden widget containers are removed on synchronous render/execute failures.
 
@@ -66,7 +70,7 @@ Relevant specs and docs:
 - [x] `cd apps/api && ./.venv/bin/python -m pytest tests/test_auth_api.py -k "email_delivery_fails or captcha_logs"` - 4 passed, 55 deselected.
 - [x] `cd apps/api && ./.venv/bin/python -m pytest` - 64 passed.
 - [x] `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
-- [x] `cd apps/web && pnpm test:e2e tests/e2e/auth.spec.ts` - 16 passed.
+- [x] `cd apps/web && pnpm test:e2e tests/e2e/auth.spec.ts` - 18 passed.
 - [x] `cd apps/web && pnpm lint` - passed.
 - [x] `cd apps/web && pnpm typecheck` - passed.
 

@@ -59,4 +59,7 @@ Templates live in `docs/plans/templates/`.
 | 0002 | [Frontend design system foundation](0002-frontend-design-system.md) | Completed |
 | 0003 | [Homepage clarity and French localization](0003-homepage-clarity-localization.md) | Completed |
 | 0004 | [Auth entry UI refresh](0004-auth-entry-ui-refresh.md) | Completed |
+| 0005 | [Password auth and profile foundation](0005-password-auth-and-profile-foundation.md) | Completed |
+| 0006 | [Email verification OTP](0006-email-verification-otp.md) | Complete |
+| 0007 | [Backend auth hardening](0007-backend-auth-hardening.md) | Complete |
 | 0008 | [Auth error handling improvements](0008-auth-error-handling.md) | Completed |

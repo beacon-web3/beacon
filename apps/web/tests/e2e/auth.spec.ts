@@ -221,6 +221,26 @@ test('login shows throttling failures distinctly', async ({ page }) => {
   )
 })
 
+test('login hides unsafe api detail responses', async ({ page }) => {
+  await page.route('**/api/auth/login/', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 403,
+      body: JSON.stringify({ detail: 'CSRF Failed: Referer checking failed.' })
+    })
+  })
+
+  await page.goto('/login')
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('Email or username').fill('readerone')
+  await page.getByLabel('Password', { exact: true }).fill(validPassword)
+  await page.getByRole('button', { name: 'Log in' }).click()
+
+  const alert = page.getByRole('alert')
+  await expect(alert).toContainText('We could not log you in.')
+  await expect(alert).not.toContainText('CSRF Failed')
+})
+
 test('password reset request shows network failures distinctly', async ({ page }) => {
   await page.route('**/api/auth/password-reset/', async (route) => {
     await route.abort('failed')
@@ -234,6 +254,52 @@ test('password reset request shows network failures distinctly', async ({ page }
   await expect(page.getByRole('alert')).toContainText(
     'Network error. Check your connection and try again.'
   )
+})
+
+test('signup removes hidden recaptcha containers when cleanup reset fails', async ({ page }) => {
+  let signupRequested = false
+
+  await page.route('**/api/auth/signup/', async (route) => {
+    signupRequested = true
+    await route.fulfill({ status: 500 })
+  })
+
+  await page.goto('/signup')
+  await page.waitForLoadState('networkidle')
+  await page.evaluate(() => {
+    const recaptchaWindow = window as unknown as {
+      grecaptcha: {
+        execute: () => never
+        ready: (readyCallback: () => void) => void
+        render: () => number
+        reset: () => never
+      }
+    }
+
+    recaptchaWindow.grecaptcha = {
+      ready: (readyCallback: () => void) => readyCallback(),
+      render: () => 1,
+      execute: () => {
+        throw new Error('execute failed')
+      },
+      reset: () => {
+        throw new Error('reset failed')
+      }
+    }
+  })
+
+  await page.getByLabel('Display name').fill('Reader One')
+  await page.getByLabel('Username').fill('readerone')
+  await page.getByLabel('Email address').fill('new@example.com')
+  await page.getByLabel('Password', { exact: true }).fill(validPassword)
+  await page.getByLabel('Confirm password').fill(validPassword)
+  await page.getByRole('button', { name: 'Create account' }).click()
+
+  await expect(page.getByRole('alert')).toContainText(
+    'Network error. Check your connection and try again.'
+  )
+  await expect.poll(async () => page.locator('body > div[hidden]').count()).toBe(0)
+  expect(signupRequested).toBe(false)
 })
 
 test('signup blocks weak passwords before calling the auth api', async ({ page }) => {

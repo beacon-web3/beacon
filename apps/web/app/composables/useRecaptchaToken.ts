@@ -100,10 +100,15 @@ export function useRecaptchaToken() {
       let widgetId: number | undefined
 
       function cleanup() {
-        if (widgetId !== undefined) {
-          activeRecaptcha.reset(widgetId)
+        try {
+          if (widgetId !== undefined) {
+            activeRecaptcha.reset(widgetId)
+          }
+        } catch {
+          // reCAPTCHA cleanup is best-effort; the hidden container must still be removed.
+        } finally {
+          container.remove()
         }
-        container.remove()
       }
 
       try {

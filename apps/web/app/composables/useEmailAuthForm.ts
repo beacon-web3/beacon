@@ -35,12 +35,6 @@ type AuthResponse = {
   }
 }
 
-type AuthFetchError = {
-  data?: {
-    code?: string
-    email?: string
-  }
-}
 type PasswordRequirement = {
   key: string
   message: string
@@ -50,7 +44,7 @@ type PasswordRequirement = {
 export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
   const { apiFetch } = useApiFetch()
-  const { getAuthApiErrorMessage, getVerificationRequiredEmail } = useAuthApiErrorMessage()
+  const { getApiErrorData, getApiErrorMessage } = useApiErrorMessage()
   const { executeRecaptcha } = useRecaptchaToken()
 
   const form = reactive<EmailAuthFormState>({
@@ -216,6 +210,13 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     form.recaptchaToken = ''
   }
 
+  function getVerificationRequiredEmail(error: unknown) {
+    const data = getApiErrorData(error)
+    return data?.code === 'EMAIL_VERIFICATION_REQUIRED' && typeof data.email === 'string'
+      ? data.email
+      : undefined
+  }
+
   async function submit(_event: FormSubmitEvent<EmailAuthFormData>) {
     errorText.value = ''
     successText.value = ''
@@ -243,13 +244,13 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         await options.onVerificationRequired?.(response.account.email)
       }
     } catch (error) {
-      const verificationEmail = getVerificationRequiredEmail(error as AuthFetchError)
+      const verificationEmail = getVerificationRequiredEmail(error)
       if (verificationEmail) {
         await options.onVerificationRequired?.(verificationEmail)
         return
       }
 
-      errorText.value = getAuthApiErrorMessage(error, options.errorMessage)
+      errorText.value = getApiErrorMessage(error, { fallbackMessageKey: options.errorMessage })
     } finally {
       isSubmitting.value = false
     }
