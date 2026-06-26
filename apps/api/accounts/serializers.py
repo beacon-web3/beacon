@@ -9,6 +9,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.captcha import verify_recaptcha_token
@@ -46,7 +47,7 @@ class RecaptchaSerializer(serializers.Serializer):
 
         if not verify_recaptcha_token(token, remote_ip):
             raise serializers.ValidationError(
-                {"recaptcha_token": "Captcha verification failed."}
+                {"recaptcha_token": _("Captcha verification failed.")}
             )
 
         return attrs
@@ -80,23 +81,23 @@ class SignupSerializer(RecaptchaSerializer):
 
         if attrs["password"] != attrs["password_confirmation"]:
             raise serializers.ValidationError(
-                {"password_confirmation": "Passwords do not match."}
+                {"password_confirmation": _("Passwords do not match.")}
             )
 
         attrs["display_name"] = attrs["display_name"].strip()
         if not attrs["display_name"]:
             raise serializers.ValidationError(
-                {"display_name": "Display name cannot be blank."}
+                {"display_name": _("Display name cannot be blank.")}
             )
 
         if Account.objects.filter(email__iexact=attrs["email"]).exists():
             raise serializers.ValidationError(
-                {"email": "An account with this email already exists."}
+                {"email": _("An account with this email already exists.")}
             )
 
         if Account.objects.filter(username__iexact=attrs["username"]).exists():
             raise serializers.ValidationError(
-                {"username": "An account with this username already exists."}
+                {"username": _("An account with this username already exists.")}
             )
 
         return attrs
@@ -113,7 +114,7 @@ class SignupSerializer(RecaptchaSerializer):
             raise serializers.ValidationError(
                 {
                     "non_field_errors": (
-                        "An account with this email or username already exists."
+                        _("An account with this email or username already exists.")
                     )
                 }
             ) from exc
@@ -138,11 +139,11 @@ class LoginSerializer(RecaptchaSerializer):
         )
 
         if account is None:
-            raise serializers.ValidationError("Invalid credentials.") from None
+            raise serializers.ValidationError(_("Invalid credentials.")) from None
 
         self.account = authenticate(username=account.username, password=password)
         if self.account is None:
-            raise serializers.ValidationError("Invalid credentials.")
+            raise serializers.ValidationError(_("Invalid credentials."))
 
         return attrs
 
@@ -168,7 +169,7 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.RegexField(
         r"^\d{6}$",
-        error_messages={"invalid": "Enter a valid verification code."},
+        error_messages={"invalid": _("Enter a valid verification code.")},
     )
     account: Account
 
@@ -186,17 +187,21 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
             )
 
             if account is None or account.email_verified_at is not None:
-                raise serializers.ValidationError({"otp": "Invalid verification code."})
+                raise serializers.ValidationError(
+                    {"otp": _("Invalid verification code.")}
+                )
 
             if not account.email_verification_code_hash:
-                raise serializers.ValidationError({"otp": "Invalid verification code."})
+                raise serializers.ValidationError(
+                    {"otp": _("Invalid verification code.")}
+                )
 
             if (
                 account.email_verification_attempts
                 >= settings.EMAIL_VERIFICATION_MAX_ATTEMPTS
             ):
                 raise serializers.ValidationError(
-                    {"otp": "Too many verification attempts. Request a new code."}
+                    {"otp": _("Too many verification attempts. Request a new code.")}
                 )
 
             if (
@@ -204,11 +209,11 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
                 or account.email_verification_code_expires_at <= timezone.now()
             ):
                 self._record_failed_attempt(account)
-                validation_error = {"otp": "Verification code has expired."}
+                validation_error = {"otp": _("Verification code has expired.")}
 
             elif not check_password(attrs["otp"], account.email_verification_code_hash):
                 self._record_failed_attempt(account)
-                validation_error = {"otp": "Invalid verification code."}
+                validation_error = {"otp": _("Invalid verification code.")}
 
         if validation_error is not None:
             raise serializers.ValidationError(validation_error)
@@ -235,7 +240,7 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
             email_verification_attempts=0,
         )
         if updated == 0:
-            raise serializers.ValidationError({"otp": "Invalid verification code."})
+            raise serializers.ValidationError({"otp": _("Invalid verification code.")})
 
         self.account.email_verified_at = verified_at
         self.account.email_verification_code_hash = ""
@@ -260,10 +265,12 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             account_id = force_str(urlsafe_base64_decode(attrs["uid"]))
             self.account = Account.objects.get(pk=account_id)
         except (TypeError, ValueError, OverflowError, Account.DoesNotExist):
-            raise serializers.ValidationError("Invalid password reset token.") from None
+            raise serializers.ValidationError(
+                _("Invalid password reset token.")
+            ) from None
 
         if not default_token_generator.check_token(self.account, attrs["token"]):
-            raise serializers.ValidationError("Invalid password reset token.")
+            raise serializers.ValidationError(_("Invalid password reset token."))
 
         return attrs
 

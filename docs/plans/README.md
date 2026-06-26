@@ -53,8 +53,8 @@ Templates live in `docs/plans/templates/`.
 
 ## Index
 
-| ID | Plan | Status |
-| --- | --- | --- |
+| ID   | Plan | Status  |
+|------| --- |---------|
 | 0001 | [Documentation foundation](0001-documentation-foundation.md) | Completed |
 | 0002 | [Frontend design system foundation](0002-frontend-design-system.md) | Completed |
 | 0003 | [Homepage clarity and French localization](0003-homepage-clarity-localization.md) | Completed |
@@ -63,3 +63,5 @@ Templates live in `docs/plans/templates/`.
 | 0006 | [Email verification OTP](0006-email-verification-otp.md) | Complete |
 | 0007 | [Backend auth hardening](0007-backend-auth-hardening.md) | Complete |
 | 0008 | [Auth error handling improvements](0008-auth-error-handling.md) | Completed |
+| 0009 | [Backend Localization](0009-backend-localization.md) | Completed |
+| 0010 | [Auth API test split](0010-auth-api-test-split.md) | Draft |

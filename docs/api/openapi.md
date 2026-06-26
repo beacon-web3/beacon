@@ -7,6 +7,13 @@ auth endpoints verify reCAPTCHA v2 Invisible tokens when captcha is enabled on
 the backend. Password reset emails build confirmation links from
 `FRONTEND_BASE_URL`.
 
+Human-facing auth response text, validation messages, and backend-generated auth
+emails are localized from the HTTP `Accept-Language` header. The backend supports
+`en` and `fr`; unsupported or missing language headers fall back to English.
+Clients must not use translated `detail` or validation text for control flow.
+Use stable response shapes, field names, HTTP status codes, and machine-readable
+codes such as `EMAIL_VERIFICATION_REQUIRED` instead.
+
 Browser clients must send Django's CSRF token on authenticated unsafe requests,
 including `POST /api/auth/logout/`. Successful login and email verification
 confirmation responses issue a `csrftoken` cookie for browser sessions. Beacon's

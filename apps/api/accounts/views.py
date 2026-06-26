@@ -12,6 +12,8 @@ from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.translation import gettext as gettext_now
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -37,10 +39,10 @@ from accounts.throttles import (
 
 Account = get_user_model()
 logger = logging.getLogger(__name__)
-PASSWORD_RESET_DETAIL = (
+PASSWORD_RESET_DETAIL = _(
     "If an account exists, password reset instructions will be sent."
 )
-EMAIL_VERIFICATION_DETAIL = "If an account exists, a verification code will be sent."
+EMAIL_VERIFICATION_DETAIL = _("If an account exists, a verification code will be sent.")
 EMAIL_VERIFICATION_EXPIRY = timedelta(minutes=15)
 EMAIL_VERIFICATION_REQUIRED = "EMAIL_VERIFICATION_REQUIRED"
 
@@ -61,12 +63,14 @@ def send_email_verification_code(account: Account) -> None:
     )
 
     send_mail(
-        subject="Verify your Beacon email",
+        subject=gettext_now("Verify your Beacon email"),
         message=(
-            "Use this code to verify your Beacon email address:\n\n"
+            gettext_now("Use this code to verify your Beacon email address:") + "\n\n"
             f"{otp}\n\n"
-            "This code expires in 15 minutes. If you did not request this, "
-            "you can ignore this email."
+            + gettext_now(
+                "This code expires in 15 minutes. If you did not request this, "
+                "you can ignore this email."
+            )
         ),
         from_email=None,
         recipient_list=[account.email],
@@ -92,11 +96,11 @@ def send_password_reset_email_best_effort(account: Account) -> None:
 
     try:
         send_mail(
-            subject="Reset your Beacon password",
+            subject=gettext_now("Reset your Beacon password"),
             message=(
-                "Use this link to reset your Beacon password:\n\n"
+                gettext_now("Use this link to reset your Beacon password:") + "\n\n"
                 f"{reset_url}\n\n"
-                "If you did not request this, you can ignore this email."
+                + gettext_now("If you did not request this, you can ignore this email.")
             ),
             from_email=None,
             recipient_list=[account.email],
@@ -231,4 +235,4 @@ class PasswordResetConfirmView(APIView):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"detail": "Password has been reset."})
+        return Response({"detail": _("Password has been reset.")})

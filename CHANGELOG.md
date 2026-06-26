@@ -12,6 +12,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added backend auth localization for English/French language negotiation,
+  localized auth validation/detail messages, localized auth emails, French Django
+  message catalogs, and Nuxt auth API `Accept-Language` forwarding.
 - Added backend auth hardening with captcha-before-duplicate signup validation,
   case-insensitive account uniqueness constraints, auth request throttles, CSRF
   regression coverage, and configurable production cookie/HTTPS/email settings.
@@ -22,6 +25,8 @@ Changelog. Use date-based entries until formal versioning starts.
   verification, a shared Nuxt backend API transport for CSRF headers, frontend
   reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
   CSRF/reCAPTCHA behavior and password reset confirmation.
+- Added a draft plan for splitting the monolithic backend auth API test file into
+  focused auth, account model, and admin test modules.
 
 ### Changed
 
@@ -45,6 +50,12 @@ Changelog. Use date-based entries until formal versioning starts.
   reCAPTCHA script loads retryable.
 - Updated placeholder contracts, scripts, SDK, config, and types README files
   with current implementation status and boundaries.
+
+### Fixed
+
+- Fixed French backend translations for password-complexity validation and added
+  regression coverage for weak-password signup errors under `Accept-Language: fr`.
+
 
 ## 2026-06-25
 

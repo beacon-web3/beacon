@@ -1,0 +1,100 @@
+# Beacon API French translations.
+# Copyright (C) 2026 Beacon contributors
+# This file is distributed under the same license as the Beacon package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Beacon API\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-26 00:00+0000\n"
+"PO-Revision-Date: 2026-06-26 00:00+0000\n"
+"Last-Translator: Beacon contributors\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Captcha verification failed."
+msgstr "La verification captcha a echoue."
+
+msgid "Passwords do not match."
+msgstr "Les mots de passe ne correspondent pas."
+
+msgid "Display name cannot be blank."
+msgstr "Le nom affiche ne peut pas etre vide."
+
+msgid "An account with this email already exists."
+msgstr "Un compte avec cette adresse e-mail existe deja."
+
+msgid "An account with this username already exists."
+msgstr "Un compte avec ce nom d'utilisateur existe deja."
+
+msgid "An account with this email or username already exists."
+msgstr "Un compte avec cette adresse e-mail ou ce nom d'utilisateur existe deja."
+
+msgid "Invalid credentials."
+msgstr "Identifiants invalides."
+
+msgid "Enter a valid verification code."
+msgstr "Saisissez un code de verification valide."
+
+msgid "Invalid verification code."
+msgstr "Code de verification invalide."
+
+msgid "Too many verification attempts. Request a new code."
+msgstr "Trop de tentatives de verification. Demandez un nouveau code."
+
+msgid "Verification code has expired."
+msgstr "Le code de verification a expire."
+
+msgid "Invalid password reset token."
+msgstr "Jeton de reinitialisation du mot de passe invalide."
+
+msgid "be longer than 8 characters"
+msgstr "faire plus de 8 caracteres"
+
+msgid "include a lowercase letter"
+msgstr "inclure une lettre minuscule"
+
+msgid "include an uppercase letter"
+msgstr "inclure une lettre majuscule"
+
+msgid "include a number"
+msgstr "inclure un chiffre"
+
+msgid "include a special character"
+msgstr "inclure un caractere special"
+
+msgid "Password must %(requirements)s."
+msgstr "Le mot de passe doit %(requirements)s."
+
+msgid "Your password must be longer than 8 characters and include a lowercase letter, uppercase letter, number, and special character."
+msgstr "Votre mot de passe doit faire plus de 8 caracteres et inclure une lettre minuscule, une lettre majuscule, un chiffre et un caractere special."
+
+msgid "If an account exists, password reset instructions will be sent."
+msgstr "Si un compte existe, les instructions de reinitialisation du mot de passe seront envoyees."
+
+msgid "If an account exists, a verification code will be sent."
+msgstr "Si un compte existe, un code de verification sera envoye."
+
+msgid "Verify your Beacon email"
+msgstr "Verifiez votre adresse e-mail Beacon"
+
+msgid "Use this code to verify your Beacon email address:"
+msgstr "Utilisez ce code pour verifier votre adresse e-mail Beacon :"
+
+msgid "This code expires in 15 minutes. If you did not request this, you can ignore this email."
+msgstr "Ce code expire dans 15 minutes. Si vous n'avez pas demande cela, vous pouvez ignorer cet e-mail."
+
+msgid "Reset your Beacon password"
+msgstr "Reinitialisez votre mot de passe Beacon"
+
+msgid "Use this link to reset your Beacon password:"
+msgstr "Utilisez ce lien pour reinitialiser votre mot de passe Beacon :"
+
+msgid "If you did not request this, you can ignore this email."
+msgstr "Si vous n'avez pas demande cela, vous pouvez ignorer cet e-mail."
+
+msgid "Password has been reset."
+msgstr "Le mot de passe a ete reinitialise."
