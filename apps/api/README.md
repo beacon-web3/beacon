@@ -201,6 +201,30 @@ Run these commands from `apps/api/`.
 
 The root pre-commit hook runs Ruff only when staged Python files exist under `apps/api/`.
 
+## Auth Configuration
+
+The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
+email verification OTPs, password reset emails, and cache-backed IP throttles.
+
+Important environment variables:
+
+* `FRONTEND_BASE_URL` controls password-reset confirmation links.
+* `EMAIL_VERIFICATION_MAX_ATTEMPTS` limits failed attempts per OTP before the
+  user must request a new code.
+* `AUTH_SIGNUP_THROTTLE_RATE`, `AUTH_LOGIN_THROTTLE_RATE`,
+  `AUTH_PASSWORD_RESET_THROTTLE_RATE`,
+  `AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE`, and
+  `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune IP throttles.
+* `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`,
+  `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and
+  `SECURE_HSTS_PRELOAD` enable production cookie and HTTPS hardening.
+* `DEFAULT_FROM_EMAIL` sets the sender for verification and password-reset
+  emails unless a custom email backend overrides it.
+
+Browser clients using session cookies must send Django's CSRF token on
+authenticated unsafe requests. The frontend should read the `csrftoken` cookie
+and send it as `X-CSRFToken`.
+
 ## Tests
 
 Run backend tests with Docker from `apps/api/`:
@@ -215,7 +239,7 @@ Or run them with `.venv`:
 .venv/bin/pytest
 ```
 
-The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and email-only auth API behavior. As the backend grows, tests should cover models, serializers, API views, permissions, and core business rules.
+The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and password/session auth API behavior. It covers signup, login, logout, profile reads, password reset, email verification OTPs, captcha gating, CSRF enforcement, throttling, and account uniqueness edge cases.
 
 Backend tests are intentionally not part of the pre-commit hook. They should be run manually during development and later in CI.
 

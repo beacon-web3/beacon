@@ -8,6 +8,17 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Added
+
+- Added backend auth hardening with captcha-before-duplicate signup validation,
+  case-insensitive account uniqueness constraints, auth request throttles, CSRF
+  regression coverage, and configurable production cookie/HTTPS/email settings.
+
+### Changed
+
+- Updated backend auth docs and configuration examples for password confirmation,
+  session CSRF usage, throttle responses, email verification attempts, and email
+  delivery settings.
 
 ## 2026-06-25
 

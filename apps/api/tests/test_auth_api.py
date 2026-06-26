@@ -1,7 +1,10 @@
 import re
+from unittest import mock
 
 import pytest
 from django.contrib.auth.tokens import default_token_generator
+from django.core.cache import cache
+from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -18,6 +21,11 @@ OTP_PATTERN = re.compile(r"\b(\d{6})\b")
 @pytest.fixture
 def api_client():
     return APIClient()
+
+
+@pytest.fixture(autouse=True)
+def clear_rate_limit_cache():
+    cache.clear()
 
 
 @pytest.mark.django_db
@@ -81,6 +89,23 @@ def test_signup_rejects_mismatched_password_confirmation(api_client):
 
 
 @pytest.mark.django_db
+def test_signup_rejects_whitespace_display_name(api_client):
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "user@example.com",
+            "username": "readerone",
+            "display_name": "   ",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "display_name" in response.data
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "weak_password",
     [
@@ -131,6 +156,98 @@ def test_signup_rejects_duplicate_email(api_client):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "email" in response.data
+
+
+@pytest.mark.django_db
+def test_signup_rejects_duplicate_username_case_insensitively(api_client):
+    Account.objects.create_user(
+        email="user@example.com",
+        username="ReaderOne",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "second@example.com",
+            "username": "readerone",
+            "display_name": "Reader Two",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "username" in response.data
+
+
+@pytest.mark.django_db
+def test_account_email_and_username_are_database_unique_case_insensitively():
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+
+    with transaction.atomic():
+        with pytest.raises(IntegrityError):
+            Account.objects.create_user(
+                email="USER@example.com",
+                username="readertwo",
+                display_name="Reader Two",
+                password=VALID_PASSWORD,
+            )
+
+    with transaction.atomic():
+        with pytest.raises(IntegrityError):
+            Account.objects.create_user(
+                email="second@example.com",
+                username="ReaderOne",
+                display_name="Reader Two",
+                password=VALID_PASSWORD,
+            )
+
+
+@pytest.mark.django_db
+def test_signup_duplicate_race_returns_validation_error(api_client):
+    with mock.patch.object(
+        Account.objects,
+        "create_user",
+        side_effect=IntegrityError("duplicate account"),
+    ):
+        response = api_client.post(
+            reverse("signup"),
+            {
+                "email": "user@example.com",
+                "username": "readerone",
+                "display_name": "Reader One",
+                "password": VALID_PASSWORD,
+                "password_confirmation": VALID_PASSWORD,
+            },
+        )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "non_field_errors" in response.data
+
+
+@pytest.mark.django_db
+def test_signup_email_delivery_failure_rolls_back_account(api_client):
+    with mock.patch("accounts.views.send_mail", side_effect=RuntimeError("smtp down")):
+        with pytest.raises(RuntimeError):
+            api_client.post(
+                reverse("signup"),
+                {
+                    "email": "user@example.com",
+                    "username": "readerone",
+                    "display_name": "Reader One",
+                    "password": VALID_PASSWORD,
+                    "password_confirmation": VALID_PASSWORD,
+                },
+            )
+
+    assert not Account.objects.filter(email="user@example.com").exists()
 
 
 @pytest.mark.django_db
@@ -247,6 +364,23 @@ def test_logout_clears_session(api_client):
 
 
 @pytest.mark.django_db
+def test_authenticated_unsafe_session_requests_enforce_csrf():
+    account = Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+        email_verified_at=timezone.now(),
+    )
+    csrf_client = APIClient(enforce_csrf_checks=True)
+    csrf_client.force_login(account)
+
+    response = csrf_client.post(reverse("logout"))
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
 def test_password_reset_request_is_generic(api_client, mailoutbox):
     response = api_client.post(
         reverse("password-reset"),
@@ -323,6 +457,35 @@ def test_captcha_failure_blocks_signup(api_client, settings):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "recaptcha_token" in response.data
+
+
+@pytest.mark.django_db
+def test_captcha_failure_blocks_duplicate_signup_signals(api_client, settings):
+    settings.RECAPTCHA_ENABLED = True
+    settings.RECAPTCHA_SECRET_KEY = "test-secret"
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "user@example.com",
+            "username": "readerone",
+            "display_name": "Reader One",
+            "password": VALID_PASSWORD,
+            "password_confirmation": VALID_PASSWORD,
+            "recaptcha_token": "",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "recaptcha_token" in response.data
+    assert "email" not in response.data
+    assert "username" not in response.data
 
 
 @pytest.mark.django_db
@@ -538,6 +701,47 @@ def test_email_verification_confirm_enforces_attempt_limit(
 
     assert locked_response.status_code == status.HTTP_400_BAD_REQUEST
     assert "otp" in locked_response.data
+
+
+@pytest.mark.django_db
+def test_auth_request_throttles_return_too_many_requests(api_client, settings):
+    settings.AUTH_THROTTLE_RATES = {
+        "auth_signup": "100/min",
+        "auth_login": "100/min",
+        "auth_password_reset": "1/min",
+        "auth_email_verification_request": "100/min",
+        "auth_email_verification_confirm": "100/min",
+    }
+
+    first_response = api_client.post(
+        reverse("password-reset"),
+        {"email": "missing@example.com"},
+    )
+    throttled_response = api_client.post(
+        reverse("password-reset"),
+        {"email": "missing@example.com"},
+    )
+
+    assert first_response.status_code == status.HTTP_202_ACCEPTED
+    assert throttled_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+
+def test_production_security_settings_are_configurable(settings):
+    settings.SESSION_COOKIE_SECURE = True
+    settings.CSRF_COOKIE_SECURE = True
+    settings.SECURE_SSL_REDIRECT = True
+    settings.SECURE_HSTS_SECONDS = 31536000
+    settings.SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    settings.SECURE_HSTS_PRELOAD = True
+    settings.DEFAULT_FROM_EMAIL = "security@beacon.test"
+
+    assert settings.SESSION_COOKIE_SECURE is True
+    assert settings.CSRF_COOKIE_SECURE is True
+    assert settings.SECURE_SSL_REDIRECT is True
+    assert settings.SECURE_HSTS_SECONDS == 31536000
+    assert settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
+    assert settings.SECURE_HSTS_PRELOAD is True
+    assert settings.DEFAULT_FROM_EMAIL == "security@beacon.test"
 
 
 @pytest.mark.django_db

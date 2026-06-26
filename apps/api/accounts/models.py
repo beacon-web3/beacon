@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Lower
 
 
 class Account(AbstractUser):
@@ -18,6 +19,16 @@ class Account(AbstractUser):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                Lower("email"),
+                name="accounts_account_email_ci_unique",
+            ),
+            models.UniqueConstraint(
+                Lower("username"),
+                name="accounts_account_username_ci_unique",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.username

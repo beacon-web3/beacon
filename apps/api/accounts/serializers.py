@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db import IntegrityError
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -62,23 +63,11 @@ class SignupSerializer(RecaptchaSerializer):
     username_validator = UnicodeUsernameValidator()
 
     def validate_email(self, value: str) -> str:
-        value = value.strip().lower()
-
-        if Account.objects.filter(email=value).exists():
-            raise serializers.ValidationError(
-                "An account with this email already exists."
-            )
-
-        return value
+        return value.strip().lower()
 
     def validate_username(self, value: str) -> str:
         value = value.strip()
         self.username_validator(value)
-
-        if Account.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError(
-                "An account with this username already exists."
-            )
 
         return value
 
@@ -94,15 +83,40 @@ class SignupSerializer(RecaptchaSerializer):
                 {"password_confirmation": "Passwords do not match."}
             )
 
+        attrs["display_name"] = attrs["display_name"].strip()
+        if not attrs["display_name"]:
+            raise serializers.ValidationError(
+                {"display_name": "Display name cannot be blank."}
+            )
+
+        if Account.objects.filter(email__iexact=attrs["email"]).exists():
+            raise serializers.ValidationError(
+                {"email": "An account with this email already exists."}
+            )
+
+        if Account.objects.filter(username__iexact=attrs["username"]).exists():
+            raise serializers.ValidationError(
+                {"username": "An account with this username already exists."}
+            )
+
         return attrs
 
     def save(self) -> Account:
-        return Account.objects.create_user(
-            email=self.validated_data["email"],
-            username=self.validated_data["username"],
-            display_name=self.validated_data["display_name"].strip(),
-            password=self.validated_data["password"],
-        )
+        try:
+            return Account.objects.create_user(
+                email=self.validated_data["email"],
+                username=self.validated_data["username"],
+                display_name=self.validated_data["display_name"],
+                password=self.validated_data["password"],
+            )
+        except IntegrityError as exc:
+            raise serializers.ValidationError(
+                {
+                    "non_field_errors": (
+                        "An account with this email or username already exists."
+                    )
+                }
+            ) from exc
 
 
 class LoginSerializer(RecaptchaSerializer):

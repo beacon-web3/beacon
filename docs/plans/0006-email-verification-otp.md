@@ -1,6 +1,6 @@
 # Email Verification OTP
 
-Status: In Progress
+Status: Complete
 
 ## Context
 
@@ -69,7 +69,7 @@ Relevant specs:
 - `cd apps/web && pnpm test:e2e` - passed, 11 tests.
 - `cd apps/web && CI=1 pnpm test:e2e tests/e2e/auth.spec.ts` - passed, 9 tests.
 
-## Open Questions
+## Follow-Up
 
-- Production IP/user throttles, cooldowns, and monitoring for OTP request volume
-  and failed confirmation attempts should be finalized before public launch.
+- Production IP throttles were added in `docs/plans/0007-backend-auth-hardening.md`.
+  Rate values should still be tuned after real traffic and abuse metrics exist.
