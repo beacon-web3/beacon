@@ -10,6 +10,7 @@ The current Python dependencies are tracked in `requirements.txt`:
 
 * Django 5.2.14
 * Django REST Framework 3.17.1
+* django-cors-headers 4.9.0
 * django-environ 0.13.0
 * psycopg 3.3.4
 
@@ -201,21 +202,86 @@ Run these commands from `apps/api/`.
 
 The root pre-commit hook runs Ruff only when staged Python files exist under `apps/api/`.
 
+## Auth Configuration
+
+The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
+email verification OTPs, password reset emails, and cache-backed auth throttles.
+
+Important environment variables:
+
+* `FRONTEND_BASE_URL` controls password-reset confirmation links.
+* `EMAIL_VERIFICATION_MAX_ATTEMPTS` limits failed attempts per OTP before the
+  user must request a new code.
+* `AUTH_SIGNUP_THROTTLE_RATE`, `AUTH_LOGIN_THROTTLE_RATE`,
+  `AUTH_PASSWORD_RESET_THROTTLE_RATE`,
+  `AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE`,
+  `AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE`, and
+  `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune auth throttles. Login,
+  reset, and verification throttles key on submitted identifiers when present so
+  repeated attacks against the same account are limited across client IPs.
+* `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`,
+  `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and
+  `SECURE_HSTS_PRELOAD` enable production cookie and HTTPS hardening.
+* `DEFAULT_FROM_EMAIL` sets the sender for verification and password-reset
+  emails unless a custom email backend overrides it.
+
+Signup creates the account transactionally and schedules the initial verification
+email after commit. If that post-commit email send fails, signup still returns
+`201 Created`; the user can request a replacement code from the verification
+resend endpoint. Verification resend and password reset requests send email
+synchronously through Django's configured email backend, so backend email errors
+can fail those requests even though their response bodies remain generic when the
+email backend succeeds.
+
+Before production or public traffic, set `RECAPTCHA_ENABLED=true` with a valid
+`RECAPTCHA_SECRET_KEY` and configure the Nuxt frontend with
+`NUXT_PUBLIC_RECAPTCHA_SITE_KEY` so browser auth submissions send reCAPTCHA v2
+Invisible tokens.
+
+Browser clients using session cookies must send Django's CSRF token on
+authenticated unsafe requests. Successful login and email verification
+confirmation responses issue a `csrftoken` cookie; the Nuxt frontend reads that
+cookie through its shared backend API transport and sends it as `X-CSRFToken` on
+unsafe API methods.
+
 ## Tests
 
-Run backend tests with Docker from `apps/api/`:
+Run backend tests with the portable PostgreSQL runner from `apps/api/`:
+
+```bash
+./scripts/test-postgres.sh
+```
+
+Pass pytest arguments through the runner for targeted checks:
+
+```bash
+./scripts/test-postgres.sh tests/test_auth_api.py
+```
+
+The runner starts the Docker Compose PostgreSQL service, waits for readiness,
+and runs pytest with a known `DATABASE_URL`. If `apps/api/.venv` is not present,
+it runs pytest inside the `api` container instead. This is the recommended path
+because it does not depend on a machine-level PostgreSQL install.
+
+Docker Desktop or the Docker daemon must be running first. If the runner reports
+that Docker is not reachable, start Docker Desktop and rerun the command. Avoid
+using plain `.venv/bin/pytest` as the default local workflow unless PostgreSQL is
+already running at the configured `DATABASE_URL`.
+
+You can also run tests fully inside Docker:
 
 ```bash
 docker compose run --rm api pytest
 ```
 
-Or run them with `.venv`:
+Plain `.venv` pytest runs are available when a compatible PostgreSQL server is
+already running at the configured `DATABASE_URL`:
 
 ```bash
 .venv/bin/pytest
 ```
 
-The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and email-only auth API behavior. As the backend grows, tests should cover models, serializers, API views, permissions, and core business rules.
+The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and password/session auth API behavior. It covers signup, login, logout, profile reads, password reset, email verification OTPs, captcha gating, CSRF enforcement, throttling, and account uniqueness edge cases.
 
 Backend tests are intentionally not part of the pre-commit hook. They should be run manually during development and later in CI.
 
@@ -229,6 +295,7 @@ docker compose run --rm api python manage.py migrate
 docker compose run --rm api pytest
 docker compose run --rm api ruff check .
 docker compose up -d postgres
+./scripts/test-postgres.sh
 docker compose ps
 docker compose down
 ```

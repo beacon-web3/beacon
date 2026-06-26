@@ -123,7 +123,7 @@ const {
       v-if="isSignup || isLogin || isPasswordResetConfirm"
       :label="isPasswordResetConfirm ? t('auth.newPasswordLabel') : t('auth.passwordLabel')"
       name="password"
-      :help="isSignup && !successText ? activeSignupPasswordRequirement?.message : undefined"
+      :help="(isSignup || isPasswordResetConfirm) && !successText ? activeSignupPasswordRequirement?.message : undefined"
     >
       <UInput
         id="auth-password"

@@ -4,7 +4,8 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.db.models import Q
+from django.db import IntegrityError, transaction
+from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -62,23 +63,11 @@ class SignupSerializer(RecaptchaSerializer):
     username_validator = UnicodeUsernameValidator()
 
     def validate_email(self, value: str) -> str:
-        value = value.strip().lower()
-
-        if Account.objects.filter(email=value).exists():
-            raise serializers.ValidationError(
-                "An account with this email already exists."
-            )
-
-        return value
+        return value.strip().lower()
 
     def validate_username(self, value: str) -> str:
         value = value.strip()
         self.username_validator(value)
-
-        if Account.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError(
-                "An account with this username already exists."
-            )
 
         return value
 
@@ -94,15 +83,40 @@ class SignupSerializer(RecaptchaSerializer):
                 {"password_confirmation": "Passwords do not match."}
             )
 
+        attrs["display_name"] = attrs["display_name"].strip()
+        if not attrs["display_name"]:
+            raise serializers.ValidationError(
+                {"display_name": "Display name cannot be blank."}
+            )
+
+        if Account.objects.filter(email__iexact=attrs["email"]).exists():
+            raise serializers.ValidationError(
+                {"email": "An account with this email already exists."}
+            )
+
+        if Account.objects.filter(username__iexact=attrs["username"]).exists():
+            raise serializers.ValidationError(
+                {"username": "An account with this username already exists."}
+            )
+
         return attrs
 
     def save(self) -> Account:
-        return Account.objects.create_user(
-            email=self.validated_data["email"],
-            username=self.validated_data["username"],
-            display_name=self.validated_data["display_name"].strip(),
-            password=self.validated_data["password"],
-        )
+        try:
+            return Account.objects.create_user(
+                email=self.validated_data["email"],
+                username=self.validated_data["username"],
+                display_name=self.validated_data["display_name"],
+                password=self.validated_data["password"],
+            )
+        except IntegrityError as exc:
+            raise serializers.ValidationError(
+                {
+                    "non_field_errors": (
+                        "An account with this email or username already exists."
+                    )
+                }
+            ) from exc
 
 
 class LoginSerializer(RecaptchaSerializer):
@@ -163,51 +177,70 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        account = Account.objects.filter(email__iexact=attrs["email"]).first()
-
-        if account is None or account.email_verified_at is not None:
-            raise serializers.ValidationError({"otp": "Invalid verification code."})
-
-        if not account.email_verification_code_hash:
-            raise serializers.ValidationError({"otp": "Invalid verification code."})
-
-        if (
-            account.email_verification_attempts
-            >= settings.EMAIL_VERIFICATION_MAX_ATTEMPTS
-        ):
-            raise serializers.ValidationError(
-                {"otp": "Too many verification attempts. Request a new code."}
+        validation_error = None
+        with transaction.atomic():
+            account = (
+                Account.objects.select_for_update()
+                .filter(email__iexact=attrs["email"])
+                .first()
             )
 
-        if (
-            account.email_verification_code_expires_at is None
-            or account.email_verification_code_expires_at <= timezone.now()
-        ):
-            account.email_verification_attempts += 1
-            account.save(update_fields=["email_verification_attempts"])
-            raise serializers.ValidationError({"otp": "Verification code has expired."})
+            if account is None or account.email_verified_at is not None:
+                raise serializers.ValidationError({"otp": "Invalid verification code."})
 
-        if not check_password(attrs["otp"], account.email_verification_code_hash):
-            account.email_verification_attempts += 1
-            account.save(update_fields=["email_verification_attempts"])
-            raise serializers.ValidationError({"otp": "Invalid verification code."})
+            if not account.email_verification_code_hash:
+                raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+            if (
+                account.email_verification_attempts
+                >= settings.EMAIL_VERIFICATION_MAX_ATTEMPTS
+            ):
+                raise serializers.ValidationError(
+                    {"otp": "Too many verification attempts. Request a new code."}
+                )
+
+            if (
+                account.email_verification_code_expires_at is None
+                or account.email_verification_code_expires_at <= timezone.now()
+            ):
+                self._record_failed_attempt(account)
+                validation_error = {"otp": "Verification code has expired."}
+
+            elif not check_password(attrs["otp"], account.email_verification_code_hash):
+                self._record_failed_attempt(account)
+                validation_error = {"otp": "Invalid verification code."}
+
+        if validation_error is not None:
+            raise serializers.ValidationError(validation_error)
 
         self.account = account
         return attrs
 
+    def _record_failed_attempt(self, account: Account) -> None:
+        Account.objects.filter(pk=account.pk).update(
+            email_verification_attempts=F("email_verification_attempts") + 1
+        )
+
     def save(self) -> Account:
-        self.account.email_verified_at = timezone.now()
+        verified_at = timezone.now()
+        updated = Account.objects.filter(
+            pk=self.account.pk,
+            email_verified_at__isnull=True,
+            email_verification_code_hash=self.account.email_verification_code_hash,
+            email_verification_code_expires_at=self.account.email_verification_code_expires_at,
+        ).update(
+            email_verified_at=verified_at,
+            email_verification_code_hash="",
+            email_verification_code_expires_at=None,
+            email_verification_attempts=0,
+        )
+        if updated == 0:
+            raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        self.account.email_verified_at = verified_at
         self.account.email_verification_code_hash = ""
         self.account.email_verification_code_expires_at = None
         self.account.email_verification_attempts = 0
-        self.account.save(
-            update_fields=[
-                "email_verified_at",
-                "email_verification_code_hash",
-                "email_verification_code_expires_at",
-                "email_verification_attempts",
-            ]
-        )
         return self.account
 
 

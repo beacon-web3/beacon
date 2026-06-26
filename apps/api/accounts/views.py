@@ -1,3 +1,4 @@
+import logging
 import secrets
 from datetime import timedelta
 
@@ -6,11 +7,13 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db import transaction
+from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -23,8 +26,17 @@ from accounts.serializers import (
     PasswordResetRequestSerializer,
     SignupSerializer,
 )
+from accounts.throttles import (
+    EmailVerificationConfirmRateThrottle,
+    EmailVerificationRequestRateThrottle,
+    LoginRateThrottle,
+    PasswordResetConfirmRateThrottle,
+    PasswordResetRateThrottle,
+    SignupRateThrottle,
+)
 
 Account = get_user_model()
+logger = logging.getLogger(__name__)
 PASSWORD_RESET_DETAIL = (
     "If an account exists, password reset instructions will be sent."
 )
@@ -62,15 +74,53 @@ def send_email_verification_code(account: Account) -> None:
     )
 
 
+def send_email_verification_code_best_effort(account: Account) -> None:
+    try:
+        send_email_verification_code(account)
+    except Exception:
+        logger.exception(
+            "Failed to send email verification code for account_id=%s", account.pk
+        )
+
+
+def send_password_reset_email_best_effort(account: Account) -> None:
+    uid = urlsafe_base64_encode(force_bytes(account.pk))
+    token = default_token_generator.make_token(account)
+    reset_url = (
+        f"{settings.FRONTEND_BASE_URL}/reset-password/confirm?uid={uid}&token={token}"
+    )
+
+    try:
+        send_mail(
+            subject="Reset your Beacon password",
+            message=(
+                "Use this link to reset your Beacon password:\n\n"
+                f"{reset_url}\n\n"
+                "If you did not request this, you can ignore this email."
+            ),
+            from_email=None,
+            recipient_list=[account.email],
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send password reset email for account_id=%s", account.pk
+        )
+
+
 class SignupView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [SignupRateThrottle]
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        account = serializer.save()
-        send_email_verification_code(account)
+        with transaction.atomic():
+            account = serializer.save()
+            transaction.on_commit(
+                lambda: send_email_verification_code_best_effort(account)
+            )
         return Response(
             {"account": AccountSerializer(account).data},
             status=status.HTTP_201_CREATED,
@@ -79,7 +129,8 @@ class SignupView(APIView):
 
 class LoginView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
@@ -92,6 +143,7 @@ class LoginView(APIView):
             )
 
         login(request, account)
+        get_token(request)
         return Response({"account": AccountSerializer(account).data})
 
 
@@ -110,7 +162,8 @@ class MeView(APIView):
 
 class EmailVerificationRequestView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [EmailVerificationRequestRateThrottle]
 
     def post(self, request):
         serializer = EmailVerificationRequestSerializer(
@@ -123,7 +176,7 @@ class EmailVerificationRequestView(APIView):
             email__iexact=serializer.validated_data["email"]
         ).first()
         if account is not None and account.email_verified_at is None:
-            send_email_verification_code(account)
+            send_email_verification_code_best_effort(account)
 
         return Response(
             {"detail": EMAIL_VERIFICATION_DETAIL},
@@ -133,19 +186,22 @@ class EmailVerificationRequestView(APIView):
 
 class EmailVerificationConfirmView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [EmailVerificationConfirmRateThrottle]
 
     def post(self, request):
         serializer = EmailVerificationConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         account = serializer.save()
         login(request, account)
+        get_token(request)
         return Response({"account": AccountSerializer(account).data})
 
 
 class PasswordResetRequestView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(
@@ -158,23 +214,7 @@ class PasswordResetRequestView(APIView):
             email__iexact=serializer.validated_data["email"]
         ).first()
         if account is not None:
-            uid = urlsafe_base64_encode(force_bytes(account.pk))
-            token = default_token_generator.make_token(account)
-            reset_url = (
-                f"{settings.FRONTEND_BASE_URL}/reset-password/confirm"
-                f"?uid={uid}&token={token}"
-            )
-            send_mail(
-                subject="Reset your Beacon password",
-                message=(
-                    "Use this link to reset your Beacon password:\n\n"
-                    f"{reset_url}\n\n"
-                    "If you did not request this, you can ignore this email."
-                ),
-                from_email=None,
-                recipient_list=[account.email],
-                fail_silently=False,
-            )
+            send_password_reset_email_best_effort(account)
 
         return Response(
             {"detail": PASSWORD_RESET_DETAIL},
@@ -184,7 +224,8 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetConfirmRateThrottle]
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)

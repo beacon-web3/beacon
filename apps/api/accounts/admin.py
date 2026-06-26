@@ -20,6 +20,17 @@ class AccountAdmin(UserAdmin):
             },
         ),
     )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (
+            "Beacon profile",
+            {
+                "fields": (
+                    "email",
+                    "display_name",
+                ),
+            },
+        ),
+    )
     readonly_fields = ("created_at",)
     list_display = (
         "username",

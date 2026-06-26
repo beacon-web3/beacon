@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const recaptchaSiteKey = process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY ?? 'playwright-site-key'
+process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY = recaptchaSiteKey
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -9,9 +12,9 @@ export default defineConfig({
     trace: 'on-first-retry'
   },
   webServer: {
-    command: 'pnpm dev --host 127.0.0.1',
+    command: `NUXT_PUBLIC_RECAPTCHA_SITE_KEY=${recaptchaSiteKey} pnpm dev --host 127.0.0.1`,
     url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000
   },
   projects: [

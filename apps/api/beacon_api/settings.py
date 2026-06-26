@@ -18,7 +18,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False),
+    DJANGO_DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
@@ -27,6 +27,19 @@ env = environ.Env(
     RECAPTCHA_VERIFY_URL=(str, "https://www.google.com/recaptcha/api/siteverify"),
     FRONTEND_BASE_URL=(str, "http://localhost:3000"),
     EMAIL_VERIFICATION_MAX_ATTEMPTS=(int, 5),
+    AUTH_SIGNUP_THROTTLE_RATE=(str, "5/min"),
+    AUTH_LOGIN_THROTTLE_RATE=(str, "10/min"),
+    AUTH_PASSWORD_RESET_THROTTLE_RATE=(str, "3/min"),
+    AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE=(str, "10/min"),
+    AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE=(str, "3/min"),
+    AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE=(str, "10/min"),
+    SESSION_COOKIE_SECURE=(bool, False),
+    CSRF_COOKIE_SECURE=(bool, False),
+    SECURE_SSL_REDIRECT=(bool, False),
+    SECURE_HSTS_SECONDS=(int, 0),
+    SECURE_HSTS_INCLUDE_SUBDOMAINS=(bool, False),
+    SECURE_HSTS_PRELOAD=(bool, False),
+    DEFAULT_FROM_EMAIL=(str, "no-reply@beacon.local"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -52,6 +65,18 @@ RECAPTCHA_SECRET_KEY = env("RECAPTCHA_SECRET_KEY")
 RECAPTCHA_VERIFY_URL = env("RECAPTCHA_VERIFY_URL")
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
 EMAIL_VERIFICATION_MAX_ATTEMPTS = env("EMAIL_VERIFICATION_MAX_ATTEMPTS")
+AUTH_THROTTLE_RATES = {
+    "auth_signup": env("AUTH_SIGNUP_THROTTLE_RATE"),
+    "auth_login": env("AUTH_LOGIN_THROTTLE_RATE"),
+    "auth_password_reset": env("AUTH_PASSWORD_RESET_THROTTLE_RATE"),
+    "auth_password_reset_confirm": env("AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE"),
+    "auth_email_verification_request": env(
+        "AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE"
+    ),
+    "auth_email_verification_confirm": env(
+        "AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE"
+    ),
+}
 
 
 # Application definition
@@ -64,12 +89,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
 ]
 
 MIDDLEWARE = [
-    "beacon_api.middleware.LocalCorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -158,12 +184,19 @@ AUTH_USER_MODEL = "accounts.Account"
 
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
+SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }

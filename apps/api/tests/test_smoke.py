@@ -24,6 +24,6 @@ def test_local_cors_preflight_sets_allowed_origin_and_vary_header():
         HTTP_ORIGIN="http://127.0.0.1:3000",
     )
 
-    assert response.status_code == 204
+    assert response.status_code == 200
     assert response["Access-Control-Allow-Origin"] == "http://127.0.0.1:3000"
-    assert "Origin" in response["Vary"]
+    assert "origin" in response["Vary"].lower()

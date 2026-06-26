@@ -151,6 +151,8 @@
     "newPasswordPlaceholder": "Nouveau mot de passe",
     "passwordResetHelp": "Les réponses de réinitialisation restent génériques pour ne pas révéler l'existence d'un compte.",
     "recaptchaNotice": "Protégé par reCAPTCHA v2 Invisible lorsqu'il est activé.",
+    "networkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+    "tooManyRequestsError": "Trop de tentatives. Réessayez plus tard.",
     "submitting": "Envoi...",
     "signupTitle": "Rejoignez les premiers lecteurs qui testent Beacon.",
     "signupDescription": "Créez votre accès anticipé au réseau de découverte centré sur les livres. Commencez avec des identifiants de compte aujourd'hui ; l'accueil portefeuille et les flux de réputation publique suivront à l'ouverture du produit.",

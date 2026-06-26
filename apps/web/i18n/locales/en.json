@@ -151,6 +151,8 @@
     "newPasswordPlaceholder": "New password",
     "passwordResetHelp": "Password reset responses are intentionally generic so account existence is not exposed.",
     "recaptchaNotice": "Protected by reCAPTCHA v2 Invisible when enabled.",
+    "networkError": "Network error. Check your connection and try again.",
+    "tooManyRequestsError": "Too many attempts. Try again later.",
     "submitting": "Submitting...",
     "signupTitle": "Join the first readers testing Beacon.",
     "signupDescription": "Create early access for the books-first discovery network. Start with account credentials today; wallet onboarding and public reputation flows will follow as the product opens.",

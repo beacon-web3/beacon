@@ -8,6 +8,43 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+## 2026-06-26
+
+### Added
+
+- Added backend auth hardening with captcha-before-duplicate signup validation,
+  case-insensitive account uniqueness constraints, auth request throttles, CSRF
+  regression coverage, and configurable production cookie/HTTPS/email settings.
+- Added a portable backend PostgreSQL test runner that starts the Compose
+  database service before running pytest from the local virtual environment or
+  API container.
+- Added browser-session CSRF token issuance for successful login and email
+  verification, a shared Nuxt backend API transport for CSRF headers, frontend
+  reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
+  CSRF/reCAPTCHA behavior and password reset confirmation.
+
+### Changed
+
+- Updated backend auth docs and configuration examples for password confirmation,
+  session CSRF usage, throttle responses, email verification attempts, and email
+  delivery settings.
+- Hardened backend auth defaults and follow-ups by requiring authentication by
+  default in DRF, explicitly marking public auth endpoints, throttling password
+  reset confirmation, moving signup verification email dispatch after commit,
+  using standard Django CORS middleware, and removing redundant email unique
+  indexing while retaining Django's required username uniqueness.
+- Tightened backend auth follow-ups by making post-commit signup verification
+  email delivery best-effort, making email verification code consumption
+  single-use under concurrent confirmation attempts, adding identifier-aware auth
+  throttling, documenting email delivery failure behavior, and recording the
+  production reCAPTCHA launch TODO.
+- Improved auth error handling by preserving generic password reset and email
+  verification resend responses when email delivery fails, logging reCAPTCHA
+  transport/parse failures without secrets, surfacing safe API validation details
+  through a shared web composable, adding localized retry copy, and making failed
+  reCAPTCHA script loads retryable.
+- Updated placeholder contracts, scripts, SDK, config, and types README files
+  with current implementation status and boundaries.
 
 ## 2026-06-25
 
