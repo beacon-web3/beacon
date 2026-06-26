@@ -10,6 +10,7 @@ The current Python dependencies are tracked in `requirements.txt`:
 
 * Django 5.2.14
 * Django REST Framework 3.17.1
+* django-cors-headers 4.9.0
 * django-environ 0.13.0
 * psycopg 3.3.4
 
@@ -213,6 +214,7 @@ Important environment variables:
   user must request a new code.
 * `AUTH_SIGNUP_THROTTLE_RATE`, `AUTH_LOGIN_THROTTLE_RATE`,
   `AUTH_PASSWORD_RESET_THROTTLE_RATE`,
+  `AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE`,
   `AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE`, and
   `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune IP throttles.
 * `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`,

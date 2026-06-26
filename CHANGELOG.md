@@ -22,6 +22,11 @@ Changelog. Use date-based entries until formal versioning starts.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.
+- Hardened backend auth defaults and follow-ups by requiring authentication by
+  default in DRF, explicitly marking public auth endpoints, throttling password
+  reset confirmation, moving signup verification email dispatch after commit,
+  using standard Django CORS middleware, and removing redundant email unique
+  indexing while retaining Django's required username uniqueness.
 
 ## 2026-06-25
 

@@ -2,6 +2,7 @@ import re
 from unittest import mock
 
 import pytest
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
 from django.db import IntegrityError, transaction
@@ -10,9 +11,19 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.test import APIClient
 
+from accounts.admin import AccountAdmin
 from accounts.models import Account
+from accounts.views import (
+    EmailVerificationConfirmView,
+    EmailVerificationRequestView,
+    LoginView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    SignupView,
+)
 
 VALID_PASSWORD = "Strong-password-12345!"
 OTP_PATTERN = re.compile(r"\b(\d{6})\b")
@@ -50,17 +61,20 @@ def test_signup_creates_account(api_client):
 
 
 @pytest.mark.django_db
-def test_signup_sends_email_verification_code(api_client, mailoutbox):
-    response = api_client.post(
-        reverse("signup"),
-        {
-            "email": "USER@Example.COM",
-            "username": "readerone",
-            "display_name": "Reader One",
-            "password": VALID_PASSWORD,
-            "password_confirmation": VALID_PASSWORD,
-        },
-    )
+def test_signup_sends_email_verification_code(
+    api_client, mailoutbox, django_capture_on_commit_callbacks
+):
+    with django_capture_on_commit_callbacks(execute=True):
+        response = api_client.post(
+            reverse("signup"),
+            {
+                "email": "USER@Example.COM",
+                "username": "readerone",
+                "display_name": "Reader One",
+                "password": VALID_PASSWORD,
+                "password_confirmation": VALID_PASSWORD,
+            },
+        )
     account = Account.objects.get(email="user@example.com")
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -233,21 +247,22 @@ def test_signup_duplicate_race_returns_validation_error(api_client):
 
 
 @pytest.mark.django_db
-def test_signup_email_delivery_failure_rolls_back_account(api_client):
-    with mock.patch("accounts.views.send_mail", side_effect=RuntimeError("smtp down")):
-        with pytest.raises(RuntimeError):
-            api_client.post(
-                reverse("signup"),
-                {
-                    "email": "user@example.com",
-                    "username": "readerone",
-                    "display_name": "Reader One",
-                    "password": VALID_PASSWORD,
-                    "password_confirmation": VALID_PASSWORD,
-                },
-            )
+def test_signup_schedules_verification_email_after_transaction_commit(api_client):
+    with mock.patch("accounts.views.transaction.on_commit") as on_commit:
+        response = api_client.post(
+            reverse("signup"),
+            {
+                "email": "user@example.com",
+                "username": "readerone",
+                "display_name": "Reader One",
+                "password": VALID_PASSWORD,
+                "password_confirmation": VALID_PASSWORD,
+            },
+        )
 
-    assert not Account.objects.filter(email="user@example.com").exists()
+    assert response.status_code == status.HTTP_201_CREATED
+    assert Account.objects.filter(email="user@example.com").exists()
+    on_commit.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -344,6 +359,27 @@ def test_me_requires_authenticated_session(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["account"]["username"] == "readerone"
+
+
+def test_drf_defaults_require_authentication(settings):
+    assert settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] == [
+        "rest_framework.permissions.IsAuthenticated",
+    ]
+
+
+@pytest.mark.parametrize(
+    "view_class",
+    [
+        SignupView,
+        LoginView,
+        EmailVerificationRequestView,
+        EmailVerificationConfirmView,
+        PasswordResetRequestView,
+        PasswordResetConfirmView,
+    ],
+)
+def test_public_auth_views_explicitly_allow_anonymous_access(view_class):
+    assert view_class.permission_classes == [AllowAny]
 
 
 @pytest.mark.django_db
@@ -709,6 +745,7 @@ def test_auth_request_throttles_return_too_many_requests(api_client, settings):
         "auth_signup": "100/min",
         "auth_login": "100/min",
         "auth_password_reset": "1/min",
+        "auth_password_reset_confirm": "100/min",
         "auth_email_verification_request": "100/min",
         "auth_email_verification_confirm": "100/min",
     }
@@ -724,6 +761,37 @@ def test_auth_request_throttles_return_too_many_requests(api_client, settings):
 
     assert first_response.status_code == status.HTTP_202_ACCEPTED
     assert throttled_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+
+@pytest.mark.django_db
+def test_password_reset_confirm_is_throttled(api_client, settings):
+    settings.AUTH_THROTTLE_RATES = {
+        "auth_signup": "100/min",
+        "auth_login": "100/min",
+        "auth_password_reset": "100/min",
+        "auth_password_reset_confirm": "1/min",
+        "auth_email_verification_request": "100/min",
+        "auth_email_verification_confirm": "100/min",
+    }
+
+    first_response = api_client.post(
+        reverse("password-reset-confirm"),
+        {"uid": "invalid", "token": "invalid", "password": VALID_PASSWORD},
+    )
+    throttled_response = api_client.post(
+        reverse("password-reset-confirm"),
+        {"uid": "invalid", "token": "invalid", "password": VALID_PASSWORD},
+    )
+
+    assert first_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert throttled_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+
+def test_account_admin_create_form_includes_required_profile_fields():
+    admin = AccountAdmin(Account, AdminSite())
+    add_fieldsets = dict(admin.add_fieldsets)
+
+    assert add_fieldsets["Beacon profile"]["fields"] == ("email", "display_name")
 
 
 def test_production_security_settings_are_configurable(settings):

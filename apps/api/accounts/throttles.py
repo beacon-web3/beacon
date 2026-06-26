@@ -26,6 +26,10 @@ class PasswordResetRateThrottle(AuthRateThrottle):
     scope = "auth_password_reset"
 
 
+class PasswordResetConfirmRateThrottle(AuthRateThrottle):
+    scope = "auth_password_reset_confirm"
+
+
 class EmailVerificationRequestRateThrottle(AuthRateThrottle):
     scope = "auth_email_verification_request"
 

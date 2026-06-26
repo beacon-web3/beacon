@@ -4,7 +4,7 @@ from django.db.models.functions import Lower
 
 
 class Account(AbstractUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     display_name = models.CharField(max_length=150)
     wallet_address = models.CharField(max_length=64, blank=True, null=True)
     reputation_score = models.DecimalField(max_digits=12, decimal_places=2, default=0)

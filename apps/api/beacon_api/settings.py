@@ -18,7 +18,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False),
+    DJANGO_DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
@@ -30,6 +30,7 @@ env = environ.Env(
     AUTH_SIGNUP_THROTTLE_RATE=(str, "5/min"),
     AUTH_LOGIN_THROTTLE_RATE=(str, "10/min"),
     AUTH_PASSWORD_RESET_THROTTLE_RATE=(str, "3/min"),
+    AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE=(str, "10/min"),
     AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE=(str, "3/min"),
     AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE=(str, "10/min"),
     SESSION_COOKIE_SECURE=(bool, False),
@@ -68,6 +69,7 @@ AUTH_THROTTLE_RATES = {
     "auth_signup": env("AUTH_SIGNUP_THROTTLE_RATE"),
     "auth_login": env("AUTH_LOGIN_THROTTLE_RATE"),
     "auth_password_reset": env("AUTH_PASSWORD_RESET_THROTTLE_RATE"),
+    "auth_password_reset_confirm": env("AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE"),
     "auth_email_verification_request": env(
         "AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE"
     ),
@@ -87,12 +89,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
 ]
 
 MIDDLEWARE = [
-    "beacon_api.middleware.LocalCorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -194,6 +197,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }

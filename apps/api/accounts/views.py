@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,6 +28,7 @@ from accounts.throttles import (
     EmailVerificationConfirmRateThrottle,
     EmailVerificationRequestRateThrottle,
     LoginRateThrottle,
+    PasswordResetConfirmRateThrottle,
     PasswordResetRateThrottle,
     SignupRateThrottle,
 )
@@ -72,7 +73,7 @@ def send_email_verification_code(account: Account) -> None:
 
 class SignupView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [SignupRateThrottle]
 
     def post(self, request):
@@ -80,7 +81,7 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         with transaction.atomic():
             account = serializer.save()
-            send_email_verification_code(account)
+            transaction.on_commit(lambda: send_email_verification_code(account))
         return Response(
             {"account": AccountSerializer(account).data},
             status=status.HTTP_201_CREATED,
@@ -89,7 +90,7 @@ class SignupView(APIView):
 
 class LoginView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
@@ -121,7 +122,7 @@ class MeView(APIView):
 
 class EmailVerificationRequestView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [EmailVerificationRequestRateThrottle]
 
     def post(self, request):
@@ -145,7 +146,7 @@ class EmailVerificationRequestView(APIView):
 
 class EmailVerificationConfirmView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [EmailVerificationConfirmRateThrottle]
 
     def post(self, request):
@@ -158,7 +159,7 @@ class EmailVerificationConfirmView(APIView):
 
 class PasswordResetRequestView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [PasswordResetRateThrottle]
 
     def post(self, request):
@@ -198,7 +199,8 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetConfirmRateThrottle]
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)

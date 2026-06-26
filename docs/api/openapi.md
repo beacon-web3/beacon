@@ -187,3 +187,5 @@ Responses:
 
 * `200 OK` with `{ "detail": "Password has been reset." }`.
 * `400 Bad Request` when the token is invalid or password validation fails.
+* `429 Too Many Requests` when reset confirmation attempts exceed the configured
+  throttle.

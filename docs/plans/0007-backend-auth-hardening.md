@@ -23,8 +23,7 @@ Relevant specs and docs:
   deployments do not leak duplicate account signals before bot screening.
 - Add database-level case-insensitive uniqueness for email and username while
   preserving the existing normalized API behavior.
-- Use Django's cache-backed throttle primitives for auth abuse controls without
-  adding a new dependency.
+- Use Django's cache-backed throttle primitives for auth abuse controls.
 - Keep local development defaults permissive, but make production cookie and SSL
   hardening configurable through environment variables.
 
@@ -45,6 +44,23 @@ Relevant specs and docs:
   status, and changelog entries.
 - [x] Run backend tests, Django checks, migration checks, and Ruff.
 
+## Review Follow-Up Tasks
+
+- [x] Change the global DRF permission default to authenticated access and make
+  public auth endpoints explicitly opt into anonymous access.
+- [x] Add throttling to password reset confirmation requests.
+- [x] Move verification email delivery until after successful signup transaction
+  commit.
+- [x] Make email verification attempt increments concurrency-safe.
+- [x] Ensure Django admin account creation includes required Beacon profile
+  fields.
+- [x] Resolve environment naming drift for the Django debug default.
+- [x] Remove redundant case-sensitive email uniqueness. Keep Django's inherited
+  username uniqueness because `username` remains the `USERNAME_FIELD` and Django
+  requires it to be unique.
+- [x] Replace custom local CORS middleware with a standard Django CORS package.
+- [x] Add regression coverage for the auth hardening follow-up changes.
+
 ## Acceptance Criteria
 
 - Captcha-enabled duplicate signup attempts fail on captcha before revealing
@@ -53,12 +69,17 @@ Relevant specs and docs:
   database boundary.
 - Concurrent duplicate signup attempts return controlled validation errors.
 - Signup rejects blank or whitespace-only display names.
-- Signup email delivery failure leaves no newly created account behind.
+- Signup verification email delivery is scheduled only after the signup
+  transaction commits.
 - Auth abuse controls reject excess request volume with HTTP 429.
 - CSRF enforcement remains active for authenticated unsafe session requests.
 - Production deployments can opt into secure cookies, SSL redirect, HSTS, and
   explicit default email sender settings through environment variables.
 - Public docs match the implemented auth API contract and configuration surface.
+- API endpoints are authenticated by default unless explicitly declared public.
+- Password reset confirmation, verification code attempts, and signup email
+  delivery remain abuse-resistant and transactionally safe.
+- Django admin account creation supports required account profile fields.
 
 ## Verification
 
@@ -69,6 +90,14 @@ Relevant specs and docs:
 - `cd apps/api && DATABASE_URL="sqlite:////var/folders/rh/ry4y28kd61gf4q10kvtktnpr0000gn/T/opencode/beacon-api-check.sqlite3" .venv/bin/python manage.py check` - passed.
 - `cd apps/api && DATABASE_URL="sqlite:////var/folders/rh/ry4y28kd61gf4q10kvtktnpr0000gn/T/opencode/beacon-api-check.sqlite3" .venv/bin/python manage.py makemigrations --check --dry-run` - passed, no changes detected.
 - `cd apps/api && .venv/bin/ruff check .` - passed.
+- `cd apps/api && ./.venv/bin/python -m pytest tests/test_auth_api.py` - passed,
+  50 tests after installing updated dev requirements.
+- `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
+- `cd apps/api && ./.venv/bin/python -m pytest` - passed, 55 tests.
+- `cd apps/api && ./.venv/bin/python manage.py check` - passed.
+- `cd apps/api && ./.venv/bin/python manage.py makemigrations --check --dry-run`
+  - passed, no changes detected.
+- `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
 
 ## Open Questions
 
