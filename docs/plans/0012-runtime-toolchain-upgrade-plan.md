@@ -240,7 +240,7 @@ Execution notes:
 
 ## Patch 3: Python Local Runtime Upgrade
 
-Status: Not started.
+Status: Verified.
 
 Description: Upgrade the local backend Python runtime pin and verify the backend
 under that interpreter before changing Docker.
@@ -282,6 +282,26 @@ Risk controls:
   support before selecting a newer Python version.
 - If the virtual environment is recreated, do not commit `.venv` artifacts.
 - Keep Docker base-image changes for Patch 4.
+
+Execution notes:
+
+- Applied and verified on 2026-06-26 with selected local Python target `3.14.6`.
+- Updated `apps/api/.python-version`, `apps/api/README.md`,
+  `.github/workflows/ci.yml`, and `apps/api/pyproject.toml` so local setup,
+  CI setup, and Ruff target the selected Python runtime.
+- Installed Python `3.14.6` locally with `pyenv` after `uv python install 3.14.6`
+  had no matching macOS aarch64 download available.
+- Updated `apps/api/requirements.txt` to use `psycopg[binary]==3.3.4` after a
+  clean Python `3.14.6` virtual environment could not load psycopg without an
+  externally visible `libpq` wrapper.
+- Updated `apps/api/accounts/serializers.py` after Ruff with the `py314` target
+  required Python 3.14 formatting for a multi-exception handler.
+- Kept `apps/api/Dockerfile` unchanged on `python:3.10-slim` for Patch 4.
+- Recreated `apps/api/.venv` from `/Users/mohsenpakfetrat/.pyenv/versions/3.14.6/bin/python`
+  and verified `.venv/bin/python --version` reports `Python 3.14.6`.
+- Passed under Python `3.14.6`: `.venv/bin/python manage.py check`,
+  `.venv/bin/ruff check .`, `.venv/bin/ruff format --check .`, and
+  `./scripts/test-postgres.sh` (`70 passed`).
 
 ## Patch 4: Python Docker Runtime Upgrade
 

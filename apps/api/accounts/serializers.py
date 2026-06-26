@@ -264,7 +264,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         try:
             account_id = force_str(urlsafe_base64_decode(attrs["uid"]))
             self.account = Account.objects.get(pk=account_id)
-        except (TypeError, ValueError, OverflowError, Account.DoesNotExist):
+        except TypeError, ValueError, OverflowError, Account.DoesNotExist:
             raise serializers.ValidationError(
                 _("Invalid password reset token.")
             ) from None

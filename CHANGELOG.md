@@ -32,6 +32,11 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Applied the backend local Python runtime target update from `3.10.10` to
+  `3.14.6` across the local pin, backend setup docs, CI Python setup, and Ruff
+  target, including the required Python 3.14 Ruff formatter update and
+  `psycopg[binary]` packaging for fresh local virtual environments; Django,
+  Ruff, and PostgreSQL-backed tests pass under Python `3.14.6`.
 - Updated the frontend pnpm package-manager pin and CI installer from `11.5.0`
   to `11.9.0`; the frozen install, lint, typecheck, build, and E2E checks passed
   without lockfile or application dependency drift.

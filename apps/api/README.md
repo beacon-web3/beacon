@@ -12,7 +12,7 @@ The current Python dependencies are tracked in `requirements.txt`:
 * Django REST Framework 3.17.1
 * django-cors-headers 4.9.0
 * django-environ 0.14.0
-* psycopg 3.3.4
+* psycopg 3.3.4 with the binary libpq wheel extra
 * asgiref 3.11.1
 * sqlparse 0.5.5
 * typing_extensions 4.15.0
@@ -75,9 +75,10 @@ docker compose run --rm api ruff check .
 
 The `.venv` workflow remains available for quick local development and editor integration.
 
-Use Python 3.10.10 for local virtual environments. The pinned local version is
+Use Python 3.14.6 for local virtual environments. The pinned local version is
 recorded in `.python-version`, and the Docker image remains on the Python 3.10
-runtime family via `python:3.10-slim`.
+runtime family via `python:3.10-slim` until the Docker runtime is upgraded
+separately.
 
 Run these commands from `apps/api/`.
 
