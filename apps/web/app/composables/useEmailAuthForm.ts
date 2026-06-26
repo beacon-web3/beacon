@@ -41,7 +41,6 @@ type AuthFetchError = {
     email?: string
   }
 }
-
 type PasswordRequirement = {
   key: string
   message: string
@@ -51,6 +50,7 @@ type PasswordRequirement = {
 export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
   const { apiFetch } = useApiFetch()
+  const { getAuthApiErrorMessage, getVerificationRequiredEmail } = useAuthApiErrorMessage()
   const { executeRecaptcha } = useRecaptchaToken()
 
   const form = reactive<EmailAuthFormState>({
@@ -243,13 +243,13 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         await options.onVerificationRequired?.(response.account.email)
       }
     } catch (error) {
-      const data = (error as AuthFetchError).data
-      if (data?.code === 'EMAIL_VERIFICATION_REQUIRED' && data.email) {
-        await options.onVerificationRequired?.(data.email)
+      const verificationEmail = getVerificationRequiredEmail(error as AuthFetchError)
+      if (verificationEmail) {
+        await options.onVerificationRequired?.(verificationEmail)
         return
       }
 
-      errorText.value = t(options.errorMessage)
+      errorText.value = getAuthApiErrorMessage(error, options.errorMessage)
     } finally {
       isSubmitting.value = false
     }

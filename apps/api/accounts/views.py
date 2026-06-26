@@ -79,7 +79,32 @@ def send_email_verification_code_best_effort(account: Account) -> None:
         send_email_verification_code(account)
     except Exception:
         logger.exception(
-            "Failed to send signup verification email for account_id=%s", account.pk
+            "Failed to send email verification code for account_id=%s", account.pk
+        )
+
+
+def send_password_reset_email_best_effort(account: Account) -> None:
+    uid = urlsafe_base64_encode(force_bytes(account.pk))
+    token = default_token_generator.make_token(account)
+    reset_url = (
+        f"{settings.FRONTEND_BASE_URL}/reset-password/confirm?uid={uid}&token={token}"
+    )
+
+    try:
+        send_mail(
+            subject="Reset your Beacon password",
+            message=(
+                "Use this link to reset your Beacon password:\n\n"
+                f"{reset_url}\n\n"
+                "If you did not request this, you can ignore this email."
+            ),
+            from_email=None,
+            recipient_list=[account.email],
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send password reset email for account_id=%s", account.pk
         )
 
 
@@ -151,7 +176,7 @@ class EmailVerificationRequestView(APIView):
             email__iexact=serializer.validated_data["email"]
         ).first()
         if account is not None and account.email_verified_at is None:
-            send_email_verification_code(account)
+            send_email_verification_code_best_effort(account)
 
         return Response(
             {"detail": EMAIL_VERIFICATION_DETAIL},
@@ -189,23 +214,7 @@ class PasswordResetRequestView(APIView):
             email__iexact=serializer.validated_data["email"]
         ).first()
         if account is not None:
-            uid = urlsafe_base64_encode(force_bytes(account.pk))
-            token = default_token_generator.make_token(account)
-            reset_url = (
-                f"{settings.FRONTEND_BASE_URL}/reset-password/confirm"
-                f"?uid={uid}&token={token}"
-            )
-            send_mail(
-                subject="Reset your Beacon password",
-                message=(
-                    "Use this link to reset your Beacon password:\n\n"
-                    f"{reset_url}\n\n"
-                    "If you did not request this, you can ignore this email."
-                ),
-                from_email=None,
-                recipient_list=[account.email],
-                fail_silently=False,
-            )
+            send_password_reset_email_best_effort(account)
 
         return Response(
             {"detail": PASSWORD_RESET_DETAIL},

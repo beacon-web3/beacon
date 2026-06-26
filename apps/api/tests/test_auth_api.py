@@ -20,6 +20,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.test import APIClient
 
 from accounts.admin import AccountAdmin
+from accounts.captcha import verify_recaptcha_token
 from accounts.models import Account
 from accounts.serializers import EmailVerificationConfirmSerializer
 from accounts.views import (
@@ -510,6 +511,31 @@ def test_password_reset_request_sends_reset_email(api_client, mailoutbox, settin
 
 
 @pytest.mark.django_db
+def test_password_reset_request_is_generic_when_email_delivery_fails(api_client):
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+        email_verified_at=timezone.now(),
+    )
+
+    with mock.patch(
+        "accounts.views.send_mail",
+        side_effect=RuntimeError("smtp unavailable"),
+    ):
+        response = api_client.post(
+            reverse("password-reset"),
+            {"email": "USER@example.com"},
+        )
+
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    assert response.data == {
+        "detail": "If an account exists, password reset instructions will be sent."
+    }
+
+
+@pytest.mark.django_db
 def test_password_reset_confirm_sets_new_password(api_client):
     account = Account.objects.create_user(
         email="user@example.com",
@@ -581,6 +607,48 @@ def test_captcha_failure_blocks_duplicate_signup_signals(api_client, settings):
     assert "username" not in response.data
 
 
+def test_captcha_logs_transport_failures(settings, caplog):
+    settings.RECAPTCHA_ENABLED = True
+    settings.RECAPTCHA_SECRET_KEY = "test-secret"
+
+    with mock.patch(
+        "accounts.captcha.request.urlopen",
+        side_effect=OSError("recaptcha unavailable"),
+    ):
+        with caplog.at_level("ERROR", logger="accounts.captcha"):
+            result = verify_recaptcha_token("captcha-token")
+
+    assert result is False
+    assert "reCAPTCHA verification request failed" in caplog.text
+    assert "captcha-token" not in caplog.text
+
+
+def test_captcha_logs_parse_failures(settings, caplog):
+    settings.RECAPTCHA_ENABLED = True
+    settings.RECAPTCHA_SECRET_KEY = "test-secret"
+
+    class InvalidRecaptchaResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, _exc_type, _exc_value, _traceback):
+            return None
+
+        def read(self):
+            return b"not-json"
+
+    with mock.patch(
+        "accounts.captcha.request.urlopen",
+        return_value=InvalidRecaptchaResponse(),
+    ):
+        with caplog.at_level("ERROR", logger="accounts.captcha"):
+            result = verify_recaptcha_token("captcha-token")
+
+    assert result is False
+    assert "reCAPTCHA verification response could not be parsed" in caplog.text
+    assert "captcha-token" not in caplog.text
+
+
 @pytest.mark.django_db
 def test_email_verification_request_is_generic_for_missing_account(
     api_client, mailoutbox
@@ -616,6 +684,30 @@ def test_email_verification_request_sends_new_code(api_client, mailoutbox):
     assert OTP_PATTERN.search(mailoutbox[0].body)
     assert account.email_verification_code_hash
     assert account.email_verification_code_expires_at > timezone.now()
+
+
+@pytest.mark.django_db
+def test_email_verification_request_is_generic_when_email_delivery_fails(api_client):
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+
+    with mock.patch(
+        "accounts.views.send_mail",
+        side_effect=RuntimeError("smtp unavailable"),
+    ):
+        response = api_client.post(
+            reverse("email-verification-request"),
+            {"email": "USER@example.com"},
+        )
+
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    assert response.data == {
+        "detail": "If an account exists, a verification code will be sent."
+    }
 
 
 @pytest.mark.django_db

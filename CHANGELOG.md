@@ -38,6 +38,10 @@ Changelog. Use date-based entries until formal versioning starts.
   single-use under concurrent confirmation attempts, adding identifier-aware auth
   throttling, documenting email delivery failure behavior, and recording the
   production reCAPTCHA launch TODO.
+- Improved auth error handling by preserving generic password reset and email
+  verification resend responses when email delivery fails, logging reCAPTCHA
+  transport/parse failures without secrets, surfacing safe auth validation
+  details in the web app, and making failed reCAPTCHA script loads retryable.
 - Updated placeholder contracts, scripts, SDK, config, and types README files
   with current implementation status and boundaries.
 

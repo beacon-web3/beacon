@@ -20,6 +20,7 @@ type AccountResponse = {
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { apiFetch } = useApiFetch()
+const { getAuthApiErrorMessage } = useAuthApiErrorMessage()
 const { executeRecaptcha } = useRecaptchaToken()
 
 const form = reactive<VerificationFormState>({
@@ -69,8 +70,8 @@ async function submit(_event: FormSubmitEvent<VerificationFormState>) {
       email: response.account?.email ?? form.email
     })
     form.otp = []
-  } catch {
-    errorText.value = t('auth.verificationError')
+  } catch (error) {
+    errorText.value = getAuthApiErrorMessage(error, 'auth.verificationError')
   } finally {
     isSubmitting.value = false
   }
@@ -99,8 +100,8 @@ async function resendCode() {
     })
 
     resendText.value = t('auth.verificationResendSuccess')
-  } catch {
-    errorText.value = t('auth.verificationResendError')
+  } catch (error) {
+    errorText.value = getAuthApiErrorMessage(error, 'auth.verificationResendError')
   } finally {
     isResending.value = false
   }
