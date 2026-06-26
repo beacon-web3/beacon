@@ -227,13 +227,31 @@ and send it as `X-CSRFToken`.
 
 ## Tests
 
-Run backend tests with Docker from `apps/api/`:
+Run backend tests with the portable PostgreSQL runner from `apps/api/`:
+
+```bash
+./scripts/test-postgres.sh
+```
+
+Pass pytest arguments through the runner for targeted checks:
+
+```bash
+./scripts/test-postgres.sh tests/test_auth_api.py
+```
+
+The runner starts the Docker Compose PostgreSQL service, waits for readiness,
+and runs pytest with a known `DATABASE_URL`. If `apps/api/.venv` is not present,
+it runs pytest inside the `api` container instead. This is the recommended path
+because it does not depend on a machine-level PostgreSQL install.
+
+You can also run tests fully inside Docker:
 
 ```bash
 docker compose run --rm api pytest
 ```
 
-Or run them with `.venv`:
+Plain `.venv` pytest runs are available when a compatible PostgreSQL server is
+already running at the configured `DATABASE_URL`:
 
 ```bash
 .venv/bin/pytest
@@ -253,6 +271,7 @@ docker compose run --rm api python manage.py migrate
 docker compose run --rm api pytest
 docker compose run --rm api ruff check .
 docker compose up -d postgres
+./scripts/test-postgres.sh
 docker compose ps
 docker compose down
 ```

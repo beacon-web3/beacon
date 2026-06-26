@@ -45,6 +45,13 @@ docker compose up -d postgres
 docker compose ps
 ```
 
+For PostgreSQL-backed tests through `.venv`, prefer the portable runner because
+it starts this service and waits for readiness before invoking pytest:
+
+```bash
+./scripts/test-postgres.sh
+```
+
 ## Run Migrations
 
 Run from `apps/api/`:

@@ -30,13 +30,31 @@ password auth API contract. Playwright starts the Nuxt dev server automatically 
 
 Backend tests use pytest in `apps/api/`.
 
-Run with Docker from `apps/api/`:
+Run PostgreSQL-backed tests with the portable `.venv` runner from `apps/api/`:
+
+```bash
+./scripts/test-postgres.sh
+```
+
+Pass pytest arguments through the runner for targeted checks:
+
+```bash
+./scripts/test-postgres.sh tests/test_auth_api.py
+```
+
+The runner starts the Docker Compose PostgreSQL service, waits for readiness,
+and runs pytest with a known `DATABASE_URL`. If `apps/api/.venv` is not present,
+it runs pytest inside the `api` container instead. Use it instead of relying on
+a machine-level PostgreSQL service at `localhost:5432`.
+
+You can also run tests fully inside Docker from `apps/api/`:
 
 ```bash
 docker compose run --rm api pytest
 ```
 
-Or run with `.venv` from `apps/api/`:
+Plain `.venv` pytest runs are available when a compatible PostgreSQL server is
+already running at the configured `DATABASE_URL`:
 
 ```bash
 source .venv/bin/activate

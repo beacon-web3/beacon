@@ -13,6 +13,9 @@ Changelog. Use date-based entries until formal versioning starts.
 - Added backend auth hardening with captcha-before-duplicate signup validation,
   case-insensitive account uniqueness constraints, auth request throttles, CSRF
   regression coverage, and configurable production cookie/HTTPS/email settings.
+- Added a portable backend PostgreSQL test runner that starts the Compose
+  database service before running pytest from the local virtual environment or
+  API container.
 
 ### Changed
 
