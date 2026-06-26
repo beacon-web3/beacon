@@ -65,4 +65,6 @@ Templates live in `docs/plans/templates/`.
 | 0008 | [Auth error handling improvements](0008-auth-error-handling.md) | Completed |
 | 0009 | [Backend Localization](0009-backend-localization.md) | Completed |
 | 0010 | [Auth test split](0010-auth-api-test-split.md) | Completed |
-| 0011 | [Library upgrade plan](0011-library-upgrade-plan.md) | Draft |
+| 0011 | [Library upgrade plan](0011-library-upgrade-plan.md) | Completed |
+| 0012 | [Runtime Toolchain Upgrade Plan](0012-runtime-toolchain-upgrade-plan.md) | Draft |
+

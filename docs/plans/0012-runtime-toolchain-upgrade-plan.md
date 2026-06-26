@@ -33,18 +33,15 @@ policy, or Solana transaction behavior.
 
 Select target versions before implementation starts:
 
-- Node.js target: keep Node 24 current line, move to Node 22 LTS, or choose
-  another supported version.
-- pnpm target: choose a pnpm version compatible with the selected Node runtime
-  and the existing lockfile format.
-- Python target: stay on Python 3.10, move to Python 3.11 or 3.12, or plan a
-  separate compatibility migration for a newer Python runtime.
+- Node.js target: Node.js 24.16.0 (LTS)
+- pnpm target: check if pnpm version v11.9.0 is compatible with the selected Node runtime and upgrade
+- Python target: Python 3.14.6
 - Docker base image target: align with the selected Python runtime using a
   specific supported `python:<version>-slim` family.
 
 ## Patch 0: Baseline Runtime Verification
 
-Status: Not started.
+Status: Verified with documented E2E blocker.
 
 Description: Verify the repository is green under the current runtime pins before
 changing any toolchain versions.
@@ -94,6 +91,19 @@ Risk controls:
 - Do not proceed if baseline verification is red unless the failure is documented
   and explicitly accepted as unrelated.
 - Do not update dependency manifests or lockfiles in this patch.
+
+Execution notes:
+
+- Verified on 2026-06-26 under current pins: Node.js `v24.16.0`, pnpm `11.5.0`,
+  local Python `3.10.10`, Docker image `python:3.10-slim` reporting Python
+  `3.10.20` at runtime.
+- Frontend passed: `pnpm install --frozen-lockfile`, `pnpm lint`,
+  `pnpm typecheck`, and `pnpm build`.
+- Frontend E2E did not run because Playwright found `http://127.0.0.1:3000`
+  already in use by a pre-existing `node` process (`PID 60948`).
+- Backend passed: `.venv/bin/python manage.py check`, `.venv/bin/ruff check .`,
+  `.venv/bin/ruff format --check .`, and `./scripts/test-postgres.sh`
+  (`70 passed`).
 
 ## Patch 1: Node.js Runtime Upgrade
 
@@ -366,12 +376,10 @@ Risk controls:
 | Runtime upgrades get mixed with library upgrades | High | Keep application dependency upgrades out of this plan unless separately approved. |
 | Documentation claims unverified runtime support | Medium | Update docs only after checks run and record exact commands in execution notes. |
 
-## Open Questions
+## Questions
 
-- Which Node.js target should Beacon standardize on for the next cycle: Node 22
-  LTS, the Node 24 current line, or another supported version?
-- Which pnpm version should be paired with the selected Node.js target?
-- Should Beacon keep backend Python on 3.10 for now, or move to Python 3.11 or
-  3.12 after compatibility review?
+- Which Node.js target should Beacon standardize on for the next cycle? Node.js 24.16.0 (LTS)
+- Which pnpm version should be paired with the selected Node.js target? v11.9.0
+- Which Python version should Beacon backend move to? Python 3.14.6 after compatibility review
 - Should Docker use an exact patch image tag or stay on a supported minor-family
-  slim tag such as `python:3.12-slim`?
+  slim tag such as `python:3.12-slim`? use the exact patch slim tag: python:3.14.6-slim, assuming that official image exists and compatibility checks pass.
