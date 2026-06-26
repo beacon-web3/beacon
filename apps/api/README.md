@@ -76,9 +76,8 @@ docker compose run --rm api ruff check .
 The `.venv` workflow remains available for quick local development and editor integration.
 
 Use Python 3.14.6 for local virtual environments. The pinned local version is
-recorded in `.python-version`, and the Docker image remains on the Python 3.10
-runtime family via `python:3.10-slim` until the Docker runtime is upgraded
-separately.
+recorded in `.python-version`, and the backend Docker image uses the matching
+`python:3.14.6-slim` runtime.
 
 Run these commands from `apps/api/`.
 

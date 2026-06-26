@@ -305,7 +305,7 @@ Execution notes:
 
 ## Patch 4: Python Docker Runtime Upgrade
 
-Status: Not started.
+Status: Verified.
 
 Description: Align the backend container runtime with the selected Python runtime
 after local backend verification is green.
@@ -344,6 +344,18 @@ Risk controls:
   container before changing application code.
 - Do not combine Docker Compose service behavior changes with this runtime image
   update.
+
+Execution notes:
+
+- Applied and verified on 2026-06-26 with selected Docker Python runtime
+  `python:3.14.6-slim` after confirming the official image tag exists.
+- Updated `apps/api/Dockerfile` and `apps/api/README.md` so Docker and local
+  backend setup both target Python `3.14.6`.
+- Passed: `docker compose build --no-cache api`.
+- Verified container runtime: `docker compose run --rm api python --version`
+  reported `Python 3.14.6`.
+- Passed in Docker: `python manage.py check`, `python manage.py migrate`,
+  `ruff check .`, and `pytest` (`70 passed`).
 
 ## Patch 5: Full Toolchain Integration Verification
 

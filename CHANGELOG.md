@@ -32,6 +32,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Aligned the backend Docker runtime image from `python:3.10-slim` to
+  `python:3.14.6-slim`; the no-cache image build, containerized Django checks,
+  migrations, Ruff checks, and pytest suite passed under Python `3.14.6`.
 - Applied the backend local Python runtime target update from `3.10.10` to
   `3.14.6` across the local pin, backend setup docs, CI Python setup, and Ruff
   target, including the required Python 3.14 Ruff formatter update and
