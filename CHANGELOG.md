@@ -32,6 +32,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 - Updated the Nuxt frontend framework dependency batch covering Nuxt, Nuxt UI,
   Nuxt ESLint, and ESLint, with lint, typecheck, build, and route checks passing.
+- Updated the frontend Playwright E2E tooling dependency to `@playwright/test`
+  1.61.1, with Chromium install and E2E tests passing.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.

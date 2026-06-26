@@ -293,6 +293,8 @@ Risk controls:
 
 ## Patch 3: Frontend E2E Tooling Batch
 
+Status: Completed on 2026-06-26.
+
 Description: Upgrade Playwright separately so browser-test-runner changes are
 isolated from Nuxt framework changes.
 
@@ -322,6 +324,22 @@ pnpm test:e2e
 ```
 
 Dependencies: Patch 2.
+
+Execution notes:
+
+- Updated `@playwright/test` from `1.60.0` to `1.61.1` on 2026-06-26 with
+  `pnpm update @playwright/test --latest` from `apps/web`.
+- Direct package updates were limited to `@playwright/test` in
+  `apps/web/package.json`.
+- Playwright Chromium installed successfully with
+  `pnpm exec playwright install chromium`.
+- E2E verification passed with `pnpm test:e2e` from `apps/web`: 22 tests
+  passed.
+- `pnpm peers check` still reports the existing transitive Tiptap peer warnings
+  documented after Patch 2; no Patch 3 direct dependency was changed to resolve
+  them.
+- No application, test, or Playwright config compatibility changes were
+  required.
 
 Risk controls:
 
