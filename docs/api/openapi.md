@@ -8,9 +8,10 @@ the backend. Password reset emails build confirmation links from
 `FRONTEND_BASE_URL`.
 
 Browser clients must send Django's CSRF token on authenticated unsafe requests,
-including `POST /api/auth/logout/`. Beacon's Nuxt frontend should read the
-`csrftoken` cookie and send it as the `X-CSRFToken` header when using session
-cookies.
+including `POST /api/auth/logout/`. Successful login and email verification
+confirmation responses issue a `csrftoken` cookie for browser sessions. Beacon's
+Nuxt frontend reads the `csrftoken` cookie and sends it as the `X-CSRFToken`
+header on unsafe auth API methods when using session cookies.
 
 Abuse-sensitive auth endpoints are rate limited. Login, reset, and verification
 throttles key on submitted identifiers when present so repeated attacks against
@@ -68,7 +69,7 @@ code through `POST /api/auth/email-verification/request/`.
 ### `POST /api/auth/login/`
 
 Authenticates an existing account with email-or-username and password. On
-success, Django sets a session cookie.
+success, Django sets a session cookie and a `csrftoken` cookie.
 
 Request body:
 
@@ -120,7 +121,7 @@ generic `202 Accepted` response.
 Confirms a pending email verification code. Each code allows a configurable
 number of failed confirmation attempts before the user must request a new code.
 On success, Beacon marks the account email as verified, clears the stored OTP
-hash and expiry, and starts a Django session.
+hash and expiry, starts a Django session, and sets a `csrftoken` cookie.
 
 Request body:
 

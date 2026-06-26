@@ -20,6 +20,8 @@ type AccountResponse = {
 const { t } = useI18n()
 const config = useRuntimeConfig()
 const localePath = useLocalePath()
+const { authFetch } = useAuthApi()
+const { executeRecaptcha } = useRecaptchaToken()
 
 const form = reactive<VerificationFormState>({
   email: props.initialEmail,
@@ -62,10 +64,9 @@ async function submit(_event: FormSubmitEvent<VerificationFormState>) {
 
   isSubmitting.value = true
   try {
-    const response = await $fetch<AccountResponse>('/api/auth/email-verification/confirm/', {
+    const response = await authFetch<AccountResponse>('/api/auth/email-verification/confirm/', {
       baseURL: apiBaseUrl.value,
       method: 'POST',
-      credentials: 'include',
       body: {
         email: form.email,
         otp: otpCode.value
@@ -95,12 +96,14 @@ async function resendCode() {
 
   isResending.value = true
   try {
-    await $fetch('/api/auth/email-verification/request/', {
+    const recaptchaToken = await executeRecaptcha()
+
+    await authFetch('/api/auth/email-verification/request/', {
       baseURL: apiBaseUrl.value,
       method: 'POST',
-      credentials: 'include',
       body: {
-        email: form.email
+        email: form.email,
+        recaptcha_token: recaptchaToken
       }
     })
 

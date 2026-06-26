@@ -447,6 +447,33 @@ def test_authenticated_unsafe_session_requests_enforce_csrf():
 
 
 @pytest.mark.django_db
+def test_login_sets_csrf_cookie_for_authenticated_unsafe_session_requests():
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+        email_verified_at=timezone.now(),
+    )
+    csrf_client = APIClient(enforce_csrf_checks=True)
+
+    login_response = csrf_client.post(
+        reverse("login"),
+        {"identifier": "user@example.com", "password": VALID_PASSWORD},
+    )
+
+    assert login_response.status_code == status.HTTP_200_OK
+    csrf_token = login_response.cookies["csrftoken"].value
+
+    logout_response = csrf_client.post(
+        reverse("logout"),
+        HTTP_X_CSRFTOKEN=csrf_token,
+    )
+
+    assert logout_response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
 def test_password_reset_request_is_generic(api_client, mailoutbox):
     response = api_client.post(
         reverse("password-reset"),

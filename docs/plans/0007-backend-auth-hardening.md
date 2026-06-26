@@ -75,6 +75,22 @@ Relevant specs and docs:
   endpoints.
 - [x] Add a production launch TODO to enable reCAPTCHA before public traffic.
 
+## 2026-06-26 Review Follow-Up Tasks
+
+- [x] Issue a usable CSRF token during browser session establishment and add a
+  positive backend regression test for an authenticated unsafe request with the
+  matching `X-CSRFToken` header.
+- [x] Add a shared Nuxt auth API helper that sends `X-CSRFToken` for unsafe
+  requests when the `csrftoken` cookie is present.
+- [x] Execute frontend reCAPTCHA when `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` is set
+  and send tokens to captcha-protected public auth endpoints.
+- [x] Reuse password complexity validation for password reset confirmation and
+  add Playwright coverage for reset-confirm request shape and weak-password
+  blocking.
+- [x] Replace placeholder package, contracts, and scripts README TODOs with
+  current implementation status and boundaries.
+- [x] Update related auth docs and changelog entries after implementation.
+
 ## Acceptance Criteria
 
 - Captcha-enabled duplicate signup attempts fail on captcha before revealing
@@ -98,6 +114,12 @@ Relevant specs and docs:
   verification email send fails after commit.
 - Production auth/security settings are covered by tests that exercise
   environment parsing at settings import time.
+- Browser session-establishing auth responses provide a usable CSRF cookie, and
+  Nuxt auth requests send `X-CSRFToken` for unsafe methods when available.
+- reCAPTCHA-enabled frontend auth submissions include fresh tokens without
+  changing disabled/local-development behavior.
+- Password reset confirmation enforces the same client-side password complexity
+  requirements as signup.
 
 ## Verification
 
@@ -121,6 +143,11 @@ Relevant specs and docs:
 - `cd apps/api && ./.venv/bin/python manage.py check` - passed.
 - `cd apps/api && ./.venv/bin/python manage.py makemigrations --check --dry-run`
   - passed, no changes detected.
+- `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
+- `cd apps/api && ./.venv/bin/python -m pytest tests/test_auth_api.py -k "csrf or logout or login_sets_csrf"` - passed, 3 tests.
+- `cd apps/web && pnpm test:e2e tests/e2e/auth.spec.ts` - passed, 12 tests.
+- `cd apps/web && pnpm lint` - passed.
+- `cd apps/web && pnpm typecheck` - passed.
 - `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
 
 ## Open Questions

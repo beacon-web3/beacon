@@ -32,10 +32,25 @@ Current pages:
 - `/fr`: French version of the Beacon landing page.
 - `/signup`: Email-based early-access signup page.
 - `/login`: Email-based login page for returning early-access accounts.
+- `/verify-email`: Email verification page for six-digit OTP confirmation and
+  resend requests.
+- `/reset-password`: Password reset request page.
+- `/reset-password/confirm`: Password reset confirmation page for Django reset
+  links.
 
 The signup and login pages use the same minimal Beacon visual system as the
 landing page. Current access is email-only; wallet onboarding comes later before
 any Solana signing flow.
+
+## Auth API Runtime Configuration
+
+The auth UI uses `NUXT_PUBLIC_API_BASE_URL` to reach the Django API. Unsafe auth
+API requests include `credentials: 'include'` and send `X-CSRFToken` when the
+Django `csrftoken` cookie is present.
+
+Set `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` when backend reCAPTCHA is enabled. When the
+site key is empty, auth forms submit an empty token so local development can run
+with backend `RECAPTCHA_ENABLED=false`.
 
 ## Internationalization
 
@@ -95,7 +110,7 @@ pnpm test:e2e
 pnpm test:e2e:ui
 ```
 
-The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, and signup/login email form behavior. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
+The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, signup/login email form behavior, email verification, password reset request, password reset confirmation, CSRF header attachment, and reCAPTCHA token inclusion. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
 
 ## Formatting
 

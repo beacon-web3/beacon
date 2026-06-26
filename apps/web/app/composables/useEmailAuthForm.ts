@@ -51,6 +51,8 @@ type PasswordRequirement = {
 export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
   const config = useRuntimeConfig()
+  const { authFetch } = useAuthApi()
+  const { executeRecaptcha } = useRecaptchaToken()
 
   const form = reactive<EmailAuthFormState>({
     email: '',
@@ -107,8 +109,8 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     ]
   }
 
-  const signupPasswordRequirements = computed<PasswordRequirement[]>(() => {
-    if (!isSignup.value) {
+  const passwordRequirements = computed<PasswordRequirement[]>(() => {
+    if (!isSignup.value && !isPasswordResetConfirm.value) {
       return []
     }
 
@@ -116,7 +118,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   })
 
   const activeSignupPasswordRequirement = computed(() => {
-    return signupPasswordRequirements.value.find(requirement => !requirement.passes)
+    return passwordRequirements.value.find(requirement => !requirement.passes)
   })
 
   const requiredString = computed(() => {
@@ -167,7 +169,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
     if (isPasswordResetConfirm.value) {
       return z.object({
-        password: requiredString.value
+        password: signupPasswordString.value
       })
     }
 
@@ -228,10 +230,13 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     isSubmitting.value = true
 
     try {
-      const response = await $fetch<AuthResponse>(options.endpoint, {
+      if (!isPasswordResetConfirm.value) {
+        form.recaptchaToken = await executeRecaptcha()
+      }
+
+      const response = await authFetch<AuthResponse>(options.endpoint, {
         baseURL: apiBaseUrl.value,
         method: 'POST',
-        credentials: 'include',
         body: buildBody()
       })
 

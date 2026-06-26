@@ -234,11 +234,14 @@ can fail those requests even though their response bodies remain generic when th
 email backend succeeds.
 
 Before production or public traffic, set `RECAPTCHA_ENABLED=true` with a valid
-`RECAPTCHA_SECRET_KEY` and verify the frontend is sending reCAPTCHA tokens.
+`RECAPTCHA_SECRET_KEY` and configure the Nuxt frontend with
+`NUXT_PUBLIC_RECAPTCHA_SITE_KEY` so browser auth submissions send reCAPTCHA v2
+Invisible tokens.
 
 Browser clients using session cookies must send Django's CSRF token on
-authenticated unsafe requests. The frontend should read the `csrftoken` cookie
-and send it as `X-CSRFToken`.
+authenticated unsafe requests. Successful login and email verification
+confirmation responses issue a `csrftoken` cookie; the Nuxt frontend reads that
+cookie and sends it as `X-CSRFToken` on unsafe auth API methods.
 
 ## Tests
 

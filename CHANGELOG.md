@@ -8,6 +8,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+## 2026-06-26
+
 ### Added
 
 - Added backend auth hardening with captcha-before-duplicate signup validation,
@@ -16,6 +18,10 @@ Changelog. Use date-based entries until formal versioning starts.
 - Added a portable backend PostgreSQL test runner that starts the Compose
   database service before running pytest from the local virtual environment or
   API container.
+- Added browser-session CSRF token issuance for successful login and email
+  verification, a shared Nuxt auth API helper for CSRF headers, frontend
+  reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
+  CSRF/reCAPTCHA behavior and password reset confirmation.
 
 ### Changed
 
@@ -32,6 +38,8 @@ Changelog. Use date-based entries until formal versioning starts.
   single-use under concurrent confirmation attempts, adding identifier-aware auth
   throttling, documenting email delivery failure behavior, and recording the
   production reCAPTCHA launch TODO.
+- Updated placeholder contracts, scripts, SDK, config, and types README files
+  with current implementation status and boundaries.
 
 ## 2026-06-25
 

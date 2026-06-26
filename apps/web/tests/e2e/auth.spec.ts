@@ -1,19 +1,54 @@
 import { expect, test } from '@playwright/test'
 
 const validPassword = 'Strong-password-12345!'
+const csrfToken = 'playwright-csrf-token'
+const recaptchaToken = 'playwright-recaptcha-token'
+
+test.beforeEach(async ({ context, page }) => {
+  await context.addCookies([
+    {
+      name: 'csrftoken',
+      value: csrfToken,
+      url: 'http://127.0.0.1:3000'
+    }
+  ])
+
+  await page.addInitScript((token) => {
+    let callback: ((value: string) => void) | undefined
+    const recaptchaWindow = window as unknown as {
+      grecaptcha: {
+        execute: () => void
+        ready: (readyCallback: () => void) => void
+        render: (_container: HTMLElement, parameters: { callback: (value: string) => void }) => number
+        reset: () => undefined
+      }
+    }
+
+    recaptchaWindow.grecaptcha = {
+      ready: (readyCallback: () => void) => readyCallback(),
+      render: (_container: HTMLElement, parameters: { callback: (value: string) => void }) => {
+        callback = parameters.callback
+        return 1
+      },
+      execute: () => callback?.(token),
+      reset: () => undefined
+    }
+  }, recaptchaToken)
+})
 
 test('signup submits account fields to the auth api', async ({ page }) => {
   await page.route('**/api/auth/signup/', async (route) => {
     const request = route.request()
 
     expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'new@example.com',
       username: 'readerone',
       display_name: 'Reader One',
       password: validPassword,
       password_confirmation: validPassword,
-      recaptcha_token: ''
+      recaptcha_token: recaptchaToken
     })
 
     await route.fulfill({
@@ -49,10 +84,11 @@ test('login submits identifier and password to the auth api', async ({ page }) =
     const request = route.request()
 
     expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       identifier: 'readerone',
       password: validPassword,
-      recaptcha_token: ''
+      recaptcha_token: recaptchaToken
     })
 
     await route.fulfill({
@@ -85,6 +121,7 @@ test('email verification submits a six digit OTP to the auth api', async ({ page
     const request = route.request()
 
     expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'user@example.com',
       otp: '123456'
@@ -111,6 +148,33 @@ test('email verification submits a six digit OTP to the auth api', async ({ page
 
   await expect(page.getByRole('status')).toContainText(
     'Email verified for user@example.com.'
+  )
+})
+
+test('email verification resend submits email and recaptcha token', async ({ page }) => {
+  await page.route('**/api/auth/email-verification/request/', async (route) => {
+    const request = route.request()
+
+    expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
+    expect(request.postDataJSON()).toEqual({
+      email: 'user@example.com',
+      recaptcha_token: recaptchaToken
+    })
+
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 202,
+      body: JSON.stringify({ detail: 'If an account exists, a verification code will be sent.' })
+    })
+  })
+
+  await page.goto('/verify-email?email=user%40example.com')
+  await page.waitForLoadState('networkidle')
+  await page.getByRole('button', { name: 'Send a new code' }).click()
+
+  await expect(page.getByRole('status')).toContainText(
+    'If an account exists, a verification code will be sent.'
   )
 })
 
@@ -237,9 +301,10 @@ test('password reset submits generic request', async ({ page }) => {
     const request = route.request()
 
     expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'user@example.com',
-      recaptcha_token: ''
+      recaptcha_token: recaptchaToken
     })
 
     await route.fulfill({
@@ -259,4 +324,52 @@ test('password reset submits generic request', async ({ page }) => {
   await expect(page.getByRole('status')).toContainText(
     'If an account exists, reset instructions will be sent.'
   )
+})
+
+test('password reset confirm submits uid token and password to the auth api', async ({ page }) => {
+  await page.route('**/api/auth/password-reset/confirm/', async (route) => {
+    const request = route.request()
+
+    expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
+    expect(request.postDataJSON()).toEqual({
+      uid: 'uid-123',
+      token: 'token-456',
+      password: validPassword
+    })
+
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 200,
+      body: JSON.stringify({ detail: 'Password reset complete.' })
+    })
+  })
+
+  await page.goto('/reset-password/confirm?uid=uid-123&token=token-456')
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('New password').fill(validPassword)
+  await page.getByRole('button', { name: 'Reset password' }).click()
+
+  await expect(page.getByRole('status')).toContainText(
+    'Password has been reset.'
+  )
+})
+
+test('password reset confirm blocks weak passwords before calling the auth api', async ({ page }) => {
+  let resetConfirmRequested = false
+
+  await page.route('**/api/auth/password-reset/confirm/', async (route) => {
+    resetConfirmRequested = true
+    await route.fulfill({ status: 500 })
+  })
+
+  await page.goto('/reset-password/confirm?uid=uid-123&token=token-456')
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('New password').fill('weak')
+  await page.getByRole('button', { name: 'Reset password' }).click()
+
+  await expect(page.getByText(
+    'Password must be longer than 8 characters'
+  )).toBeVisible()
+  expect(resetConfirmRequested).toBe(false)
 })
