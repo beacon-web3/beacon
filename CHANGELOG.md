@@ -38,6 +38,8 @@ Changelog. Use date-based entries until formal versioning starts.
   Ruff checks, and PostgreSQL-backed tests passing.
 - Updated the backend `django-environ` dependency to 0.14.0, with settings
   parsing checks and PostgreSQL-backed tests passing.
+- Updated backend test tooling dependencies to pytest 9.1.1 and Ruff 0.15.20,
+  with Ruff checks and PostgreSQL-backed tests passing.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.

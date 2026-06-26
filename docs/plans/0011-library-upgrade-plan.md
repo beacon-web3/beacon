@@ -461,6 +461,8 @@ Risk controls:
 
 ## Patch 6: Backend Test Tooling Upgrade
 
+Status: Completed on 2026-06-26.
+
 Description: Upgrade backend development tools after runtime dependencies are
 stable.
 
@@ -491,6 +493,17 @@ python -m pip install pytest==9.1.1 ruff==0.15.20
 ```
 
 Dependencies: Patch 5.
+
+Execution notes:
+
+- Updated `pytest` from `9.0.3` to `9.1.1` and `ruff` from `0.15.15` to
+  `0.15.20` on 2026-06-26 by changing only `apps/api/requirements-dev.txt`.
+- Installed `pytest==9.1.1` and `ruff==0.15.20` into the existing backend
+  virtualenv.
+- Backend tooling verification passed with `.venv/bin/ruff check .` and
+  `.venv/bin/ruff format --check .` from `apps/api`.
+- PostgreSQL-backed tests passed with 70 tests using pytest 9.1.1.
+- No test, lint, source, or configuration compatibility changes were required.
 
 Risk controls:
 
