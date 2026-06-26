@@ -25,6 +25,8 @@ Changelog. Use date-based entries until formal versioning starts.
   verification, a shared Nuxt backend API transport for CSRF headers, frontend
   reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
   CSRF/reCAPTCHA behavior and password reset confirmation.
+- Added a draft plan for splitting the monolithic backend auth API test file into
+  focused auth, account model, and admin test modules.
 
 ### Changed
 
@@ -48,6 +50,12 @@ Changelog. Use date-based entries until formal versioning starts.
   reCAPTCHA script loads retryable.
 - Updated placeholder contracts, scripts, SDK, config, and types README files
   with current implementation status and boundaries.
+
+### Fixed
+
+- Fixed French backend translations for password-complexity validation and added
+  regression coverage for weak-password signup errors under `Accept-Language: fr`.
+
 
 ## 2026-06-25
 

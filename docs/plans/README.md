@@ -64,3 +64,4 @@ Templates live in `docs/plans/templates/`.
 | 0007 | [Backend auth hardening](0007-backend-auth-hardening.md) | Complete |
 | 0008 | [Auth error handling improvements](0008-auth-error-handling.md) | Completed |
 | 0009 | [Backend Localization](0009-backend-localization.md) | Completed |
+| 0010 | [Auth API test split](0010-auth-api-test-split.md) | Draft |

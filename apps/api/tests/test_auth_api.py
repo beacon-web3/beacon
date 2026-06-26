@@ -156,6 +156,29 @@ def test_signup_rejects_passwords_without_required_complexity(
 
 
 @pytest.mark.django_db
+def test_signup_uses_french_password_complexity_message(api_client):
+    weak_password = "missing-uppercase-123!"
+
+    response = api_client.post(
+        reverse("signup"),
+        {
+            "email": "user@example.com",
+            "username": "readerone",
+            "display_name": "Reader One",
+            "password": weak_password,
+            "password_confirmation": weak_password,
+        },
+        HTTP_ACCEPT_LANGUAGE="fr",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.wsgi_request.LANGUAGE_CODE == "fr"
+    assert str(response.data["password"][0]) == (
+        "Le mot de passe doit inclure une lettre majuscule."
+    )
+
+
+@pytest.mark.django_db
 def test_signup_rejects_duplicate_email(api_client):
     Account.objects.create_user(
         email="user@example.com",

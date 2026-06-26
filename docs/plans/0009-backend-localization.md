@@ -139,6 +139,12 @@ Completed checks:
 - `cd apps/web && pnpm typecheck`
 - `cd apps/web && pnpm test:e2e tests/e2e/auth.spec.ts`
 
+Follow-up correction:
+
+- Added missing French catalog entries and regression coverage for the active
+  password-complexity validator msgids after review found stale password msgids
+  in the catalog.
+
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
