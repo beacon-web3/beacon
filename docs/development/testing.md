@@ -20,6 +20,18 @@ Current frontend test files live in:
 apps/web/tests/e2e/
 ```
 
+Auth E2E tests are split by flow under:
+
+```text
+apps/web/tests/e2e/auth/
+```
+
+Run the focused auth E2E subset from `apps/web/` with:
+
+```bash
+pnpm exec playwright test tests/e2e/auth
+```
+
 The current E2E tests verify that the home page loads in Chromium, the landing
 page fits narrow mobile screens without horizontal overflow, the French route
 loads with LTR direction, and signup/login/email-verification/password-reset
@@ -44,7 +56,7 @@ cd apps/api
 Pass pytest arguments through the runner for targeted checks:
 
 ```bash
-./scripts/test-postgres.sh tests/test_auth_api.py
+./scripts/test-postgres.sh tests/auth tests/accounts tests/test_settings.py
 ```
 
 The runner starts the Docker Compose PostgreSQL service, waits for readiness,
@@ -77,6 +89,13 @@ Current backend test files live in:
 
 ```text
 apps/api/tests/
+```
+
+Auth API tests are split by endpoint and behavior under:
+
+```text
+apps/api/tests/auth/
+apps/api/tests/accounts/
 ```
 
 The current backend tests verify Django settings, PostgreSQL configuration,
