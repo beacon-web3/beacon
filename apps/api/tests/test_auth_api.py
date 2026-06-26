@@ -1,8 +1,13 @@
+import json
+import os
 import re
+import subprocess
+import sys
 from unittest import mock
 
 import pytest
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
 from django.db import IntegrityError, transaction
@@ -10,12 +15,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.test import APIClient
 
 from accounts.admin import AccountAdmin
 from accounts.models import Account
+from accounts.serializers import EmailVerificationConfirmSerializer
 from accounts.views import (
     EmailVerificationConfirmView,
     EmailVerificationRequestView,
@@ -263,6 +269,30 @@ def test_signup_schedules_verification_email_after_transaction_commit(api_client
     assert response.status_code == status.HTTP_201_CREATED
     assert Account.objects.filter(email="user@example.com").exists()
     on_commit.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_signup_returns_created_when_post_commit_verification_email_fails(
+    api_client, django_capture_on_commit_callbacks
+):
+    with mock.patch(
+        "accounts.views.send_mail",
+        side_effect=RuntimeError("smtp unavailable"),
+    ):
+        with django_capture_on_commit_callbacks(execute=True):
+            response = api_client.post(
+                reverse("signup"),
+                {
+                    "email": "user@example.com",
+                    "username": "readerone",
+                    "display_name": "Reader One",
+                    "password": VALID_PASSWORD,
+                    "password_confirmation": VALID_PASSWORD,
+                },
+            )
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert Account.objects.filter(email="user@example.com").exists()
 
 
 @pytest.mark.django_db
@@ -740,6 +770,39 @@ def test_email_verification_confirm_enforces_attempt_limit(
 
 
 @pytest.mark.django_db
+def test_email_verification_confirm_rejects_stale_success_after_code_is_consumed():
+    account = Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+    )
+    account.email_verification_code_hash = make_password("123456")
+    account.email_verification_code_expires_at = timezone.now() + timezone.timedelta(
+        minutes=15
+    )
+    account.save(
+        update_fields=[
+            "email_verification_code_hash",
+            "email_verification_code_expires_at",
+        ]
+    )
+    first_serializer = EmailVerificationConfirmSerializer(
+        data={"email": "user@example.com", "otp": "123456"}
+    )
+    stale_serializer = EmailVerificationConfirmSerializer(
+        data={"email": "user@example.com", "otp": "123456"}
+    )
+
+    assert first_serializer.is_valid(), first_serializer.errors
+    assert stale_serializer.is_valid(), stale_serializer.errors
+    first_serializer.save()
+
+    with pytest.raises(serializers.ValidationError):
+        stale_serializer.save()
+
+
+@pytest.mark.django_db
 def test_auth_request_throttles_return_too_many_requests(api_client, settings):
     settings.AUTH_THROTTLE_RATES = {
         "auth_signup": "100/min",
@@ -787,6 +850,39 @@ def test_password_reset_confirm_is_throttled(api_client, settings):
     assert throttled_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
 
+@pytest.mark.django_db
+def test_login_throttle_is_keyed_by_identifier_across_client_ips(settings):
+    settings.AUTH_THROTTLE_RATES = {
+        "auth_signup": "100/min",
+        "auth_login": "1/min",
+        "auth_password_reset": "100/min",
+        "auth_password_reset_confirm": "100/min",
+        "auth_email_verification_request": "100/min",
+        "auth_email_verification_confirm": "100/min",
+    }
+    Account.objects.create_user(
+        email="user@example.com",
+        username="readerone",
+        display_name="Reader One",
+        password=VALID_PASSWORD,
+        email_verified_at=timezone.now(),
+    )
+
+    first_response = APIClient().post(
+        reverse("login"),
+        {"identifier": "USER@example.com", "password": "wrong-password"},
+        REMOTE_ADDR="203.0.113.10",
+    )
+    throttled_response = APIClient().post(
+        reverse("login"),
+        {"identifier": "user@example.com", "password": "wrong-password"},
+        REMOTE_ADDR="203.0.113.11",
+    )
+
+    assert first_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert throttled_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+
 def test_account_admin_create_form_includes_required_profile_fields():
     admin = AccountAdmin(Account, AdminSite())
     add_fieldsets = dict(admin.add_fieldsets)
@@ -810,6 +906,65 @@ def test_production_security_settings_are_configurable(settings):
     assert settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
     assert settings.SECURE_HSTS_PRELOAD is True
     assert settings.DEFAULT_FROM_EMAIL == "security@beacon.test"
+
+
+def test_production_security_settings_are_parsed_from_environment(tmp_path):
+    database_path = tmp_path / "settings.sqlite3"
+    env = os.environ.copy()
+    env.update(
+        {
+            "DATABASE_URL": f"sqlite:///{database_path}",
+            "DJANGO_DEBUG": "False",
+            "DJANGO_SECRET_KEY": "test-secret-key",
+            "ALLOWED_HOSTS": "api.beacon.test",
+            "SESSION_COOKIE_SECURE": "True",
+            "CSRF_COOKIE_SECURE": "True",
+            "SECURE_SSL_REDIRECT": "True",
+            "SECURE_HSTS_SECONDS": "31536000",
+            "SECURE_HSTS_INCLUDE_SUBDOMAINS": "True",
+            "SECURE_HSTS_PRELOAD": "True",
+            "DEFAULT_FROM_EMAIL": "security@beacon.test",
+            "AUTH_LOGIN_THROTTLE_RATE": "7/min",
+        }
+    )
+    code = """
+import json
+import beacon_api.settings as settings
+
+print(json.dumps({
+    "DEBUG": settings.DEBUG,
+    "SESSION_COOKIE_SECURE": settings.SESSION_COOKIE_SECURE,
+    "CSRF_COOKIE_SECURE": settings.CSRF_COOKIE_SECURE,
+    "SECURE_SSL_REDIRECT": settings.SECURE_SSL_REDIRECT,
+    "SECURE_HSTS_SECONDS": settings.SECURE_HSTS_SECONDS,
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS": settings.SECURE_HSTS_INCLUDE_SUBDOMAINS,
+    "SECURE_HSTS_PRELOAD": settings.SECURE_HSTS_PRELOAD,
+    "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
+    "AUTH_LOGIN_THROTTLE_RATE": settings.AUTH_THROTTLE_RATES["auth_login"],
+}))
+"""
+
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=os.path.dirname(os.path.dirname(__file__)),
+        env=env,
+    )
+
+    parsed_settings = json.loads(result.stdout)
+    assert parsed_settings == {
+        "DEBUG": False,
+        "SESSION_COOKIE_SECURE": True,
+        "CSRF_COOKIE_SECURE": True,
+        "SECURE_SSL_REDIRECT": True,
+        "SECURE_HSTS_SECONDS": 31536000,
+        "SECURE_HSTS_INCLUDE_SUBDOMAINS": True,
+        "SECURE_HSTS_PRELOAD": True,
+        "DEFAULT_FROM_EMAIL": "security@beacon.test",
+        "AUTH_LOGIN_THROTTLE_RATE": "7/min",
+    }
 
 
 @pytest.mark.django_db

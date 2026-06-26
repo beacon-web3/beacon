@@ -12,12 +12,14 @@ including `POST /api/auth/logout/`. Beacon's Nuxt frontend should read the
 `csrftoken` cookie and send it as the `X-CSRFToken` header when using session
 cookies.
 
-Abuse-sensitive auth endpoints are rate limited by client IP. Throttled requests
-return `429 Too Many Requests`.
+Abuse-sensitive auth endpoints are rate limited. Login, reset, and verification
+throttles key on submitted identifiers when present so repeated attacks against
+the same account or token are limited across client IPs. Throttled requests return
+`429 Too Many Requests`.
 
 Account responses return a public account envelope. Signup creates an unverified
-account and sends a six-digit email verification code; successful login requires
-the email address to be verified.
+account and schedules a six-digit email verification code after the account
+transaction commits; successful login requires the email address to be verified.
 
 ```json
 {
@@ -58,6 +60,10 @@ Responses:
 * `400 Bad Request` when input is invalid, the email or username already exists,
   password validation fails, or captcha verification fails.
 * `429 Too Many Requests` when signup attempts exceed the configured throttle.
+
+If the account transaction commits but the post-commit verification email send
+fails, signup still returns `201 Created`. The user can request a replacement
+code through `POST /api/auth/email-verification/request/`.
 
 ### `POST /api/auth/login/`
 
@@ -104,6 +110,10 @@ Responses:
 * `400 Bad Request` when input is invalid or captcha verification fails.
 * `429 Too Many Requests` when verification-code requests exceed the configured
   throttle.
+
+Email verification resend uses Django's configured email backend synchronously.
+If the backend raises a delivery error, the request can fail before returning the
+generic `202 Accepted` response.
 
 ### `POST /api/auth/email-verification/confirm/`
 
@@ -168,6 +178,10 @@ Responses:
 * `202 Accepted` with `{ "detail": "If an account exists, password reset instructions will be sent." }`.
 * `400 Bad Request` when input is invalid or captcha verification fails.
 * `429 Too Many Requests` when reset requests exceed the configured throttle.
+
+Password reset email delivery uses Django's configured email backend
+synchronously. If the backend raises a delivery error for an existing account,
+the request can fail before returning the generic `202 Accepted` response.
 
 ### `POST /api/auth/password-reset/confirm/`
 

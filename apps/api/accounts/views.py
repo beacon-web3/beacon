@@ -1,3 +1,4 @@
+import logging
 import secrets
 from datetime import timedelta
 
@@ -34,6 +35,7 @@ from accounts.throttles import (
 )
 
 Account = get_user_model()
+logger = logging.getLogger(__name__)
 PASSWORD_RESET_DETAIL = (
     "If an account exists, password reset instructions will be sent."
 )
@@ -71,6 +73,15 @@ def send_email_verification_code(account: Account) -> None:
     )
 
 
+def send_email_verification_code_best_effort(account: Account) -> None:
+    try:
+        send_email_verification_code(account)
+    except Exception:
+        logger.exception(
+            "Failed to send signup verification email for account_id=%s", account.pk
+        )
+
+
 class SignupView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -81,7 +92,9 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         with transaction.atomic():
             account = serializer.save()
-            transaction.on_commit(lambda: send_email_verification_code(account))
+            transaction.on_commit(
+                lambda: send_email_verification_code_best_effort(account)
+            )
         return Response(
             {"account": AccountSerializer(account).data},
             status=status.HTTP_201_CREATED,

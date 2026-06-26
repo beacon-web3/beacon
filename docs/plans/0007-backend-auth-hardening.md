@@ -26,6 +26,9 @@ Relevant specs and docs:
 - Use Django's cache-backed throttle primitives for auth abuse controls.
 - Keep local development defaults permissive, but make production cookie and SSL
   hardening configurable through environment variables.
+- Signup returns `201 Created` after the account transaction commits even if the
+  post-commit verification email send fails; users can request another
+  verification code through the resend endpoint.
 
 ## Tasks
 
@@ -60,6 +63,17 @@ Relevant specs and docs:
   requires it to be unique.
 - [x] Replace custom local CORS middleware with a standard Django CORS package.
 - [x] Add regression coverage for the auth hardening follow-up changes.
+- [x] Make post-commit signup verification email delivery best-effort so SMTP
+  failure does not turn a committed account creation into an HTTP 500.
+- [x] Make successful email verification confirmation single-use under
+  concurrent requests.
+- [x] Add identifier-aware throttling for auth endpoints that validate reusable
+  credentials or tokens.
+- [x] Add settings import coverage for production auth/security environment
+  parsing.
+- [x] Document email delivery failure behavior for signup and reset/resend
+  endpoints.
+- [x] Add a production launch TODO to enable reCAPTCHA before public traffic.
 
 ## Acceptance Criteria
 
@@ -80,6 +94,10 @@ Relevant specs and docs:
 - Password reset confirmation, verification code attempts, and signup email
   delivery remain abuse-resistant and transactionally safe.
 - Django admin account creation supports required account profile fields.
+- Signup still returns `201 Created` when account creation committed but the
+  verification email send fails after commit.
+- Production auth/security settings are covered by tests that exercise
+  environment parsing at settings import time.
 
 ## Verification
 
@@ -98,8 +116,16 @@ Relevant specs and docs:
 - `cd apps/api && ./.venv/bin/python manage.py makemigrations --check --dry-run`
   - passed, no changes detected.
 - `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
+- `cd apps/api && ./.venv/bin/python -m pytest tests/test_auth_api.py -k "post_commit_verification_email_fails or stale_success or keyed_by_identifier or parsed_from_environment"` - passed, 4 tests.
+- `cd apps/api && ./.venv/bin/python -m pytest` - passed, 59 tests.
+- `cd apps/api && ./.venv/bin/python manage.py check` - passed.
+- `cd apps/api && ./.venv/bin/python manage.py makemigrations --check --dry-run`
+  - passed, no changes detected.
+- `cd apps/api && ./.venv/bin/python -m ruff check .` - passed.
 
 ## Open Questions
 
 - Production throttle rates may need tuning after real traffic and abuse metrics
   exist; current values should start conservative and be configurable.
+- Enable reCAPTCHA for production/public launch once site keys and operational
+  ownership are ready.

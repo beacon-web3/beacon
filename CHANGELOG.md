@@ -27,6 +27,11 @@ Changelog. Use date-based entries until formal versioning starts.
   reset confirmation, moving signup verification email dispatch after commit,
   using standard Django CORS middleware, and removing redundant email unique
   indexing while retaining Django's required username uniqueness.
+- Tightened backend auth follow-ups by making post-commit signup verification
+  email delivery best-effort, making email verification code consumption
+  single-use under concurrent confirmation attempts, adding identifier-aware auth
+  throttling, documenting email delivery failure behavior, and recording the
+  production reCAPTCHA launch TODO.
 
 ## 2026-06-25
 

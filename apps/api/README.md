@@ -205,7 +205,7 @@ The root pre-commit hook runs Ruff only when staged Python files exist under `ap
 ## Auth Configuration
 
 The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
-email verification OTPs, password reset emails, and cache-backed IP throttles.
+email verification OTPs, password reset emails, and cache-backed auth throttles.
 
 Important environment variables:
 
@@ -216,12 +216,25 @@ Important environment variables:
   `AUTH_PASSWORD_RESET_THROTTLE_RATE`,
   `AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE`,
   `AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE`, and
-  `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune IP throttles.
+  `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune auth throttles. Login,
+  reset, and verification throttles key on submitted identifiers when present so
+  repeated attacks against the same account are limited across client IPs.
 * `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`,
   `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and
   `SECURE_HSTS_PRELOAD` enable production cookie and HTTPS hardening.
 * `DEFAULT_FROM_EMAIL` sets the sender for verification and password-reset
   emails unless a custom email backend overrides it.
+
+Signup creates the account transactionally and schedules the initial verification
+email after commit. If that post-commit email send fails, signup still returns
+`201 Created`; the user can request a replacement code from the verification
+resend endpoint. Verification resend and password reset requests send email
+synchronously through Django's configured email backend, so backend email errors
+can fail those requests even though their response bodies remain generic when the
+email backend succeeds.
+
+Before production or public traffic, set `RECAPTCHA_ENABLED=true` with a valid
+`RECAPTCHA_SECRET_KEY` and verify the frontend is sending reCAPTCHA tokens.
 
 Browser clients using session cookies must send Django's CSRF token on
 authenticated unsafe requests. The frontend should read the `csrftoken` cookie

@@ -222,18 +222,25 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
         )
 
     def save(self) -> Account:
-        self.account.email_verified_at = timezone.now()
+        verified_at = timezone.now()
+        updated = Account.objects.filter(
+            pk=self.account.pk,
+            email_verified_at__isnull=True,
+            email_verification_code_hash=self.account.email_verification_code_hash,
+            email_verification_code_expires_at=self.account.email_verification_code_expires_at,
+        ).update(
+            email_verified_at=verified_at,
+            email_verification_code_hash="",
+            email_verification_code_expires_at=None,
+            email_verification_attempts=0,
+        )
+        if updated == 0:
+            raise serializers.ValidationError({"otp": "Invalid verification code."})
+
+        self.account.email_verified_at = verified_at
         self.account.email_verification_code_hash = ""
         self.account.email_verification_code_expires_at = None
         self.account.email_verification_attempts = 0
-        self.account.save(
-            update_fields=[
-                "email_verified_at",
-                "email_verification_code_hash",
-                "email_verification_code_expires_at",
-                "email_verification_attempts",
-            ]
-        )
         return self.account
 
 
