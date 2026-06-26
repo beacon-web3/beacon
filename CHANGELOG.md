@@ -12,6 +12,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added backend auth localization for English/French language negotiation,
+  localized auth validation/detail messages, localized auth emails, French Django
+  message catalogs, and Nuxt auth API `Accept-Language` forwarding.
 - Added backend auth hardening with captcha-before-duplicate signup validation,
   case-insensitive account uniqueness constraints, auth request throttles, CSRF
   regression coverage, and configurable production cookie/HTTPS/email settings.

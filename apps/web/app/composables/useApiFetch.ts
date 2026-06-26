@@ -64,6 +64,7 @@ export class ApiFetchError extends Error {
 export function useApiFetch() {
   const config = useRuntimeConfig()
   const csrfToken = useCookie<string | null>('csrftoken')
+  const { locale } = useI18n()
 
   const apiBaseUrl = computed(() => {
     return typeof config.public.apiBaseUrl === 'string'
@@ -75,6 +76,10 @@ export function useApiFetch() {
     const { onRequest, onResponse, ...fetchOptions } = options
     const method = options.method ?? 'GET'
     const headers = new Headers(options.headers)
+
+    if (!headers.has('Accept-Language')) {
+      headers.set('Accept-Language', locale.value)
+    }
 
     if (UNSAFE_METHODS.has(method) && csrfToken.value) {
       headers.set('X-CSRFToken', csrfToken.value)

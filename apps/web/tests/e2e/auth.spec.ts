@@ -41,6 +41,7 @@ test('signup submits account fields to the auth api', async ({ page }) => {
     const request = route.request()
 
     expect(request.method()).toBe('POST')
+    expect(request.headers()['accept-language']).toBe('en')
     expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'new@example.com',
@@ -76,6 +77,42 @@ test('signup submits account fields to the auth api', async ({ page }) => {
 
   await expect(page.getByRole('status')).toContainText(
     'Account created for new@example.com.'
+  )
+})
+
+test('signup sends the active locale to the auth api', async ({ page }) => {
+  await page.route('**/api/auth/signup/', async (route) => {
+    const request = route.request()
+
+    expect(request.method()).toBe('POST')
+    expect(request.headers()['accept-language']).toBe('fr')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
+
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 201,
+      body: JSON.stringify({
+        account: {
+          id: 1,
+          email: 'new@example.com',
+          username: 'readerone',
+          display_name: 'Reader One'
+        }
+      })
+    })
+  })
+
+  await page.goto('/fr/signup')
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('Nom affiché').fill('Reader One')
+  await page.getByLabel('Nom d\'utilisateur').fill('readerone')
+  await page.getByLabel('Adresse email').fill('new@example.com')
+  await page.getByLabel('Mot de passe', { exact: true }).fill(validPassword)
+  await page.getByLabel('Confirmer le mot de passe').fill(validPassword)
+  await page.getByRole('button', { name: 'Créer un compte' }).click()
+
+  await expect(page.getByRole('status')).toContainText(
+    'Compte créé pour new@example.com.'
   )
 })
 
