@@ -32,6 +32,25 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Completed integrated runtime toolchain verification across Node.js `v24.16.0`,
+  pnpm `11.9.0`, local Python `3.14.6`, and Docker Python
+  `python:3.14.6-slim`; frontend install/lint/typecheck/build/E2E, local
+  backend checks/Ruff/PostgreSQL tests, and Docker build/check/migrate/Ruff/pytest
+  all passed.
+- Aligned the backend Docker runtime image from `python:3.10-slim` to
+  `python:3.14.6-slim`; the no-cache image build, containerized Django checks,
+  migrations, Ruff checks, and pytest suite passed under Python `3.14.6`.
+- Applied the backend local Python runtime target update from `3.10.10` to
+  `3.14.6` across the local pin, backend setup docs, CI Python setup, and Ruff
+  target, including the required Python 3.14 Ruff formatter update and
+  `psycopg[binary]` packaging for fresh local virtual environments; Django,
+  Ruff, and PostgreSQL-backed tests pass under Python `3.14.6`.
+- Updated the frontend pnpm package-manager pin and CI installer from `11.5.0`
+  to `11.9.0`; the frozen install, lint, typecheck, build, and E2E checks passed
+  without lockfile or application dependency drift.
+- Aligned the frontend CI Node.js runtime pin with the web `.nvmrc` Node.js
+  `24.16.0` target; local frontend install, lint, typecheck, build, and E2E
+  checks passed under Node.js `v24.16.0` with pnpm `11.5.0`.
 - Updated the Nuxt frontend framework dependency batch covering Nuxt, Nuxt UI,
   Nuxt ESLint, and ESLint, with lint, typecheck, build, and route checks passing.
 - Updated the low-risk frontend dependency batch covering Iconify icon sets,

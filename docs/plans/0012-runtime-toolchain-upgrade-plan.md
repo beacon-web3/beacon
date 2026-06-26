@@ -1,6 +1,6 @@
 # Runtime Toolchain Upgrade Plan
 
-Status: Draft
+Status: Verified
 
 ## Context
 
@@ -33,18 +33,15 @@ policy, or Solana transaction behavior.
 
 Select target versions before implementation starts:
 
-- Node.js target: keep Node 24 current line, move to Node 22 LTS, or choose
-  another supported version.
-- pnpm target: choose a pnpm version compatible with the selected Node runtime
-  and the existing lockfile format.
-- Python target: stay on Python 3.10, move to Python 3.11 or 3.12, or plan a
-  separate compatibility migration for a newer Python runtime.
+- Node.js target: Node.js 24.16.0 (LTS)
+- pnpm target: check if pnpm version v11.9.0 is compatible with the selected Node runtime and upgrade
+- Python target: Python 3.14.6
 - Docker base image target: align with the selected Python runtime using a
   specific supported `python:<version>-slim` family.
 
 ## Patch 0: Baseline Runtime Verification
 
-Status: Not started.
+Status: Verified with documented E2E blocker.
 
 Description: Verify the repository is green under the current runtime pins before
 changing any toolchain versions.
@@ -95,9 +92,22 @@ Risk controls:
   and explicitly accepted as unrelated.
 - Do not update dependency manifests or lockfiles in this patch.
 
+Execution notes:
+
+- Verified on 2026-06-26 under current pins: Node.js `v24.16.0`, pnpm `11.5.0`,
+  local Python `3.10.10`, Docker image `python:3.10-slim` reporting Python
+  `3.10.20` at runtime.
+- Frontend passed: `pnpm install --frozen-lockfile`, `pnpm lint`,
+  `pnpm typecheck`, and `pnpm build`.
+- Frontend E2E did not run because Playwright found `http://127.0.0.1:3000`
+  already in use by a pre-existing `node` process (`PID 60948`).
+- Backend passed: `.venv/bin/python manage.py check`, `.venv/bin/ruff check .`,
+  `.venv/bin/ruff format --check .`, and `./scripts/test-postgres.sh`
+  (`70 passed`).
+
 ## Patch 1: Node.js Runtime Upgrade
 
-Status: Not started.
+Status: Verified.
 
 Description: Upgrade the frontend Node.js runtime pin independently from pnpm and
 application libraries.
@@ -123,7 +133,7 @@ Verification from `apps/web`:
 
 ```bash
 node --version
-corepack enable
+corepack enable pnpm
 pnpm --version
 pnpm install --frozen-lockfile
 pnpm lint
@@ -143,9 +153,26 @@ Risk controls:
 - Keep pnpm version changes for Patch 2 unless Node.js compatibility blocks
   verification.
 
+Execution notes:
+
+- Applied on 2026-06-26 with selected Node.js target `24.16.0`.
+- `apps/web/.nvmrc` and `apps/web/README.md` already matched Node.js `24.16.0`.
+- Updated `.github/workflows/ci.yml` frontend `actions/setup-node` pin from Node
+  `22` to `24.16.0` so CI matches the local runtime pin.
+- Kept `apps/web/package.json` package manager unchanged at `pnpm@11.5.0` for
+  Patch 2.
+- Verified local runtime and package manager: Node.js `v24.16.0`, pnpm `11.5.0`.
+- Used `corepack enable pnpm` instead of broad `corepack enable` because the web
+  workspace is pnpm-only and broad Corepack enable also touches unrelated Yarn
+  shims on local machines.
+- Passed: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`,
+  `pnpm build`, and `pnpm test:e2e` from `apps/web`.
+- `pnpm test:e2e` passed after stopping the pre-existing Nuxt dev server process
+  that was listening on `http://127.0.0.1:3000`; Playwright ran `22 passed`.
+
 ## Patch 2: pnpm Upgrade
 
-Status: Not started.
+Status: Verified with documented peer dependency warnings.
 
 Description: Upgrade the frontend package manager after the Node.js runtime is
 stable.
@@ -191,9 +218,29 @@ Risk controls:
 - If `pnpm install --frozen-lockfile` fails because the lockfile format must be
   refreshed, run a non-frozen install once and inspect the lockfile diff closely.
 
+Execution notes:
+
+- Applied on 2026-06-26 with selected pnpm target `11.9.0` after Patch 1
+  verified Node.js `24.16.0`.
+- Updated `apps/web/package.json`, `apps/web/README.md`, and
+  `.github/workflows/ci.yml` from pnpm `11.5.0` to `11.9.0`.
+- Activated pnpm with `corepack prepare pnpm@11.9.0 --activate` and verified
+  `pnpm --version` reported `11.9.0`.
+- `pnpm install --frozen-lockfile` passed without changing
+  `apps/web/pnpm-lock.yaml`; no application dependency versions drifted.
+- Passed: `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm test:e2e`
+  (`22 passed`) from `apps/web`.
+- `pnpm peers check` reported unresolved transitive Tiptap peer ranges:
+  `@tiptap/y-tiptap` installed `3.0.3` but `@tiptap/extension-collaboration`
+  wants `^3.0.4`; `@tiptap/core` installed `3.24.0` but several Tiptap
+  extensions want `3.27.1`; `@tiptap/pm` installed `3.24.0` but several Tiptap
+  extensions want `3.27.1`. These were documented and left unresolved because
+  resolving them would require unrelated application dependency updates outside
+  Patch 2.
+
 ## Patch 3: Python Local Runtime Upgrade
 
-Status: Not started.
+Status: Verified.
 
 Description: Upgrade the local backend Python runtime pin and verify the backend
 under that interpreter before changing Docker.
@@ -236,9 +283,29 @@ Risk controls:
 - If the virtual environment is recreated, do not commit `.venv` artifacts.
 - Keep Docker base-image changes for Patch 4.
 
+Execution notes:
+
+- Applied and verified on 2026-06-26 with selected local Python target `3.14.6`.
+- Updated `apps/api/.python-version`, `apps/api/README.md`,
+  `.github/workflows/ci.yml`, and `apps/api/pyproject.toml` so local setup,
+  CI setup, and Ruff target the selected Python runtime.
+- Installed Python `3.14.6` locally with `pyenv` after `uv python install 3.14.6`
+  had no matching macOS aarch64 download available.
+- Updated `apps/api/requirements.txt` to use `psycopg[binary]==3.3.4` after a
+  clean Python `3.14.6` virtual environment could not load psycopg without an
+  externally visible `libpq` wrapper.
+- Updated `apps/api/accounts/serializers.py` after Ruff with the `py314` target
+  required Python 3.14 formatting for a multi-exception handler.
+- Kept `apps/api/Dockerfile` unchanged on `python:3.10-slim` for Patch 4.
+- Recreated `apps/api/.venv` from `/Users/mohsenpakfetrat/.pyenv/versions/3.14.6/bin/python`
+  and verified `.venv/bin/python --version` reports `Python 3.14.6`.
+- Passed under Python `3.14.6`: `.venv/bin/python manage.py check`,
+  `.venv/bin/ruff check .`, `.venv/bin/ruff format --check .`, and
+  `./scripts/test-postgres.sh` (`70 passed`).
+
 ## Patch 4: Python Docker Runtime Upgrade
 
-Status: Not started.
+Status: Verified.
 
 Description: Align the backend container runtime with the selected Python runtime
 after local backend verification is green.
@@ -278,9 +345,21 @@ Risk controls:
 - Do not combine Docker Compose service behavior changes with this runtime image
   update.
 
+Execution notes:
+
+- Applied and verified on 2026-06-26 with selected Docker Python runtime
+  `python:3.14.6-slim` after confirming the official image tag exists.
+- Updated `apps/api/Dockerfile` and `apps/api/README.md` so Docker and local
+  backend setup both target Python `3.14.6`.
+- Passed: `docker compose build --no-cache api`.
+- Verified container runtime: `docker compose run --rm api python --version`
+  reported `Python 3.14.6`.
+- Passed in Docker: `python manage.py check`, `python manage.py migrate`,
+  `ruff check .`, and `pytest` (`70 passed`).
+
 ## Patch 5: Full Toolchain Integration Verification
 
-Status: Not started.
+Status: Verified.
 
 Description: Verify the upgraded Node.js, pnpm, local Python, and Docker Python
 runtimes together after each independent patch is green.
@@ -335,6 +414,26 @@ Risk controls:
 - Keep final documentation edits factual and limited to versions and checks that
   were actually verified.
 
+Execution notes:
+
+- Applied and verified on 2026-06-26 with final selected runtimes: Node.js
+  `v24.16.0`, pnpm `11.9.0`, local Python `3.14.6`, and Docker Python
+  `python:3.14.6-slim` reporting Python `3.14.6`.
+- Confirmed README setup guidance already matched the final selected versions.
+- Frontend passed from `apps/web`: `pnpm install --frozen-lockfile`,
+  `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm test:e2e`
+  (`22 passed`). The production build completed with existing Vite/Rollup
+  warnings about sourcemaps and third-party PURE annotations.
+- Backend local passed from `apps/api`: `.venv/bin/python manage.py check`,
+  `.venv/bin/ruff check .`, `.venv/bin/ruff format --check .`, and
+  `./scripts/test-postgres.sh` (`70 passed`).
+- Backend Docker passed from `apps/api`: `docker compose build --no-cache api`,
+  `docker compose run --rm api python --version`,
+  `docker compose run --rm api python manage.py check`,
+  `docker compose run --rm api python manage.py migrate`,
+  `docker compose run --rm api ruff check .`, and
+  `docker compose run --rm api pytest` (`70 passed`).
+
 ## Recommended Session Boundaries
 
 - Session 1: Patch 0 only.
@@ -366,12 +465,10 @@ Risk controls:
 | Runtime upgrades get mixed with library upgrades | High | Keep application dependency upgrades out of this plan unless separately approved. |
 | Documentation claims unverified runtime support | Medium | Update docs only after checks run and record exact commands in execution notes. |
 
-## Open Questions
+## Questions
 
-- Which Node.js target should Beacon standardize on for the next cycle: Node 22
-  LTS, the Node 24 current line, or another supported version?
-- Which pnpm version should be paired with the selected Node.js target?
-- Should Beacon keep backend Python on 3.10 for now, or move to Python 3.11 or
-  3.12 after compatibility review?
+- Which Node.js target should Beacon standardize on for the next cycle? Node.js 24.16.0 (LTS)
+- Which pnpm version should be paired with the selected Node.js target? v11.9.0
+- Which Python version should Beacon backend move to? Python 3.14.6 after compatibility review
 - Should Docker use an exact patch image tag or stay on a supported minor-family
-  slim tag such as `python:3.12-slim`?
+  slim tag such as `python:3.12-slim`? use the exact patch slim tag: python:3.14.6-slim, assuming that official image exists and compatibility checks pass.
