@@ -406,6 +406,8 @@ Risk controls:
 
 ## Patch 5: Backend Runtime Helper Upgrade
 
+Status: Completed on 2026-06-26.
+
 Description: Upgrade `django-environ` separately because settings parsing affects
 runtime configuration, database URLs, CORS, CSRF, and security settings.
 
@@ -434,6 +436,20 @@ python manage.py check
 ```
 
 Dependencies: Patch 4.
+
+Execution notes:
+
+- Updated `django-environ` from `0.13.0` to `0.14.0` on 2026-06-26 by changing
+  only `apps/api/requirements.txt`.
+- Installed `django-environ==0.14.0` into the existing backend virtualenv.
+- Backend verification passed with `.venv/bin/python manage.py check` and
+  `./scripts/test-postgres.sh` from `apps/api`.
+- Targeted settings, CORS, CSRF, auth throttle, and smoke tests passed with 15
+  tests before the full PostgreSQL-backed suite.
+- PostgreSQL-backed tests passed with 70 tests on Django 5.2.15 and
+  django-environ 0.14.0.
+- No `.env.example`, source, or configuration compatibility changes were
+  required.
 
 Risk controls:
 

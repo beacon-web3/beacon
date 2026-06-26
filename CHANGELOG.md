@@ -36,6 +36,8 @@ Changelog. Use date-based entries until formal versioning starts.
   1.61.1, with Chromium install and E2E tests passing.
 - Updated the backend Django dependency to 5.2.15, with Django system checks,
   Ruff checks, and PostgreSQL-backed tests passing.
+- Updated the backend `django-environ` dependency to 0.14.0, with settings
+  parsing checks and PostgreSQL-backed tests passing.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.
