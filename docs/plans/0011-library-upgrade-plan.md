@@ -93,6 +93,8 @@ Backend packages already at latest during planning:
 
 ## Patch 0: Baseline Verification
 
+Status: Completed on 2026-06-26.
+
 Description: Verify the current repository state before dependency changes. This
 patch should not change dependency manifests, lockfiles, application code, or
 documentation except for recording a separate blocker if the baseline is already
@@ -132,6 +134,17 @@ python -m pip install -r requirements-dev.txt
 
 Dependencies: None.
 
+Execution notes:
+
+- Frontend baseline passed on 2026-06-26 with `pnpm install --frozen-lockfile`,
+  `pnpm lint`, `pnpm typecheck`, and `pnpm build` from `apps/web`.
+- Backend baseline passed on 2026-06-26 from `apps/api` using the existing
+  virtualenv: requirements install, Ruff check, Ruff format check, and
+  `./scripts/test-postgres.sh`.
+- The literal `python -m pip install -r requirements-dev.txt` command failed in
+  this local shell because `python` is not on `PATH`; the existing `.venv` Python
+  was used instead. Backend PostgreSQL-backed tests passed with 70 tests.
+
 Risk controls:
 
 - Do not begin upgrades if the baseline is red.
@@ -141,6 +154,8 @@ Risk controls:
   environment in a separate setup step before this plan continues.
 
 ## Patch 1: Frontend Low-Risk Patch Updates
+
+Status: Completed on 2026-06-26.
 
 Description: Upgrade frontend packages with low expected framework risk before
 touching Nuxt, Nuxt UI, ESLint, or Playwright.
@@ -178,6 +193,20 @@ pnpm build
 ```
 
 Dependencies: Patch 0.
+
+Execution notes:
+
+- Updated the planned frontend low-risk package batch on 2026-06-26 with
+  `pnpm update @iconify-json/lucide @iconify-json/simple-icons prettier lint-staged tailwindcss vue-tsc --latest`
+  from `apps/web`.
+- Direct package updates were limited to `@iconify-json/lucide`,
+  `@iconify-json/simple-icons`, `prettier`, `lint-staged`, `tailwindcss`, and
+  `vue-tsc` in `apps/web/package.json`.
+- Frontend verification passed with `pnpm lint`, `pnpm typecheck`, and
+  `pnpm build` from `apps/web`.
+- `pnpm peers check` reported an unmet transitive Tiptap peer warning
+  (`@tiptap/extension-collaboration@3.24.0` wants `@tiptap/y-tiptap@^3.0.4`,
+  installed `3.0.3`); no Patch 1 direct dependency was changed to resolve it.
 
 Risk controls:
 
