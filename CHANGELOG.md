@@ -25,8 +25,8 @@ Changelog. Use date-based entries until formal versioning starts.
   verification, a shared Nuxt backend API transport for CSRF headers, frontend
   reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
   CSRF/reCAPTCHA behavior and password reset confirmation.
-- Added a draft plan for splitting the monolithic backend auth API test file into
-  focused auth, account model, and admin test modules.
+- Added and completed an auth test split plan covering backend auth API tests and
+  frontend auth Playwright tests.
 
 ### Changed
 
@@ -50,6 +50,8 @@ Changelog. Use date-based entries until formal versioning starts.
   reCAPTCHA script loads retryable.
 - Updated placeholder contracts, scripts, SDK, config, and types README files
   with current implementation status and boundaries.
+- Split monolithic backend and frontend auth test files into focused auth,
+  account, settings, and Playwright E2E modules without changing auth behavior.
 
 ### Fixed
 
