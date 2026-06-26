@@ -30,6 +30,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Updated the Nuxt frontend framework dependency batch covering Nuxt, Nuxt UI,
+  Nuxt ESLint, and ESLint, with lint, typecheck, build, and route checks passing.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.

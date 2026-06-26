@@ -218,6 +218,8 @@ Risk controls:
 
 ## Patch 2: Frontend Nuxt Framework Batch
 
+Status: Completed on 2026-06-26.
+
 Description: Upgrade Nuxt ecosystem packages together because their peer
 dependencies and generated configuration are coupled.
 
@@ -263,6 +265,22 @@ Manual route checks after `pnpm dev`:
 - `/reset-password/confirm`
 
 Dependencies: Patch 1.
+
+Execution notes:
+
+- Updated the planned Nuxt framework package batch on 2026-06-26 with
+  `pnpm update nuxt @nuxt/ui @nuxt/eslint eslint --latest` from `apps/web`.
+- Direct package updates were limited to `nuxt`, `@nuxt/ui`, `@nuxt/eslint`,
+  and `eslint` in `apps/web/package.json`.
+- Frontend verification passed with `pnpm install`, `pnpm lint`,
+  `pnpm typecheck`, and `pnpm build` from `apps/web`.
+- Manual route checks against `pnpm dev --host 127.0.0.1 --port 3000` returned
+  HTTP 200 for `/`, `/fr`, `/signup`, `/login`, `/verify-email`,
+  `/reset-password`, and `/reset-password/confirm`.
+- `pnpm peers check` reported unmet transitive Tiptap peer warnings after the
+  Nuxt UI update (`@tiptap/y-tiptap`, `@tiptap/core`, and `@tiptap/pm`); no
+  Patch 2 direct dependency was changed to resolve them.
+- No source or config compatibility changes were required.
 
 Risk controls:
 
