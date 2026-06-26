@@ -8,18 +8,21 @@ This workspace uses Django, Django REST Framework, and PostgreSQL for the Beacon
 
 The current Python dependencies are tracked in `requirements.txt`:
 
-* Django 5.2.14
+* Django 5.2.15
 * Django REST Framework 3.17.1
 * django-cors-headers 4.9.0
-* django-environ 0.13.0
+* django-environ 0.14.0
 * psycopg 3.3.4
+* asgiref 3.11.1
+* sqlparse 0.5.5
+* typing_extensions 4.15.0
 
 Development-only Python tools are tracked in `requirements-dev.txt`:
 
-* Ruff 0.15.15
-* pytest 9.0.3
+* Ruff 0.15.20
+* pytest 9.1.1
 * pytest-django 4.12.0
-* factory-boy 3.3.3
+* factory_boy 3.3.3
 
 ## Docker Setup
 
@@ -71,6 +74,10 @@ docker compose run --rm api ruff check .
 ## Virtual Environment Setup
 
 The `.venv` workflow remains available for quick local development and editor integration.
+
+Use Python 3.10.10 for local virtual environments. The pinned local version is
+recorded in `.python-version`, and the Docker image remains on the Python 3.10
+runtime family via `python:3.10-slim`.
 
 Run these commands from `apps/api/`.
 
@@ -143,7 +150,7 @@ python -m django --version
 Expected version:
 
 ```text
-5.2.14
+5.2.15
 ```
 
 ### 8. Verify Django REST Framework

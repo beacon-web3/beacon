@@ -27,9 +27,26 @@ Changelog. Use date-based entries until formal versioning starts.
   CSRF/reCAPTCHA behavior and password reset confirmation.
 - Added and completed an auth test split plan covering backend auth API tests and
   frontend auth Playwright tests.
+- Added a runtime toolchain upgrade plan for future Python, Node.js, and pnpm
+  upgrades with separate verification patches.
 
 ### Changed
 
+- Updated the Nuxt frontend framework dependency batch covering Nuxt, Nuxt UI,
+  Nuxt ESLint, and ESLint, with lint, typecheck, build, and route checks passing.
+- Updated the low-risk frontend dependency batch covering Iconify icon sets,
+  Prettier, lint-staged, Tailwind CSS, and vue-tsc, with frontend lint,
+  typecheck, and build checks passing.
+- Updated the frontend Playwright E2E tooling dependency to `@playwright/test`
+  1.61.1, with Chromium install and E2E tests passing.
+- Updated the backend Django dependency to 5.2.15, with Django system checks,
+  Ruff checks, and PostgreSQL-backed tests passing.
+- Updated the backend `django-environ` dependency to 0.14.0, with settings
+  parsing checks and PostgreSQL-backed tests passing.
+- Updated backend test tooling dependencies to pytest 9.1.1 and Ruff 0.15.20,
+  with Ruff checks and PostgreSQL-backed tests passing.
+- Added explicit local runtime pins for the web Node.js version and API Python
+  version, with setup docs aligned to the completed dependency upgrades.
 - Updated backend auth docs and configuration examples for password confirmation,
   session CSRF usage, throttle responses, email verification attempts, and email
   delivery settings.
