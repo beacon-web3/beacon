@@ -352,6 +352,8 @@ Risk controls:
 
 ## Patch 4: Backend Django Patch Upgrade
 
+Status: Completed on 2026-06-26.
+
 Description: Upgrade the Django patch version alone to isolate framework runtime
 behavior from backend tooling changes.
 
@@ -383,6 +385,18 @@ python manage.py check
 
 Dependencies: Patch 0. This can run after frontend patches or independently once
 baseline verification is complete.
+
+Execution notes:
+
+- Updated `Django` from `5.2.14` to `5.2.15` on 2026-06-26 by changing only
+  `apps/api/requirements.txt`.
+- Installed backend dev requirements into the existing `.venv`, which replaced
+  Django 5.2.14 with Django 5.2.15 while keeping DRF, pytest, Ruff, and
+  django-environ unchanged.
+- Backend verification passed with `.venv/bin/python manage.py check`,
+  `.venv/bin/ruff check .`, and `./scripts/test-postgres.sh` from `apps/api`.
+- PostgreSQL-backed tests passed with 70 tests on Django 5.2.15.
+- No migrations or source compatibility changes were required.
 
 Risk controls:
 
