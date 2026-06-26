@@ -172,7 +172,7 @@ Execution notes:
 
 ## Patch 2: pnpm Upgrade
 
-Status: Not started.
+Status: Verified with documented peer dependency warnings.
 
 Description: Upgrade the frontend package manager after the Node.js runtime is
 stable.
@@ -217,6 +217,26 @@ Risk controls:
 - Do not use `pnpm update` for application packages in this patch.
 - If `pnpm install --frozen-lockfile` fails because the lockfile format must be
   refreshed, run a non-frozen install once and inspect the lockfile diff closely.
+
+Execution notes:
+
+- Applied on 2026-06-26 with selected pnpm target `11.9.0` after Patch 1
+  verified Node.js `24.16.0`.
+- Updated `apps/web/package.json`, `apps/web/README.md`, and
+  `.github/workflows/ci.yml` from pnpm `11.5.0` to `11.9.0`.
+- Activated pnpm with `corepack prepare pnpm@11.9.0 --activate` and verified
+  `pnpm --version` reported `11.9.0`.
+- `pnpm install --frozen-lockfile` passed without changing
+  `apps/web/pnpm-lock.yaml`; no application dependency versions drifted.
+- Passed: `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm test:e2e`
+  (`22 passed`) from `apps/web`.
+- `pnpm peers check` reported unresolved transitive Tiptap peer ranges:
+  `@tiptap/y-tiptap` installed `3.0.3` but `@tiptap/extension-collaboration`
+  wants `^3.0.4`; `@tiptap/core` installed `3.24.0` but several Tiptap
+  extensions want `3.27.1`; `@tiptap/pm` installed `3.24.0` but several Tiptap
+  extensions want `3.27.1`. These were documented and left unresolved because
+  resolving them would require unrelated application dependency updates outside
+  Patch 2.
 
 ## Patch 3: Python Local Runtime Upgrade
 

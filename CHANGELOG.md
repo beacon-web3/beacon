@@ -32,6 +32,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Updated the frontend pnpm package-manager pin and CI installer from `11.5.0`
+  to `11.9.0`; the frozen install, lint, typecheck, build, and E2E checks passed
+  without lockfile or application dependency drift.
 - Aligned the frontend CI Node.js runtime pin with the web `.nvmrc` Node.js
   `24.16.0` target; local frontend install, lint, typecheck, build, and E2E
   checks passed under Node.js `v24.16.0` with pnpm `11.5.0`.
