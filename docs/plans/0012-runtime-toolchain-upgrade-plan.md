@@ -1,6 +1,6 @@
 # Runtime Toolchain Upgrade Plan
 
-Status: Draft
+Status: Verified
 
 ## Context
 
@@ -359,7 +359,7 @@ Execution notes:
 
 ## Patch 5: Full Toolchain Integration Verification
 
-Status: Not started.
+Status: Verified.
 
 Description: Verify the upgraded Node.js, pnpm, local Python, and Docker Python
 runtimes together after each independent patch is green.
@@ -413,6 +413,26 @@ Risk controls:
   compatibility edits.
 - Keep final documentation edits factual and limited to versions and checks that
   were actually verified.
+
+Execution notes:
+
+- Applied and verified on 2026-06-26 with final selected runtimes: Node.js
+  `v24.16.0`, pnpm `11.9.0`, local Python `3.14.6`, and Docker Python
+  `python:3.14.6-slim` reporting Python `3.14.6`.
+- Confirmed README setup guidance already matched the final selected versions.
+- Frontend passed from `apps/web`: `pnpm install --frozen-lockfile`,
+  `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm test:e2e`
+  (`22 passed`). The production build completed with existing Vite/Rollup
+  warnings about sourcemaps and third-party PURE annotations.
+- Backend local passed from `apps/api`: `.venv/bin/python manage.py check`,
+  `.venv/bin/ruff check .`, `.venv/bin/ruff format --check .`, and
+  `./scripts/test-postgres.sh` (`70 passed`).
+- Backend Docker passed from `apps/api`: `docker compose build --no-cache api`,
+  `docker compose run --rm api python --version`,
+  `docker compose run --rm api python manage.py check`,
+  `docker compose run --rm api python manage.py migrate`,
+  `docker compose run --rm api ruff check .`, and
+  `docker compose run --rm api pytest` (`70 passed`).
 
 ## Recommended Session Boundaries
 

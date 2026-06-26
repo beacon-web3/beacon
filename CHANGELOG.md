@@ -32,6 +32,11 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Completed integrated runtime toolchain verification across Node.js `v24.16.0`,
+  pnpm `11.9.0`, local Python `3.14.6`, and Docker Python
+  `python:3.14.6-slim`; frontend install/lint/typecheck/build/E2E, local
+  backend checks/Ruff/PostgreSQL tests, and Docker build/check/migrate/Ruff/pytest
+  all passed.
 - Aligned the backend Docker runtime image from `python:3.10-slim` to
   `python:3.14.6-slim`; the no-cache image build, containerized Django checks,
   migrations, Ruff checks, and pytest suite passed under Python `3.14.6`.
