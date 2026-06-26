@@ -33,6 +33,7 @@ Backend tests use pytest in `apps/api/`.
 Run PostgreSQL-backed tests with the portable `.venv` runner from `apps/api/`:
 
 ```bash
+cd apps/api
 ./scripts/test-postgres.sh
 ```
 
@@ -46,6 +47,12 @@ The runner starts the Docker Compose PostgreSQL service, waits for readiness,
 and runs pytest with a known `DATABASE_URL`. If `apps/api/.venv` is not present,
 it runs pytest inside the `api` container instead. Use it instead of relying on
 a machine-level PostgreSQL service at `localhost:5432`.
+
+Docker Desktop or the Docker daemon must be running before invoking the runner.
+If the runner prints `Docker is not running or is not reachable`, start Docker
+Desktop and retry the same command. Do not use a plain `.venv/bin/pytest` run as
+the default local workflow unless PostgreSQL is already listening at the
+configured `DATABASE_URL`.
 
 You can also run tests fully inside Docker from `apps/api/`:
 

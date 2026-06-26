@@ -244,6 +244,11 @@ and runs pytest with a known `DATABASE_URL`. If `apps/api/.venv` is not present,
 it runs pytest inside the `api` container instead. This is the recommended path
 because it does not depend on a machine-level PostgreSQL install.
 
+Docker Desktop or the Docker daemon must be running first. If the runner reports
+that Docker is not reachable, start Docker Desktop and rerun the command. Avoid
+using plain `.venv/bin/pytest` as the default local workflow unless PostgreSQL is
+already running at the configured `DATABASE_URL`.
+
 You can also run tests fully inside Docker:
 
 ```bash

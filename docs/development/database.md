@@ -49,8 +49,13 @@ For PostgreSQL-backed tests through `.venv`, prefer the portable runner because
 it starts this service and waits for readiness before invoking pytest:
 
 ```bash
+cd apps/api
 ./scripts/test-postgres.sh
 ```
+
+The runner requires Docker Desktop or the Docker daemon to be running. If Docker
+is stopped, the runner exits before starting PostgreSQL and direct pytest runs
+will fail with connection errors against `localhost:5432`.
 
 ## Run Migrations
 
