@@ -107,7 +107,7 @@ Execution notes:
 
 ## Patch 1: Node.js Runtime Upgrade
 
-Status: Not started.
+Status: Applied with documented local verification blockers.
 
 Description: Upgrade the frontend Node.js runtime pin independently from pnpm and
 application libraries.
@@ -152,6 +152,23 @@ Risk controls:
   chooses the current line.
 - Keep pnpm version changes for Patch 2 unless Node.js compatibility blocks
   verification.
+
+Execution notes:
+
+- Applied on 2026-06-26 with selected Node.js target `24.16.0`.
+- `apps/web/.nvmrc` and `apps/web/README.md` already matched Node.js `24.16.0`.
+- Updated `.github/workflows/ci.yml` frontend `actions/setup-node` pin from Node
+  `22` to `24.16.0` so CI matches the local runtime pin.
+- Kept `apps/web/package.json` package manager unchanged at `pnpm@11.5.0` for
+  Patch 2.
+- Verified local runtime and package manager: Node.js `v24.16.0`, pnpm `11.5.0`.
+- `corepack enable` was blocked by a local Corepack shim error resolving missing
+  `/usr/local/bin/yarn`; `corepack enable pnpm` succeeded.
+- Passed: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, and
+  `pnpm build` from `apps/web`.
+- `pnpm test:e2e` did not run because Playwright found
+  `http://127.0.0.1:3000` already in use by pre-existing Nuxt dev server process
+  `PID 60948`, and `playwright.config.ts` has `reuseExistingServer: false`.
 
 ## Patch 2: pnpm Upgrade
 

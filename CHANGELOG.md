@@ -32,6 +32,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Changed
 
+- Aligned the frontend CI Node.js runtime pin with the web `.nvmrc` Node.js
+  `24.16.0` target; local frontend install, lint, typecheck, and build checks
+  passed under Node.js `v24.16.0` with pnpm `11.5.0`.
 - Updated the Nuxt frontend framework dependency batch covering Nuxt, Nuxt UI,
   Nuxt ESLint, and ESLint, with lint, typecheck, build, and route checks passing.
 - Updated the low-risk frontend dependency batch covering Iconify icon sets,
