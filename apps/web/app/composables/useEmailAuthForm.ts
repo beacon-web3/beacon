@@ -50,8 +50,7 @@ type PasswordRequirement = {
 
 export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
-  const config = useRuntimeConfig()
-  const { authFetch } = useAuthApi()
+  const { apiFetch } = useApiFetch()
   const { executeRecaptcha } = useRecaptchaToken()
 
   const form = reactive<EmailAuthFormState>({
@@ -67,12 +66,6 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const isSubmitting = shallowRef(false)
   const errorText = shallowRef('')
   const successText = shallowRef('')
-
-  const apiBaseUrl = computed(() => {
-    return typeof config.public.apiBaseUrl === 'string'
-      ? config.public.apiBaseUrl
-      : undefined
-  })
 
   const isSignup = computed(() => options.mode === 'signup')
   const isLogin = computed(() => options.mode === 'login')
@@ -234,8 +227,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         form.recaptchaToken = await executeRecaptcha()
       }
 
-      const response = await authFetch<AuthResponse>(options.endpoint, {
-        baseURL: apiBaseUrl.value,
+      const response = await apiFetch<AuthResponse>(options.endpoint, {
         method: 'POST',
         body: buildBody()
       })

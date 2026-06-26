@@ -19,7 +19,7 @@ Changelog. Use date-based entries until formal versioning starts.
   database service before running pytest from the local virtual environment or
   API container.
 - Added browser-session CSRF token issuance for successful login and email
-  verification, a shared Nuxt auth API helper for CSRF headers, frontend
+  verification, a shared Nuxt backend API transport for CSRF headers, frontend
   reCAPTCHA v2 Invisible execution, and Playwright coverage for auth request
   CSRF/reCAPTCHA behavior and password reset confirmation.
 

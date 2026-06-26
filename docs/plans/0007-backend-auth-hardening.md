@@ -80,8 +80,8 @@ Relevant specs and docs:
 - [x] Issue a usable CSRF token during browser session establishment and add a
   positive backend regression test for an authenticated unsafe request with the
   matching `X-CSRFToken` header.
-- [x] Add a shared Nuxt auth API helper that sends `X-CSRFToken` for unsafe
-  requests when the `csrftoken` cookie is present.
+- [x] Add a shared Nuxt backend API transport that sends `X-CSRFToken` for
+  unsafe requests when the `csrftoken` cookie is present.
 - [x] Execute frontend reCAPTCHA when `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` is set
   and send tokens to captcha-protected public auth endpoints.
 - [x] Reuse password complexity validation for password reset confirmation and
@@ -115,7 +115,7 @@ Relevant specs and docs:
 - Production auth/security settings are covered by tests that exercise
   environment parsing at settings import time.
 - Browser session-establishing auth responses provide a usable CSRF cookie, and
-  Nuxt auth requests send `X-CSRFToken` for unsafe methods when available.
+  Nuxt backend API requests send `X-CSRFToken` for unsafe methods when available.
 - reCAPTCHA-enabled frontend auth submissions include fresh tokens without
   changing disabled/local-development behavior.
 - Password reset confirmation enforces the same client-side password complexity

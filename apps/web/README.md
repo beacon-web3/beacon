@@ -42,11 +42,17 @@ The signup and login pages use the same minimal Beacon visual system as the
 landing page. Current access is email-only; wallet onboarding comes later before
 any Solana signing flow.
 
-## Auth API Runtime Configuration
+## Backend API Runtime Configuration
 
-The auth UI uses `NUXT_PUBLIC_API_BASE_URL` to reach the Django API. Unsafe auth
-API requests include `credentials: 'include'` and send `X-CSRFToken` when the
-Django `csrftoken` cookie is present.
+The Nuxt app uses `NUXT_PUBLIC_API_BASE_URL` to reach the Django API through the
+shared `useApiFetch()` transport. Backend API requests default to
+`credentials: 'include'`, apply a 15 second timeout, normalize fetch failures as
+`ApiFetchError`, and send `X-CSRFToken` on unsafe methods when the Django
+`csrftoken` cookie is present.
+
+Use `useApiFetch()` for Beacon backend HTTP resources. Keep Solana RPC calls,
+wallet signing flows, and package SDK calls outside this transport unless they
+explicitly proxy through the Django API.
 
 Set `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` when backend reCAPTCHA is enabled. When the
 site key is empty, auth forms submit an empty token so local development can run
@@ -110,7 +116,7 @@ pnpm test:e2e
 pnpm test:e2e:ui
 ```
 
-The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, signup/login email form behavior, email verification, password reset request, password reset confirmation, CSRF header attachment, and reCAPTCHA token inclusion. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
+The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, signup/login email form behavior, email verification, password reset request, password reset confirmation, shared backend API transport CSRF header attachment, and reCAPTCHA token inclusion. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
 
 ## Formatting
 

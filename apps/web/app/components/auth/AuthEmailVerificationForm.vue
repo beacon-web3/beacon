@@ -18,9 +18,8 @@ type AccountResponse = {
 }
 
 const { t } = useI18n()
-const config = useRuntimeConfig()
 const localePath = useLocalePath()
-const { authFetch } = useAuthApi()
+const { apiFetch } = useApiFetch()
 const { executeRecaptcha } = useRecaptchaToken()
 
 const form = reactive<VerificationFormState>({
@@ -33,12 +32,6 @@ const isResending = shallowRef(false)
 const successText = shallowRef('')
 const errorText = shallowRef('')
 const resendText = shallowRef('')
-
-const apiBaseUrl = computed(() => {
-  return typeof config.public.apiBaseUrl === 'string'
-    ? config.public.apiBaseUrl
-    : undefined
-})
 
 const otpCode = computed(() => form.otp.join(''))
 
@@ -64,8 +57,7 @@ async function submit(_event: FormSubmitEvent<VerificationFormState>) {
 
   isSubmitting.value = true
   try {
-    const response = await authFetch<AccountResponse>('/api/auth/email-verification/confirm/', {
-      baseURL: apiBaseUrl.value,
+    const response = await apiFetch<AccountResponse>('/api/auth/email-verification/confirm/', {
       method: 'POST',
       body: {
         email: form.email,
@@ -98,8 +90,7 @@ async function resendCode() {
   try {
     const recaptchaToken = await executeRecaptcha()
 
-    await authFetch('/api/auth/email-verification/request/', {
-      baseURL: apiBaseUrl.value,
+    await apiFetch('/api/auth/email-verification/request/', {
       method: 'POST',
       body: {
         email: form.email,

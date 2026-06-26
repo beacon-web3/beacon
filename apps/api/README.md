@@ -241,7 +241,8 @@ Invisible tokens.
 Browser clients using session cookies must send Django's CSRF token on
 authenticated unsafe requests. Successful login and email verification
 confirmation responses issue a `csrftoken` cookie; the Nuxt frontend reads that
-cookie and sends it as `X-CSRFToken` on unsafe auth API methods.
+cookie through its shared backend API transport and sends it as `X-CSRFToken` on
+unsafe API methods.
 
 ## Tests
 
