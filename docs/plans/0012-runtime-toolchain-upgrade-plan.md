@@ -107,7 +107,7 @@ Execution notes:
 
 ## Patch 1: Node.js Runtime Upgrade
 
-Status: Applied with documented local verification blockers.
+Status: Verified.
 
 Description: Upgrade the frontend Node.js runtime pin independently from pnpm and
 application libraries.
@@ -133,7 +133,7 @@ Verification from `apps/web`:
 
 ```bash
 node --version
-corepack enable
+corepack enable pnpm
 pnpm --version
 pnpm install --frozen-lockfile
 pnpm lint
@@ -162,13 +162,13 @@ Execution notes:
 - Kept `apps/web/package.json` package manager unchanged at `pnpm@11.5.0` for
   Patch 2.
 - Verified local runtime and package manager: Node.js `v24.16.0`, pnpm `11.5.0`.
-- `corepack enable` was blocked by a local Corepack shim error resolving missing
-  `/usr/local/bin/yarn`; `corepack enable pnpm` succeeded.
-- Passed: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, and
-  `pnpm build` from `apps/web`.
-- `pnpm test:e2e` did not run because Playwright found
-  `http://127.0.0.1:3000` already in use by pre-existing Nuxt dev server process
-  `PID 60948`, and `playwright.config.ts` has `reuseExistingServer: false`.
+- Used `corepack enable pnpm` instead of broad `corepack enable` because the web
+  workspace is pnpm-only and broad Corepack enable also touches unrelated Yarn
+  shims on local machines.
+- Passed: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`,
+  `pnpm build`, and `pnpm test:e2e` from `apps/web`.
+- `pnpm test:e2e` passed after stopping the pre-existing Nuxt dev server process
+  that was listening on `http://127.0.0.1:3000`; Playwright ran `22 passed`.
 
 ## Patch 2: pnpm Upgrade
 
