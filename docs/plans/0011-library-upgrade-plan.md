@@ -588,6 +588,8 @@ Risk controls:
 
 ## Patch 8: Full Integration Verification
 
+Status: Completed on 2026-06-26.
+
 Description: Verify frontend and backend together after all dependency patches.
 This patch is primarily verification; it should not change code unless a minimal
 integration fix is required and justified by a failing check.
@@ -633,6 +635,26 @@ Risk controls:
   once.
 - Keep auth and security behavior unchanged unless a dependency forces a
   documented compatibility fix.
+
+Execution notes:
+
+- Backend Docker Compose verification passed with `docker compose up --build -d`
+  from `apps/api`; the backend image built and the API and PostgreSQL services
+  started successfully.
+- Backend migrations applied successfully with
+  `docker compose run --rm api python manage.py migrate` from `apps/api`.
+- Backend containerized Ruff verification passed with
+  `docker compose run --rm api ruff check .` from `apps/api`.
+- Backend containerized tests passed with `docker compose run --rm api pytest`
+  from `apps/api`: 70 tests passed on Python 3.10.20, Django 5.2.15, and pytest
+  9.1.1.
+- Frontend E2E verification passed with
+  `NUXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 pnpm test:e2e` from
+  `apps/web`: 22 Playwright tests passed against the running backend.
+- Browser console smoke verification passed for `/`, `/fr`, `/signup`, `/login`,
+  `/verify-email`, `/reset-password`, and `/reset-password/confirm` with the
+  frontend pointed at `http://127.0.0.1:8000`.
+- No code or compatibility fixes were required.
 
 ## Patch 9: Documentation And Changelog
 
