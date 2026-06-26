@@ -13,13 +13,16 @@ The current Python dependencies are tracked in `requirements.txt`:
 * django-cors-headers 4.9.0
 * django-environ 0.14.0
 * psycopg 3.3.4
+* asgiref 3.11.1
+* sqlparse 0.5.5
+* typing_extensions 4.15.0
 
 Development-only Python tools are tracked in `requirements-dev.txt`:
 
 * Ruff 0.15.20
 * pytest 9.1.1
 * pytest-django 4.12.0
-* factory-boy 3.3.3
+* factory_boy 3.3.3
 
 ## Docker Setup
 

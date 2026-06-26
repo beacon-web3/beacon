@@ -658,6 +658,8 @@ Execution notes:
 
 ## Patch 9: Documentation And Changelog
 
+Status: Completed on 2026-06-26.
+
 Description: Update dependency-version references and completion notes after
 verified upgrades. Documentation should reflect actual completed work, not
 planned work.
@@ -685,6 +687,18 @@ Verification:
 - Confirm the changelog does not claim checks that were not run.
 
 Dependencies: Patch 8.
+
+Execution notes:
+
+- Updated `apps/web/README.md` with current key frontend dependency versions from
+  `apps/web/package.json`.
+- Updated `apps/api/README.md` so the listed runtime and development dependency
+  versions match `apps/api/requirements.txt` and `apps/api/requirements-dev.txt`.
+- Updated `CHANGELOG.md` to summarize the completed low-risk frontend dependency
+  batch in addition to the already recorded Nuxt, Playwright, backend runtime,
+  backend tooling, runtime pinning, and verification work.
+- Verified documentation version references against the actual manifests and did
+  not add claims for checks beyond those already recorded in completed patches.
 
 Risk controls:
 

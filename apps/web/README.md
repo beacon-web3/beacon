@@ -13,6 +13,18 @@ This workspace uses pnpm. Do not run Yarn commands here; `package.json` intentio
 Use Node.js 24.16.0 for local development. The pinned version is recorded in
 `.nvmrc` for Node version managers.
 
+Current key frontend versions are tracked in `package.json`:
+
+- Nuxt 4.4.8
+- Nuxt UI 4.9.0
+- Nuxt i18n 10.4.0
+- TypeScript 6.0.3
+- ESLint 10.5.0
+- Playwright 1.61.1
+- Tailwind CSS 4.3.1
+- vue-tsc 3.3.5
+- Prettier 3.8.4
+
 ### 1. Install Dependencies
 
 ```bash
