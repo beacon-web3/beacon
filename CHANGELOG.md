@@ -10,6 +10,10 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added public backend Swagger/OpenAPI documentation with `drf-spectacular`,
+  generated schema output at `/api/schema/`, Swagger UI at
+  `/api/docs/swagger/`, ReDoc at `/api/docs/redoc/`, auth endpoint schema
+  annotations, and regression coverage.
 - Added Google social auth with backend-owned OAuth/OIDC exchange,
   `django-allauth` provider storage, verified-email account linking, social-only
   account creation with generated usernames, Nuxt login/signup controls, a

@@ -13,11 +13,17 @@ from django.http import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.serializers import (
+    GoogleSocialStartResponseSerializer,
+    GoogleSocialStartSerializer,
+    SocialProviderListSerializer,
+)
 from accounts.social_auth import SocialAuthError, SocialIdentity, resolve_social_account
 from accounts.throttles import (
     SocialAuthCallbackRateThrottle,
@@ -124,6 +130,14 @@ class SocialProviderListView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        summary="List social auth providers",
+        description=(
+            "Public endpoint. Returns public provider metadata only. Provider "
+            "tokens, client secrets, and internal configuration are never exposed."
+        ),
+        responses={200: SocialProviderListSerializer},
+    )
     def get(self, request):
         return Response(
             {
@@ -149,6 +163,21 @@ class GoogleSocialAuthStartView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SocialAuthStartRateThrottle]
 
+    @extend_schema(
+        summary="Start Google social authentication",
+        description=(
+            "Public endpoint. Creates server-side OAuth state and returns a Google "
+            "authorization URL. The optional next value must be a same-site "
+            "relative path."
+        ),
+        request=GoogleSocialStartSerializer,
+        responses={
+            200: GoogleSocialStartResponseSerializer,
+            400: OpenApiResponse(description="Unsafe next path."),
+            429: OpenApiResponse(description="Social auth start throttle exceeded."),
+            503: OpenApiResponse(description="Google OAuth is not configured."),
+        },
+    )
     def post(self, request):
         next_path = sanitize_next_path(request.data.get("next"))
         if request.data.get("next") and next_path is None:
@@ -191,6 +220,17 @@ class GoogleSocialAuthCallbackView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SocialAuthCallbackRateThrottle]
 
+    @extend_schema(
+        summary="Handle the Google OAuth callback",
+        description=(
+            "Public redirect endpoint. Validates OAuth state, exchanges the code "
+            "on the backend, resolves or creates the Beacon account, starts a "
+            "Django session, issues a CSRF cookie, and redirects to the frontend. "
+            "Failure redirects are generic and do not expose provider or account "
+            "resolution details."
+        ),
+        responses={302: OpenApiResponse(description="Redirect to the frontend.")},
+    )
     def get(self, request):
         next_path = request.session.pop("social_auth_next", "/dashboard")
         expected_state = request.session.pop("social_auth_google_state", None)

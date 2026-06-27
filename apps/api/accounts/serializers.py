@@ -36,6 +36,38 @@ class AccountSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class AccountEnvelopeSerializer(serializers.Serializer):
+    account = AccountSerializer(read_only=True)
+
+
+class DetailResponseSerializer(serializers.Serializer):
+    detail = serializers.CharField(read_only=True)
+
+
+class EmailVerificationRequiredSerializer(serializers.Serializer):
+    code = serializers.CharField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+
+
+class SocialProviderSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    start_url = serializers.URLField(read_only=True)
+    enabled = serializers.BooleanField(read_only=True)
+
+
+class SocialProviderListSerializer(serializers.Serializer):
+    providers = SocialProviderSerializer(many=True, read_only=True)
+
+
+class GoogleSocialStartSerializer(serializers.Serializer):
+    next = serializers.CharField(required=False, allow_blank=True)
+
+
+class GoogleSocialStartResponseSerializer(serializers.Serializer):
+    authorization_url = serializers.URLField(read_only=True)
+
+
 class RecaptchaSerializer(serializers.Serializer):
     recaptcha_token = serializers.CharField(required=False, allow_blank=True)
 

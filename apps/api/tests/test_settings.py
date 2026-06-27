@@ -10,6 +10,13 @@ def test_drf_defaults_require_authentication(settings):
     ]
 
 
+def test_drf_uses_spectacular_schema_class(settings):
+    assert (
+        settings.REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"]
+        == "drf_spectacular.openapi.AutoSchema"
+    )
+
+
 def test_production_security_settings_are_configurable(settings):
     settings.SESSION_COOKIE_SECURE = True
     settings.CSRF_COOKIE_SECURE = True

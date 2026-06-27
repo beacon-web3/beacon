@@ -17,8 +17,38 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+from rest_framework.permissions import AllowAny
+
+public_schema_view = SpectacularAPIView.as_view(
+    authentication_classes=[],
+    permission_classes=[AllowAny],
+)
 
 urlpatterns = [
+    path("api/schema/", public_schema_view, name="schema"),
+    path(
+        "api/docs/swagger/",
+        SpectacularSwaggerView.as_view(
+            authentication_classes=[],
+            permission_classes=[AllowAny],
+            url_name="schema",
+        ),
+        name="swagger-ui",
+    ),
+    path(
+        "api/docs/redoc/",
+        SpectacularRedocView.as_view(
+            authentication_classes=[],
+            permission_classes=[AllowAny],
+            url_name="schema",
+        ),
+        name="redoc",
+    ),
     path("api/auth/", include("accounts.urls")),
     path("admin/", admin.site.urls),
 ]
