@@ -39,6 +39,7 @@ from accounts.throttles import (
 
 Account = get_user_model()
 logger = logging.getLogger(__name__)
+SESSION_LOGIN_BACKEND = "django.contrib.auth.backends.ModelBackend"
 PASSWORD_RESET_DETAIL = _(
     "If an account exists, password reset instructions will be sent."
 )
@@ -146,7 +147,7 @@ class LoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        login(request, account)
+        login(request, account, backend=SESSION_LOGIN_BACKEND)
         get_token(request)
         return Response({"account": AccountSerializer(account).data})
 
@@ -197,7 +198,7 @@ class EmailVerificationConfirmView(APIView):
         serializer = EmailVerificationConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         account = serializer.save()
-        login(request, account)
+        login(request, account, backend=SESSION_LOGIN_BACKEND)
         get_token(request)
         return Response({"account": AccountSerializer(account).data})
 

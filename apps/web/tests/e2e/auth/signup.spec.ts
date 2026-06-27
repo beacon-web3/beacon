@@ -50,6 +50,28 @@ test('signup submits account fields to the auth api', async ({ page }) => {
   )
 })
 
+test('signup starts Google social auth through the shared start endpoint', async ({ page }) => {
+  await page.route('**/api/auth/social/google/start/', async (route) => {
+    const request = route.request()
+
+    expect(request.method()).toBe('POST')
+    expect(request.headers()['x-csrftoken']).toBe(csrfToken)
+    expect(request.postDataJSON()).toEqual({ next: '/dashboard' })
+
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 200,
+      body: JSON.stringify({ authorization_url: '/mock-google-auth' })
+    })
+  })
+
+  await page.goto('/signup')
+  await page.waitForLoadState('networkidle')
+  await page.getByRole('button', { name: 'Sign up with Google' }).click()
+
+  await expect(page).toHaveURL(/\/mock-google-auth$/)
+})
+
 test('signup sends the active locale to the auth api', async ({ page }) => {
   await page.route('**/api/auth/signup/', async (route) => {
     const request = route.request()

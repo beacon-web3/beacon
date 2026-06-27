@@ -67,4 +67,4 @@ Templates live in `docs/plans/templates/`.
 | 0010 | [Auth test split](0010-auth-api-test-split.md) | Completed |
 | 0011 | [Library upgrade plan](0011-library-upgrade-plan.md) | Completed |
 | 0012 | [Runtime Toolchain Upgrade Plan](0012-runtime-toolchain-upgrade-plan.md) | Completed |
-
+| 0013 | [Google Social Auth](0013-google-social-auth.md) | Draft |

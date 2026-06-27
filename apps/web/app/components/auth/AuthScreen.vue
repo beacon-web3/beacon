@@ -13,10 +13,13 @@ defineProps<{
   resetUid?: string
   resetToken?: string
   clearOnSuccess?: boolean
+  socialAuthError?: string
+  socialAuthSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
   verificationRequired: [email: string]
+  googleAuthStart: []
 }>()
 
 const { t } = useI18n()
@@ -58,7 +61,10 @@ const { t } = useI18n()
           :reset-uid="resetUid"
           :reset-token="resetToken"
           :clear-on-success="clearOnSuccess"
+          :social-auth-error="socialAuthError"
+          :social-auth-submitting="socialAuthSubmitting"
           @verification-required="email => emit('verificationRequired', email)"
+          @google-auth-start="emit('googleAuthStart')"
         />
       </div>
     </section>

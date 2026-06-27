@@ -10,6 +10,13 @@ Acceptance criteria:
 
 * I can sign up with email, username, display name, and password.
 * I can log in with either email or username plus password.
+* I can start Google sign-in or signup from the auth screens.
+* If my verified Google email matches an existing Beacon account, Beacon links
+  the Google identity to that account and logs me in.
+* If my verified Google email has no Beacon account, Beacon creates an account
+  with a generated username and logs me in.
+* I understand social auth is account access only, not wallet identity, Solana
+  account ownership proof, or anti-sybil proof.
 * I can log out and confirm my current authenticated account.
 * I can request a password reset without Beacon revealing whether an email has an
   account.

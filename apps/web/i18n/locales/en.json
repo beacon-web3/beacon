@@ -151,6 +151,11 @@
     "newPasswordPlaceholder": "New password",
     "passwordResetHelp": "Password reset responses are intentionally generic so account existence is not exposed.",
     "recaptchaNotice": "Protected by reCAPTCHA v2 Invisible when enabled.",
+    "socialDivider": "or",
+    "googleSignup": "Sign up with Google",
+    "googleLogin": "Continue with Google",
+    "socialStartError": "We could not start Google sign-in.",
+    "socialCallbackError": "Google sign-in could not be completed. Try again.",
     "networkError": "Network error. Check your connection and try again.",
     "tooManyRequestsError": "Too many attempts. Try again later.",
     "submitting": "Submitting...",
@@ -205,5 +210,16 @@
     },
     "comingSoon": "Coming soon",
     "backHome": "Back to home"
+  },
+  "dashboard": {
+    "eyebrow": "Account ready",
+    "title": "Your Beacon account is active.",
+    "description": "This early-access dashboard confirms your session. Book discovery, curation, support, wallet, and reputation tools will arrive as those flows are approved and implemented.",
+    "socialAuthSuccess": "Google sign-in completed.",
+    "loading": "Confirming your session...",
+    "authRequired": "Log in to view your Beacon account.",
+    "emailLabel": "Email",
+    "usernameLabel": "Username",
+    "loginLink": "Log in"
   }
 }
