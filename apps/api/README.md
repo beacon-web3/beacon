@@ -13,6 +13,7 @@ The current Python dependencies are tracked in `requirements.txt`:
 * django-allauth 65.13.1
 * django-cors-headers 4.9.0
 * django-environ 0.14.0
+* drf-spectacular 0.29.0
 * psycopg 3.3.4 with the binary libpq wheel extra
 * requests 2.32.5, retained as the OAuth2 HTTP transport used by
   `django-allauth`
@@ -185,6 +186,7 @@ Expected version:
 * PostgreSQL driver installed: yes
 * Local PostgreSQL database: Docker Compose service in `apps/api/compose.yaml`
 * Django project generated: yes, `beacon_api`
+* Generated OpenAPI docs: yes, through `drf-spectacular`
 * Ruff installed: yes
 * pytest installed: yes
 * Django apps generated: yes, `accounts`
@@ -274,6 +276,20 @@ HTTP transport. A verified Google email can auto-link to an existing Beacon
 account or create a new social-only account with a generated username. This is
 account authentication only; it is not wallet identity or proof of Solana account
 ownership.
+
+## API Documentation
+
+Generated API documentation is available from the Django backend in local and
+production environments:
+
+* Schema: `http://localhost:8000/api/schema/`
+* Swagger UI: `http://localhost:8000/api/docs/swagger/`
+* ReDoc: `http://localhost:8000/api/docs/redoc/`
+
+The docs are intentionally public. They describe session-cookie authentication
+and Django CSRF requirements, but must not include provider secrets, private
+environment values, or operational stack details. The hand-maintained API notes
+remain in `docs/api/openapi.md` for product and integration context.
 
 ## Tests
 

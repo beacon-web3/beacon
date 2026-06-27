@@ -1,5 +1,18 @@
 # OpenAPI
 
+## Generated API Docs
+
+The backend publishes generated OpenAPI documentation with `drf-spectacular`:
+
+* `GET /api/schema/` returns the machine-readable OpenAPI schema.
+* `GET /api/docs/swagger/` serves public Swagger UI for interactive browsing.
+* `GET /api/docs/redoc/` serves public ReDoc reference documentation.
+
+These routes are intentionally public in development and production. The schema
+documents public API behavior, Django session-cookie authentication, and CSRF
+expectations without exposing provider secrets, private environment values, or
+operational stack details.
+
 ## Auth
 
 Auth endpoints use Django session cookies for browser authentication. Mutating

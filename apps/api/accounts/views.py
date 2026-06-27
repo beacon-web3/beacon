@@ -14,19 +14,30 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext as gettext_now
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    PolymorphicProxySerializer,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.serializers import (
+    AccountEnvelopeSerializer,
     AccountSerializer,
+    DetailResponseSerializer,
     EmailVerificationConfirmSerializer,
     EmailVerificationRequestSerializer,
+    EmailVerificationRequiredSerializer,
     LoginSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     SignupSerializer,
+    ValidationErrorSerializer,
 )
 from accounts.throttles import (
     EmailVerificationConfirmRateThrottle,
@@ -46,6 +57,13 @@ PASSWORD_RESET_DETAIL = _(
 EMAIL_VERIFICATION_DETAIL = _("If an account exists, a verification code will be sent.")
 EMAIL_VERIFICATION_EXPIRY = timedelta(minutes=15)
 EMAIL_VERIFICATION_REQUIRED = "EMAIL_VERIFICATION_REQUIRED"
+CSRF_HEADER_PARAMETER = OpenApiParameter(
+    name="X-CSRFToken",
+    type=str,
+    location=OpenApiParameter.HEADER,
+    required=True,
+    description="Django CSRF token for authenticated unsafe requests.",
+)
 
 
 def send_email_verification_code(account: Account) -> None:
@@ -118,6 +136,20 @@ class SignupView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SignupRateThrottle]
 
+    @extend_schema(
+        summary="Create an account",
+        description=(
+            "Public endpoint. Creates an unverified Beacon account and schedules "
+            "an email verification code after the account transaction commits. "
+            "When captcha is enabled, include a reCAPTCHA v2 Invisible token."
+        ),
+        request=SignupSerializer,
+        responses={
+            201: AccountEnvelopeSerializer,
+            400: OpenApiResponse(description="Invalid signup input or captcha."),
+            429: OpenApiResponse(description="Signup throttle exceeded."),
+        },
+    )
     def post(self, request):
         serializer = SignupSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
@@ -137,6 +169,44 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [LoginRateThrottle]
 
+    @extend_schema(
+        summary="Log in with email-or-username and password",
+        description=(
+            "Public endpoint. On success, Django starts a session and issues a "
+            "CSRF cookie for browser clients. When captcha is enabled, include a "
+            "reCAPTCHA v2 Invisible token."
+        ),
+        request=LoginSerializer,
+        responses={
+            200: AccountEnvelopeSerializer,
+            400: OpenApiResponse(
+                response=PolymorphicProxySerializer(
+                    component_name="LoginError",
+                    serializers=[
+                        EmailVerificationRequiredSerializer,
+                        ValidationErrorSerializer,
+                    ],
+                    resource_type_field_name=None,
+                ),
+                description=(
+                    "Invalid credentials, captcha failure, or valid credentials "
+                    "for an account that still needs email verification."
+                ),
+            ),
+            429: OpenApiResponse(description="Login throttle exceeded."),
+        },
+        examples=[
+            OpenApiExample(
+                "Email verification required",
+                value={
+                    "code": EMAIL_VERIFICATION_REQUIRED,
+                    "email": "user@example.com",
+                },
+                response_only=True,
+                status_codes=["400"],
+            )
+        ],
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
@@ -153,6 +223,19 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    @extend_schema(
+        summary="Log out the current session",
+        description=(
+            "Protected endpoint. Browser clients using session cookies must send "
+            "Django's CSRF token on this unsafe request."
+        ),
+        request=None,
+        parameters=[CSRF_HEADER_PARAMETER],
+        responses={
+            204: OpenApiResponse(description="Session cleared."),
+            403: OpenApiResponse(description="Authentication or CSRF failed."),
+        },
+    )
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -161,6 +244,14 @@ class LogoutView(APIView):
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Get the current account",
+        description="Protected endpoint. Returns the account for the current session.",
+        responses={
+            200: AccountEnvelopeSerializer,
+            403: OpenApiResponse(description="No authenticated session exists."),
+        },
+    )
     def get(self, request):
         return Response({"account": AccountSerializer(request.user).data})
 
@@ -170,6 +261,20 @@ class EmailVerificationRequestView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [EmailVerificationRequestRateThrottle]
 
+    @extend_schema(
+        summary="Request an email verification code",
+        description=(
+            "Public endpoint. Returns a generic response to avoid revealing "
+            "whether an account exists. When captcha is enabled, include a "
+            "reCAPTCHA v2 Invisible token."
+        ),
+        request=EmailVerificationRequestSerializer,
+        responses={
+            202: DetailResponseSerializer,
+            400: OpenApiResponse(description="Invalid input or captcha."),
+            429: OpenApiResponse(description="Verification request throttle exceeded."),
+        },
+    )
     def post(self, request):
         serializer = EmailVerificationRequestSerializer(
             data=request.data,
@@ -194,6 +299,19 @@ class EmailVerificationConfirmView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [EmailVerificationConfirmRateThrottle]
 
+    @extend_schema(
+        summary="Confirm an email verification code",
+        description=(
+            "Public endpoint. On success, marks the email as verified, starts a "
+            "Django session, and issues a CSRF cookie for browser clients."
+        ),
+        request=EmailVerificationConfirmSerializer,
+        responses={
+            200: AccountEnvelopeSerializer,
+            400: OpenApiResponse(description="Invalid, expired, or exhausted code."),
+            429: OpenApiResponse(description="Verification confirm throttle exceeded."),
+        },
+    )
     def post(self, request):
         serializer = EmailVerificationConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -208,6 +326,20 @@ class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [PasswordResetRateThrottle]
 
+    @extend_schema(
+        summary="Request a password reset",
+        description=(
+            "Public endpoint. Returns a generic response to avoid revealing "
+            "whether an account exists. When captcha is enabled, include a "
+            "reCAPTCHA v2 Invisible token."
+        ),
+        request=PasswordResetRequestSerializer,
+        responses={
+            202: DetailResponseSerializer,
+            400: OpenApiResponse(description="Invalid input or captcha."),
+            429: OpenApiResponse(description="Password reset throttle exceeded."),
+        },
+    )
     def post(self, request):
         serializer = PasswordResetRequestSerializer(
             data=request.data,
@@ -232,6 +364,20 @@ class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [PasswordResetConfirmRateThrottle]
 
+    @extend_schema(
+        summary="Confirm a password reset",
+        description=(
+            "Public endpoint. Sets a new password using Django's uid/token pair."
+        ),
+        request=PasswordResetConfirmSerializer,
+        responses={
+            200: DetailResponseSerializer,
+            400: OpenApiResponse(description="Invalid token or password."),
+            429: OpenApiResponse(
+                description="Password reset confirmation throttle exceeded."
+            ),
+        },
+    )
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

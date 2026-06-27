@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -238,4 +239,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Beacon API",
+    "VERSION": "0.1.0",
+    "DESCRIPTION": (
+        "Public API for Beacon's books-first discovery and reputation network. "
+        "Browser clients authenticate with Django session cookies. Authenticated "
+        "unsafe requests must include Django's CSRF token in the X-CSRFToken "
+        "header."
+    ),
 }
