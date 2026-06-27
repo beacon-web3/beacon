@@ -16,6 +16,14 @@ Changelog. Use date-based entries until formal versioning starts.
   session-confirming dashboard target, API docs, and an auth strategy decision
   record.
 
+### Changed
+
+- Hardened Google social auth remediation by routing provider exchange/extraction
+  through allauth, enforcing strict verified Google identity normalization,
+  explicitly reactivating inactive accounts only after verified proof, expanding
+  backend regression coverage, and renaming the backend callback module as
+  Google-specific.
+
 ## 2026-06-26
 
 ### Added

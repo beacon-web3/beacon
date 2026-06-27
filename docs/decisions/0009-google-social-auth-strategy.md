@@ -23,9 +23,17 @@ with Google only. Keep Django session cookies as the browser auth mechanism.
 
 Google OAuth/OIDC starts from Nuxt but redirects to Google through a backend
 start endpoint. The callback is handled by Django, which validates state,
-exchanges the authorization code server-side, resolves the Beacon account, calls
-Django `login()`, issues a CSRF cookie, and redirects back to Nuxt with only a
-generic success or failure query parameter.
+uses allauth's Google provider adapter and OAuth2 client for code exchange,
+provider token handling, and Google account extraction, resolves the Beacon
+account, calls Django `login()`, issues a CSRF cookie, and redirects back to Nuxt
+with only a generic success or failure query parameter.
+
+Beacon keeps a small Google callback wrapper for product-specific behavior that
+allauth does not own: preserving the `/api/auth/social/google/` route contract,
+session-backed redirect state, Nuxt success/failure redirects, strict normalized
+identity validation, Beacon account resolution, account reactivation rules, and
+safe auth logging. That wrapper must not become a hand-rolled provider token
+validation or userinfo trust implementation.
 
 Beacon will auto-link a Google identity to an existing Beacon account only when
 Google reports the email as verified. A verified Google email without a Beacon
@@ -74,6 +82,9 @@ auto-linking.
 - Backend configuration now requires Google OAuth client credentials and a
   callback redirect URI before social auth can be enabled outside local tests.
 - Provider access tokens remain backend-only and are not part of Nuxt state.
+- Beacon's Google wrapper depends on allauth for provider token exchange and
+  account extraction; future providers should preserve that boundary or receive a
+  separate security review.
 - Future GitHub or Apple support should reuse the same Beacon session contract
   while adding provider-specific verified-email normalization.
 - Social auth remains separate from wallet connection and on-chain identity.

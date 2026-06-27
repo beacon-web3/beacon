@@ -1,11 +1,14 @@
-import json
 import logging
 import secrets
 import urllib.parse
-import urllib.request
 
+from allauth.socialaccount.models import SocialApp, SocialToken
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client, OAuth2Error
 from django.conf import settings
 from django.contrib.auth import login
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.urls import reverse
@@ -23,9 +26,6 @@ from accounts.throttles import (
 
 logger = logging.getLogger(__name__)
 
-GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
-GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 SOCIAL_AUTH_SUCCESS = "social_auth=success"
 SOCIAL_AUTH_ERROR = "error=social_auth_failed"
 SESSION_LOGIN_BACKEND = "django.contrib.auth.backends.ModelBackend"
@@ -63,46 +63,61 @@ def sanitize_next_path(value: str | None) -> str | None:
 
 
 def fetch_google_identity(request, code: str) -> SocialIdentity:
-    token_payload = urllib.parse.urlencode(
-        {
-            "code": code,
-            "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
-            "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": get_google_redirect_uri(request),
-            "grant_type": "authorization_code",
-        }
-    ).encode()
-    token_request = urllib.request.Request(
-        GOOGLE_TOKEN_URL,
-        data=token_payload,
-        headers={"Accept": "application/json"},
-        method="POST",
+    adapter = GoogleOAuth2Adapter(request)
+    app = _get_google_social_app()
+    client = OAuth2Client(
+        request,
+        app.client_id,
+        app.secret,
+        adapter.access_token_method,
+        adapter.access_token_url,
+        get_google_redirect_uri(request),
+        scope_delimiter=adapter.scope_delimiter,
+        headers=adapter.headers,
+        basic_auth=adapter.basic_auth,
     )
-    token_data = _read_json(token_request)
-    access_token = token_data.get("access_token")
-    if not access_token:
-        raise SocialAuthError("Google token response did not include an access token.")
+    token_data = client.get_access_token(code)
+    token = SocialToken(token=token_data["access_token"])
+    social_login = adapter.complete_login(request, app, token, response=token_data)
+    return normalize_google_identity(social_login.account.extra_data)
 
-    userinfo_request = urllib.request.Request(
-        GOOGLE_USERINFO_URL,
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json",
-        },
-    )
-    userinfo = _read_json(userinfo_request)
+
+def normalize_google_identity(data: dict) -> SocialIdentity:
+    subject = data.get("sub")
+    if not isinstance(subject, str) or not subject.strip():
+        raise SocialAuthError("Google identity subject is missing or invalid.")
+
+    email = data.get("email")
+    if not isinstance(email, str):
+        raise SocialAuthError("Google identity email is missing or invalid.")
+    normalized_email = email.strip().lower()
+    try:
+        validate_email(normalized_email)
+    except ValidationError as exc:
+        raise SocialAuthError("Google identity email is invalid.") from exc
+
+    if data.get("email_verified") is not True:
+        raise SocialAuthError("Google identity email is not verified.")
+
+    name = data.get("name")
     return SocialIdentity(
         provider="google",
-        uid=str(userinfo.get("sub", "")),
-        email=str(userinfo.get("email", "")).strip().lower(),
-        email_verified=bool(userinfo.get("email_verified")),
-        name=str(userinfo.get("name", "")),
+        uid=subject.strip(),
+        email=normalized_email,
+        email_verified=True,
+        name=name.strip() if isinstance(name, str) else "",
     )
 
 
-def _read_json(request: urllib.request.Request) -> dict:
-    with urllib.request.urlopen(request, timeout=10) as response:
-        return json.loads(response.read().decode())
+def _get_google_social_app() -> SocialApp:
+    if not settings.GOOGLE_OAUTH_CLIENT_ID or not settings.GOOGLE_OAUTH_CLIENT_SECRET:
+        raise SocialAuthError("Google social authentication is not configured.")
+    return SocialApp(
+        provider="google",
+        name="Google",
+        client_id=settings.GOOGLE_OAUTH_CLIENT_ID,
+        secret=settings.GOOGLE_OAUTH_CLIENT_SECRET,
+    )
 
 
 class SocialProviderListView(APIView):
@@ -166,7 +181,9 @@ class GoogleSocialAuthStartView(APIView):
                 "prompt": "select_account",
             }
         )
-        return Response({"authorization_url": f"{GOOGLE_AUTH_URL}?{query}"})
+        return Response(
+            {"authorization_url": f"{GoogleOAuth2Adapter.authorize_url}?{query}"}
+        )
 
 
 class GoogleSocialAuthCallbackView(APIView):
@@ -189,11 +206,13 @@ class GoogleSocialAuthCallbackView(APIView):
             return HttpResponseRedirect(build_frontend_error_redirect())
 
         try:
-            raw_identity = fetch_google_identity(request, code)
-            identity = raw_identity
-            if isinstance(raw_identity, dict):
-                identity = SocialIdentity(**raw_identity)
+            identity = fetch_google_identity(request, code)
+            if isinstance(identity, dict):
+                identity = SocialIdentity(**identity)
             account = resolve_social_account(identity)
+        except OAuth2Error, SocialAuthError:
+            logger.warning("Google social auth callback rejected")
+            return HttpResponseRedirect(build_frontend_error_redirect())
         except Exception:
             logger.exception("Google social auth callback failed")
             return HttpResponseRedirect(build_frontend_error_redirect())

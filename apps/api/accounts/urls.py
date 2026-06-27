@@ -1,6 +1,6 @@
 from django.urls import path
 
-from accounts.social_views import (
+from accounts.google_social_views import (
     GoogleSocialAuthCallbackView,
     GoogleSocialAuthStartView,
     SocialProviderListView,

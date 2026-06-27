@@ -14,7 +14,8 @@ The current Python dependencies are tracked in `requirements.txt`:
 * django-cors-headers 4.9.0
 * django-environ 0.14.0
 * psycopg 3.3.4 with the binary libpq wheel extra
-* requests 2.32.5
+* requests 2.32.5, retained as the OAuth2 HTTP transport used by
+  `django-allauth`
 * PyJWT 2.10.1
 * cryptography 46.0.3
 * asgiref 3.11.1
@@ -263,11 +264,16 @@ confirmation responses issue a `csrftoken` cookie; the Nuxt frontend reads that
 cookie through its shared backend API transport and sends it as `X-CSRFToken` on
 unsafe API methods.
 
-Google social auth exchanges provider tokens only on the backend and returns no
-provider token data to Nuxt. A verified Google email can auto-link to an existing
-Beacon account or create a new social-only account with a generated username.
-This is account authentication only; it is not wallet identity or proof of Solana
-account ownership.
+Google social auth exchanges provider tokens only on the backend through
+`django-allauth`'s Google adapter and OAuth2 client, and returns no provider token
+data to Nuxt. Beacon's callback wrapper handles only Beacon-specific redirects,
+session login, strict normalized identity validation, and account resolution; it
+does not perform direct provider HTTP requests. `requests` remains a direct
+dependency because allauth's OAuth2 client uses it for provider token and userinfo
+HTTP transport. A verified Google email can auto-link to an existing Beacon
+account or create a new social-only account with a generated username. This is
+account authentication only; it is not wallet identity or proof of Solana account
+ownership.
 
 ## Tests
 
