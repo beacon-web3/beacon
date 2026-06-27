@@ -69,3 +69,4 @@ Templates live in `docs/plans/templates/`.
 | 0012 | [Runtime Toolchain Upgrade Plan](0012-runtime-toolchain-upgrade-plan.md) | Completed |
 | 0013 | [Google Social Auth](0013-google-social-auth.md) | Completed |
 | 0014 | [Backend Swagger OpenAPI Docs](0014-backend-swagger-openapi.md) | Completed |
+| 0015 | [MVP free hosting setup](0015-mvp-free-hosting-setup.md) | Draft |

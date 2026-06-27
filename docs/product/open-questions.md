@@ -82,6 +82,8 @@ implementation.
 - Which data belongs on-chain versus off-chain for the MVP?
 - How should the backend index Solana events and reconcile failed or delayed
   transactions?
+- Should Solana event monitoring for the production-like MVP run in Django, a
+  separate worker or indexer, scheduled jobs, or direct Nuxt client RPC reads?
 - What API boundaries should exist between `apps/web`, `apps/api`,
   `apps/contracts`, and `packages/sdk`?
 - What observability is required for treasury, support, reward, and staking
@@ -93,3 +95,13 @@ implementation.
   on-chain account state?
 - How should program upgrade authority be represented in the frontend and
   treasury dashboard?
+
+## Infrastructure And Launch
+
+- Should the first production-like Django deployment use Render free tier or
+  Google Cloud Run free tier?
+- Should the first managed PostgreSQL provider be Neon or Aiven?
+- What cold-start delay is acceptable for early MVP testing before paid or
+  always-on backend hosting is required?
+- Which uptime, backup, and data-retention thresholds must be met before public
+  beta?

@@ -61,6 +61,21 @@ Key outcomes:
   sponsored or affiliate revenue.
 - Security review covers contracts, APIs, wallet flows, and treasury operations.
 
+## Phase 4.5: Production-Like MVP Hosting
+
+Goal: Stand up the lowest-cost production-like environment before public beta so
+integration risks are visible without implying final production reliability.
+
+Key outcomes:
+
+- Nuxt frontend is deployed to Vercel.
+- Django API is deployed to Render free tier or Cloud Run free tier.
+- PostgreSQL runs on a dedicated managed provider such as Neon or Aiven.
+- Production environment variables, CORS, CSRF, secure cookies, OAuth redirects,
+  email, reCAPTCHA, and health checks are configured.
+- Cold-start behavior, database retention assumptions, and Solana indexing
+  blockers are documented before broader beta launch.
+
 ## Phase 5: Public Beta
 
 Goal: Launch a constrained beta that tests real user behavior while preserving

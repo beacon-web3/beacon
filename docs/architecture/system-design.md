@@ -83,6 +83,34 @@ Responsibilities:
 * Treasury transparency pages.
 * Governance proposal and voting pages.
 
+## MVP Hosting Shape
+
+For the first production-like MVP environment, Beacon should prefer a simple
+cross-provider free-tier deployment while the product loop is still being
+validated:
+
+* Nuxt frontend on Vercel free tier.
+* Django REST API on Render free tier, unless Cloud Run is selected during
+  implementation for Docker-native deployment and faster scale-to-zero cold
+  starts.
+* PostgreSQL on a dedicated managed free tier such as Neon or Aiven, not on a
+  short-lived app-platform database if durable MVP data matters.
+
+Expected tradeoffs:
+
+* Free backend hosting may have cold starts after inactivity.
+* Serverless PostgreSQL may require pooled connection strings or conservative
+  persistent connection settings.
+* A sleeping web service is not a reliable home for continuous Solana RPC
+  WebSocket listeners, durable background jobs, or always-on event indexing.
+
+Manual blocker before implementation: decide whether Solana event monitoring is
+handled by Django, a separate worker/indexer, scheduled jobs, or direct Nuxt
+client reads from RPC nodes. Do not invent this boundary during deployment work.
+
+See `docs/decisions/0010-mvp-free-hosting-stack.md` and
+`docs/plans/0015-mvp-free-hosting-setup.md`.
+
 ## Data Model Concepts
 
 Core concepts for future specification:
