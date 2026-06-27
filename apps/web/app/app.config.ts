@@ -16,9 +16,17 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'rounded-md font-semibold tracking-[-0.01em] transition-colors',
+        base: 'cursor-pointer rounded-md font-semibold tracking-[-0.01em] transition-colors disabled:cursor-not-allowed aria-disabled:cursor-not-allowed',
         leadingIcon: 'shrink-0',
         trailingIcon: 'shrink-0'
+      },
+      variants: {
+        block: {
+          true: {
+            base: 'w-full justify-center',
+            trailingIcon: 'ms-0'
+          }
+        }
       },
       defaultVariants: {
         color: 'primary',
