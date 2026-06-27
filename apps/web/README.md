@@ -45,8 +45,10 @@ Current pages:
 
 - `/`: Beacon landing page explaining the discovery marketplace concept.
 - `/fr`: French version of the Beacon landing page.
-- `/signup`: Email-based early-access signup page.
-- `/login`: Email-based login page for returning early-access accounts.
+- `/signup`: Early-access signup page with email/password and Google social
+  signup entry points.
+- `/login`: Login page with email/password and Google social auth entry points
+  for returning early-access accounts.
 - `/verify-email`: Email verification page for six-digit OTP confirmation and
   resend requests.
 - `/reset-password`: Password reset request page.
@@ -54,8 +56,8 @@ Current pages:
   links.
 
 The signup and login pages use the same minimal Beacon visual system as the
-landing page. Current access is email-only; wallet onboarding comes later before
-any Solana signing flow.
+landing page. Current access supports email/password auth and Google social auth;
+wallet onboarding comes later before any Solana signing flow.
 
 ## Backend API Runtime Configuration
 
@@ -131,7 +133,7 @@ pnpm test:e2e
 pnpm test:e2e:ui
 ```
 
-The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, signup/login email form behavior, email verification, password reset request, password reset confirmation, shared backend API transport CSRF header attachment, and reCAPTCHA token inclusion. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
+The current test setup uses Playwright with Chromium and starts the Nuxt dev server automatically. E2E coverage includes the landing page, narrow mobile layout, French route, signup/login email form behavior, Google social auth start and callback states, email verification, password reset request, password reset confirmation, shared backend API transport CSRF header attachment, and reCAPTCHA token inclusion. E2E tests are intentionally not part of the pre-commit hook because they are slower than staged-file linting.
 
 ## Formatting
 

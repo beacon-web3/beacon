@@ -112,10 +112,11 @@ apps/api/tests/accounts/
 
 The current backend tests verify Django settings, PostgreSQL configuration,
 Django REST Framework installation, password signup/login session behavior,
-password reset email and confirmation behavior, captcha failure handling, CSRF
-enforcement, CSRF cookie issuance for session-establishing auth responses,
-throttling, backend auth localization negotiation, localized auth email content,
-and account uniqueness edge cases.
+password reset email and confirmation behavior, Google social auth
+start/callback behavior, captcha failure handling, CSRF enforcement, CSRF cookie
+issuance for session-establishing auth responses, throttling, backend auth
+localization negotiation, localized auth email content, and account uniqueness
+edge cases.
 
 ## What To Test Later
 
