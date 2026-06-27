@@ -196,7 +196,7 @@ Example response:
     {
       "id": "google",
       "name": "Google",
-      "start_url": "/api/auth/social/google/start/",
+      "start_url": "https://api.beacon.example/api/auth/social/google/start/",
       "enabled": true
     }
   ]
