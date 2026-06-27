@@ -10,9 +10,14 @@ The current Python dependencies are tracked in `requirements.txt`:
 
 * Django 5.2.15
 * Django REST Framework 3.17.1
+* django-allauth 65.13.1
 * django-cors-headers 4.9.0
 * django-environ 0.14.0
 * psycopg 3.3.4 with the binary libpq wheel extra
+* requests 2.32.5, retained as the OAuth2 HTTP transport used by
+  `django-allauth`
+* PyJWT 2.10.1
+* cryptography 46.0.3
 * asgiref 3.11.1
 * sqlparse 0.5.5
 * typing_extensions 4.15.0
@@ -212,11 +217,16 @@ The root pre-commit hook runs Ruff only when staged Python files exist under `ap
 ## Auth Configuration
 
 The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
-email verification OTPs, password reset emails, and cache-backed auth throttles.
+email verification OTPs, password reset emails, Google social auth through
+`django-allauth`, and cache-backed auth throttles.
 
 Important environment variables:
 
 * `FRONTEND_BASE_URL` controls password-reset confirmation links.
+* `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, and
+  `GOOGLE_OAUTH_REDIRECT_URI` configure Google social auth. If the Google client
+  ID or secret is missing, the social auth start endpoint returns `503 Service
+  Unavailable`.
 * `EMAIL_VERIFICATION_MAX_ATTEMPTS` limits failed attempts per OTP before the
   user must request a new code.
 * `AUTH_SIGNUP_THROTTLE_RATE`, `AUTH_LOGIN_THROTTLE_RATE`,
@@ -226,6 +236,9 @@ Important environment variables:
   `AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE` tune auth throttles. Login,
   reset, and verification throttles key on submitted identifiers when present so
   repeated attacks against the same account are limited across client IPs.
+* `AUTH_SOCIAL_START_THROTTLE_RATE` and
+  `AUTH_SOCIAL_CALLBACK_THROTTLE_RATE` tune Google social auth start and callback
+  throttles.
 * `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`,
   `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and
   `SECURE_HSTS_PRELOAD` enable production cookie and HTTPS hardening.
@@ -250,6 +263,17 @@ authenticated unsafe requests. Successful login and email verification
 confirmation responses issue a `csrftoken` cookie; the Nuxt frontend reads that
 cookie through its shared backend API transport and sends it as `X-CSRFToken` on
 unsafe API methods.
+
+Google social auth exchanges provider tokens only on the backend through
+`django-allauth`'s Google adapter and OAuth2 client, and returns no provider token
+data to Nuxt. Beacon's callback wrapper handles only Beacon-specific redirects,
+session login, strict normalized identity validation, and account resolution; it
+does not perform direct provider HTTP requests. `requests` remains a direct
+dependency because allauth's OAuth2 client uses it for provider token and userinfo
+HTTP transport. A verified Google email can auto-link to an existing Beacon
+account or create a new social-only account with a generated username. This is
+account authentication only; it is not wallet identity or proof of Solana account
+ownership.
 
 ## Tests
 
@@ -288,7 +312,7 @@ already running at the configured `DATABASE_URL`:
 .venv/bin/pytest
 ```
 
-The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and password/session auth API behavior. It covers signup, login, logout, profile reads, password reset, email verification OTPs, captcha gating, CSRF enforcement, throttling, and account uniqueness edge cases.
+The current backend test suite contains smoke tests for Django settings, PostgreSQL configuration, Django REST Framework installation, and password/session auth API behavior. It covers signup, login, logout, profile reads, password reset, email verification OTPs, Google social auth start/callback behavior, captcha gating, CSRF enforcement, throttling, and account uniqueness edge cases.
 
 Backend tests are intentionally not part of the pre-commit hook. They should be run manually during development and later in CI.
 

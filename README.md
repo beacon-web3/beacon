@@ -131,7 +131,7 @@ Local frontend tooling is currently managed in `apps/web/` with pnpm. Local back
 
 Fast pre-commit checks are configured through the tracked hook at `.husky/pre-commit`. See `docs/development/git-hooks.md` for setup and usage details.
 
-Testing is split by workspace. Frontend E2E tests use Playwright in `apps/web/`; backend tests use pytest in `apps/api/`. See `docs/development/testing.md` for commands and scope.
+Testing is split by workspace. Frontend E2E tests use Playwright in `apps/web/`; backend tests use pytest in `apps/api/`. Use `make test-api-postgres` from the repository root to run PostgreSQL-backed backend tests, or pass `PYTEST_ARGS` for targeted pytest runs such as `make test-api-postgres PYTEST_ARGS="tests/auth/test_social_auth.py"`. See `docs/development/testing.md` for commands and scope.
 
 Local backend development can run through Docker Compose in `apps/api/`, including the Django API and PostgreSQL database. See `docs/development/database.md` for setup commands.
 

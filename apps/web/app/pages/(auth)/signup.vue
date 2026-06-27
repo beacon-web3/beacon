@@ -4,9 +4,18 @@ definePageMeta({
 })
 
 const localePath = useLocalePath()
+const {
+  isStartingGoogleAuth,
+  socialAuthError,
+  startGoogleAuth
+} = useSocialAuthStart()
 
 async function goToVerification(email: string) {
   await navigateTo(`${localePath('/verify-email')}?email=${encodeURIComponent(email)}`)
+}
+
+async function startGoogleSignup() {
+  await startGoogleAuth({ next: '/dashboard' })
 }
 </script>
 
@@ -23,6 +32,9 @@ async function goToVerification(email: string) {
     alternate-to="/login"
     alternate-label="auth.loginLink"
     clear-on-success
+    :social-auth-error="socialAuthError"
+    :social-auth-submitting="isStartingGoogleAuth"
     @verification-required="goToVerification"
+    @google-auth-start="startGoogleSignup"
   />
 </template>

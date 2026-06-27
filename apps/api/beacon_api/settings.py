@@ -33,6 +33,8 @@ env = environ.Env(
     AUTH_PASSWORD_RESET_CONFIRM_THROTTLE_RATE=(str, "10/min"),
     AUTH_EMAIL_VERIFICATION_REQUEST_THROTTLE_RATE=(str, "3/min"),
     AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE=(str, "10/min"),
+    AUTH_SOCIAL_START_THROTTLE_RATE=(str, "20/min"),
+    AUTH_SOCIAL_CALLBACK_THROTTLE_RATE=(str, "20/min"),
     SESSION_COOKIE_SECURE=(bool, False),
     CSRF_COOKIE_SECURE=(bool, False),
     SECURE_SSL_REDIRECT=(bool, False),
@@ -40,6 +42,9 @@ env = environ.Env(
     SECURE_HSTS_INCLUDE_SUBDOMAINS=(bool, False),
     SECURE_HSTS_PRELOAD=(bool, False),
     DEFAULT_FROM_EMAIL=(str, "no-reply@beacon.local"),
+    GOOGLE_OAUTH_CLIENT_ID=(str, ""),
+    GOOGLE_OAUTH_CLIENT_SECRET=(str, ""),
+    GOOGLE_OAUTH_REDIRECT_URI=(str, ""),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -76,7 +81,12 @@ AUTH_THROTTLE_RATES = {
     "auth_email_verification_confirm": env(
         "AUTH_EMAIL_VERIFICATION_CONFIRM_THROTTLE_RATE"
     ),
+    "auth_social_start": env("AUTH_SOCIAL_START_THROTTLE_RATE"),
+    "auth_social_callback": env("AUTH_SOCIAL_CALLBACK_THROTTLE_RATE"),
 }
+GOOGLE_OAUTH_CLIENT_ID = env("GOOGLE_OAUTH_CLIENT_ID")
+GOOGLE_OAUTH_CLIENT_SECRET = env("GOOGLE_OAUTH_CLIENT_SECRET")
+GOOGLE_OAUTH_REDIRECT_URI = env("GOOGLE_OAUTH_REDIRECT_URI")
 
 
 # Application definition
@@ -87,8 +97,13 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "corsheaders",
     "rest_framework",
 ]
@@ -101,6 +116,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -189,6 +205,21 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.Account"
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["openid", "email", "profile"],
+        "AUTH_PARAMS": {"access_type": "online", "prompt": "select_account"},
+    }
+}
 
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"

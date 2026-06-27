@@ -37,6 +37,7 @@ Each record should include:
 | 0006 | [Conservative native SOL staking preference](0006-conservative-native-sol-staking.md) | Proposed |
 | 0007 | [Password session auth foundation](0007-password-session-auth-foundation.md) | Accepted |
 | 0008 | [Trust-minimized protocol custody](0008-trust-minimized-protocol-custody.md) | Proposed |
+| 0009 | [Google social auth strategy](0009-google-social-auth-strategy.md) | Accepted |
 
 ## Maintenance Rules
 

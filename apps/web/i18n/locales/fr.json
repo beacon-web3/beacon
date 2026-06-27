@@ -151,6 +151,11 @@
     "newPasswordPlaceholder": "Nouveau mot de passe",
     "passwordResetHelp": "Les réponses de réinitialisation restent génériques pour ne pas révéler l'existence d'un compte.",
     "recaptchaNotice": "Protégé par reCAPTCHA v2 Invisible lorsqu'il est activé.",
+    "socialDivider": "ou",
+    "googleSignup": "S'inscrire avec Google",
+    "googleLogin": "Continuer avec Google",
+    "socialStartError": "Nous n'avons pas pu démarrer la connexion Google.",
+    "socialCallbackError": "La connexion Google n'a pas pu être terminée. Réessayez.",
     "networkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
     "tooManyRequestsError": "Trop de tentatives. Réessayez plus tard.",
     "submitting": "Envoi...",
@@ -205,5 +210,16 @@
     },
     "comingSoon": "Bientôt disponible",
     "backHome": "Retour à l'accueil"
+  },
+  "dashboard": {
+    "eyebrow": "Compte prêt",
+    "title": "Votre compte Beacon est actif.",
+    "description": "Ce tableau de bord d'accès anticipé confirme votre session. Les outils de découverte, curation, soutien, portefeuille et réputation arriveront quand ces flux seront approuvés et implémentés.",
+    "socialAuthSuccess": "Connexion Google terminée.",
+    "loading": "Confirmation de votre session...",
+    "authRequired": "Connectez-vous pour voir votre compte Beacon.",
+    "emailLabel": "Email",
+    "usernameLabel": "Nom d'utilisateur",
+    "loginLink": "Connexion"
   }
 }

@@ -53,10 +53,22 @@ cd apps/api
 ./scripts/test-postgres.sh
 ```
 
+From the repository root, use the Make shortcut:
+
+```bash
+make test-api-postgres
+```
+
 Pass pytest arguments through the runner for targeted checks:
 
 ```bash
 ./scripts/test-postgres.sh tests/auth tests/accounts tests/test_settings.py
+```
+
+From the repository root, pass targeted pytest arguments with `PYTEST_ARGS`:
+
+```bash
+make test-api-postgres PYTEST_ARGS="tests/auth/test_social_auth.py"
 ```
 
 The runner starts the Docker Compose PostgreSQL service, waits for readiness,

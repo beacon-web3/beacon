@@ -7,6 +7,11 @@ auth endpoints verify reCAPTCHA v2 Invisible tokens when captcha is enabled on
 the backend. Password reset emails build confirmation links from
 `FRONTEND_BASE_URL`.
 
+Google social auth also uses Django session cookies. Google OAuth/OIDC token
+exchange happens only on the backend; provider tokens are not returned to Nuxt or
+stored in browser storage. Social auth starts and callbacks are throttled and use
+generic user-facing failure redirects.
+
 Human-facing auth response text, validation messages, and backend-generated auth
 emails are localized from the HTTP `Accept-Language` header. The backend supports
 `en` and `fr`; unsupported or missing language headers fall back to English.
@@ -29,6 +34,14 @@ the same account or token are limited across client IPs. Throttled requests retu
 Account responses return a public account envelope. Signup creates an unverified
 account and schedules a six-digit email verification code after the account
 transaction commits; successful login requires the email address to be verified.
+Google social signup is open: a verified Google email with no Beacon account
+creates an account with a generated username and an unusable password, while a
+verified Google email matching an existing Beacon account auto-links the Google
+identity and logs that account in. Unverified provider email claims are never
+used for email-based auto-linking.
+
+Social auth is account authentication only. It is not wallet identity, Solana
+account ownership proof, anti-sybil proof, or any claim about on-chain access.
 
 ```json
 {
@@ -165,6 +178,68 @@ Responses:
 
 * `200 OK` with the account envelope.
 * `403 Forbidden` when no authenticated session exists.
+
+### `GET /api/auth/social/providers/`
+
+Returns the enabled social auth providers. The response exposes public provider
+metadata and start URLs only; it never exposes client secrets or provider tokens.
+
+Responses:
+
+* `200 OK` with provider metadata.
+
+Example response:
+
+```json
+{
+  "providers": [
+    {
+      "id": "google",
+      "name": "Google",
+      "start_url": "/api/auth/social/google/start/",
+      "enabled": true
+    }
+  ]
+}
+```
+
+### `POST /api/auth/social/google/start/`
+
+Starts Google OAuth/OIDC authorization for browser clients. The optional `next`
+value must be a same-site relative path. Unsafe absolute, scheme-relative, or
+non-root-relative values are rejected.
+
+Request body:
+
+```json
+{
+  "next": "/dashboard"
+}
+```
+
+Responses:
+
+* `200 OK` with `{ "authorization_url": "https://accounts.google.com/o/oauth2/v2/auth?..." }`.
+* `400 Bad Request` when `next` is unsafe.
+* `429 Too Many Requests` when social auth starts exceed the configured throttle.
+* `503 Service Unavailable` when Google OAuth is not configured on the backend.
+
+### `GET /api/auth/social/google/callback/`
+
+Handles Google's redirect callback. The backend validates state, exchanges the
+authorization code for provider data, resolves or creates the Beacon account,
+calls Django `login()`, issues a `csrftoken` cookie, and redirects back to Nuxt.
+
+Successful callbacks redirect to the validated `next` path, defaulting to
+`/dashboard`, with `social_auth=success`. Failed callbacks redirect to the login
+page with `error=social_auth_failed`. Error redirects are intentionally generic
+and do not reveal provider, state, token, or account-linking details.
+
+Responses:
+
+* `302 Found` to the Nuxt success destination when login succeeds.
+* `302 Found` to the Nuxt login error destination when state validation, provider
+  response, token exchange, or account resolution fails.
 
 ### `POST /api/auth/password-reset/`
 

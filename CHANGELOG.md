@@ -8,6 +8,22 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Added
+
+- Added Google social auth with backend-owned OAuth/OIDC exchange,
+  `django-allauth` provider storage, verified-email account linking, social-only
+  account creation with generated usernames, Nuxt login/signup controls, a
+  session-confirming dashboard target, API docs, and an auth strategy decision
+  record.
+
+### Changed
+
+- Hardened Google social auth remediation by routing provider exchange/extraction
+  through allauth, enforcing strict verified Google identity normalization,
+  explicitly reactivating inactive accounts only after verified proof, expanding
+  backend regression coverage, and renaming the backend callback module as
+  Google-specific.
+
 ## 2026-06-26
 
 ### Added

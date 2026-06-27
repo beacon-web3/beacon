@@ -54,3 +54,11 @@ class EmailVerificationRequestRateThrottle(AuthRateThrottle):
 class EmailVerificationConfirmRateThrottle(AuthRateThrottle):
     scope = "auth_email_verification_confirm"
     identifier_fields = ("email",)
+
+
+class SocialAuthStartRateThrottle(AuthRateThrottle):
+    scope = "auth_social_start"
+
+
+class SocialAuthCallbackRateThrottle(AuthRateThrottle):
+    scope = "auth_social_callback"

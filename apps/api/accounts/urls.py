@@ -1,5 +1,10 @@
 from django.urls import path
 
+from accounts.google_social_views import (
+    GoogleSocialAuthCallbackView,
+    GoogleSocialAuthStartView,
+    SocialProviderListView,
+)
 from accounts.views import (
     EmailVerificationConfirmView,
     EmailVerificationRequestView,
@@ -16,6 +21,21 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
+    path(
+        "social/providers/",
+        SocialProviderListView.as_view(),
+        name="social-providers",
+    ),
+    path(
+        "social/google/start/",
+        GoogleSocialAuthStartView.as_view(),
+        name="social-google-start",
+    ),
+    path(
+        "social/google/callback/",
+        GoogleSocialAuthCallbackView.as_view(),
+        name="social-google-callback",
+    ),
     path(
         "email-verification/request/",
         EmailVerificationRequestView.as_view(),
