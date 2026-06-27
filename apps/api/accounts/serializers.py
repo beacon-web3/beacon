@@ -49,6 +49,29 @@ class EmailVerificationRequiredSerializer(serializers.Serializer):
     email = serializers.EmailField(read_only=True)
 
 
+class ValidationErrorSerializer(serializers.Serializer):
+    non_field_errors = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        read_only=True,
+    )
+    recaptcha_token = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        read_only=True,
+    )
+    identifier = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        read_only=True,
+    )
+    password = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        read_only=True,
+    )
+
+
 class SocialProviderSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
@@ -296,7 +319,12 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         try:
             account_id = force_str(urlsafe_base64_decode(attrs["uid"]))
             self.account = Account.objects.get(pk=account_id)
-        except TypeError, ValueError, OverflowError, Account.DoesNotExist:
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            Account.DoesNotExist,
+        ):
             raise serializers.ValidationError(
                 _("Invalid password reset token.")
             ) from None

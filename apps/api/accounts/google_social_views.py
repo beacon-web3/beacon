@@ -250,7 +250,10 @@ class GoogleSocialAuthCallbackView(APIView):
             if isinstance(identity, dict):
                 identity = SocialIdentity(**identity)
             account = resolve_social_account(identity)
-        except OAuth2Error, SocialAuthError:
+        except (
+            OAuth2Error,
+            SocialAuthError,
+        ):
             logger.warning("Google social auth callback rejected")
             return HttpResponseRedirect(build_frontend_error_redirect())
         except Exception:

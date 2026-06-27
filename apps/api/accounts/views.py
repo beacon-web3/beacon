@@ -14,7 +14,13 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext as gettext_now
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    PolymorphicProxySerializer,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -31,6 +37,7 @@ from accounts.serializers import (
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     SignupSerializer,
+    ValidationErrorSerializer,
 )
 from accounts.throttles import (
     EmailVerificationConfirmRateThrottle,
@@ -50,6 +57,13 @@ PASSWORD_RESET_DETAIL = _(
 EMAIL_VERIFICATION_DETAIL = _("If an account exists, a verification code will be sent.")
 EMAIL_VERIFICATION_EXPIRY = timedelta(minutes=15)
 EMAIL_VERIFICATION_REQUIRED = "EMAIL_VERIFICATION_REQUIRED"
+CSRF_HEADER_PARAMETER = OpenApiParameter(
+    name="X-CSRFToken",
+    type=str,
+    location=OpenApiParameter.HEADER,
+    required=True,
+    description="Django CSRF token for authenticated unsafe requests.",
+)
 
 
 def send_email_verification_code(account: Account) -> None:
@@ -166,7 +180,14 @@ class LoginView(APIView):
         responses={
             200: AccountEnvelopeSerializer,
             400: OpenApiResponse(
-                response=EmailVerificationRequiredSerializer,
+                response=PolymorphicProxySerializer(
+                    component_name="LoginError",
+                    serializers=[
+                        EmailVerificationRequiredSerializer,
+                        ValidationErrorSerializer,
+                    ],
+                    resource_type_field_name=None,
+                ),
                 description=(
                     "Invalid credentials, captcha failure, or valid credentials "
                     "for an account that still needs email verification."
@@ -209,6 +230,7 @@ class LogoutView(APIView):
             "Django's CSRF token on this unsafe request."
         ),
         request=None,
+        parameters=[CSRF_HEADER_PARAMETER],
         responses={
             204: OpenApiResponse(description="Session cleared."),
             403: OpenApiResponse(description="Authentication or CSRF failed."),
