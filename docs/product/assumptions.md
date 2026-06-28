@@ -30,6 +30,10 @@ Status values:
 | Early authority control | Upgrade authority or incomplete treasury automation may be team or multisig controlled only if publicly disclosed | Draft | Needs multisig threshold, signer distribution, and launch disclosure review. |
 | Mature authority control | Custody-affecting upgrades and Community Treasury execution should move toward governance control with timelocks | Draft | Needs governance design, timelock duration, and transfer milestone. |
 | Contract assurance | Production contracts custodying meaningful SOL should be open source, security-reviewed, and publicly documented before launch | Draft | Needs audit scope, budget, and launch-blocking criteria. |
+| MVP frontend hosting | Vercel free tier for the Nuxt frontend | Proposed | Suitable for production-like MVP testing; not a production reliability guarantee. |
+| MVP backend hosting | Render free tier for Django, with Cloud Run as an alternative if Docker deployment and faster cold starts are preferred | Proposed | Needs provider account setup, environment configuration, and cold-start acceptance. |
+| MVP database hosting | Neon or Aiven free-tier managed PostgreSQL, selected before deployment | Proposed | Avoid disposable app-platform free databases for durable MVP data. |
+| Solana event monitoring host | Undecided | Draft | Manual blocker before implementing background workers, RPC WebSocket listeners, or durable indexing. |
 
 ## Maintenance Rules
 

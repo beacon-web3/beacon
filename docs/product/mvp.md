@@ -91,6 +91,23 @@ If any MVP flow still depends on team-controlled, company-controlled,
 server-controlled, or manually administered custody, that dependency must be
 visible in the spec, product copy, and launch risk review.
 
+### Production-Like Hosting Validation
+
+Before public beta, the MVP should run in a low-cost production-like environment
+that validates the full Nuxt, Django, PostgreSQL, and Solana integration path
+without implying final production reliability.
+
+Initial hosting assumptions:
+
+* Nuxt frontend on Vercel free tier.
+* Django API on Render free tier, with Google Cloud Run as an alternative if
+  Docker deployment and faster scale-to-zero cold starts are preferred.
+* PostgreSQL on a dedicated managed free tier such as Neon or Aiven.
+
+The MVP must document free-tier limits, including backend cold starts, database
+retention assumptions, manual provider setup, production secret configuration,
+and any Solana event monitoring that cannot safely run on a sleeping web service.
+
 ## Out of Scope for MVP
 
 * Movies, games, music, or other non-book categories.
@@ -122,3 +139,5 @@ The MVP is successful if it demonstrates:
 * What metadata source should be used for book identity?
 * Which MVP balances and authorities must be program-controlled before launch?
 * Which early-stage authorities can remain under disclosed multisig control?
+* Should Solana event monitoring run in Django, a separate worker/indexer,
+  scheduled jobs, or direct Nuxt client RPC reads during the production-like MVP?

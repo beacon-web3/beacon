@@ -90,3 +90,29 @@ Then start PostgreSQL and run migrations again.
 ## Notes
 
 The API container is intended for local development. It mounts the `apps/api/` directory into `/app` so code changes are visible without rebuilding the image. Rebuild the image after changing Python dependencies.
+
+## Production-Like MVP Database
+
+For the first production-like MVP environment, use a dedicated managed
+PostgreSQL provider rather than a disposable app-platform database.
+
+Recommended free-tier candidates:
+
+* Neon, if serverless PostgreSQL and database branching are useful for schema
+  testing.
+* Aiven, if an always-on managed PostgreSQL instance is more important than
+  serverless branching.
+
+Avoid relying on Render free PostgreSQL for durable MVP data because free-tier
+database retention and expiration policies can make it unsuitable for anything
+that must survive beyond short experiments.
+
+Django reads the production database connection from `DATABASE_URL`. When using a
+serverless database, prefer the provider's pooled connection string when offered,
+or add a dedicated Django connection-persistence setting as part of the
+deployment implementation. Do not hardcode production credentials in repository
+files.
+
+Manual blocker before production data setup: choose Neon or Aiven, create the
+project manually, record the selected region, and provide the resulting
+`DATABASE_URL` through the backend host's secret/environment variable manager.

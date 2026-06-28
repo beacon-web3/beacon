@@ -10,6 +10,13 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added a proposed MVP free hosting decision and implementation plan covering
+  Vercel frontend hosting, Render or Cloud Run Django hosting, Neon or Aiven
+  PostgreSQL hosting, production environment setup, and manual blockers for
+  provider accounts and Solana event monitoring architecture.
+- Documented the recommended MVP hosting stack as Vercel for Nuxt, Render for
+  Django, and Aiven PostgreSQL, including rationale, alternatives, Solana
+  indexing boundaries, and a later self-hosting migration shape.
 - Added public backend Swagger/OpenAPI documentation with `drf-spectacular`,
   generated schema output at `/api/schema/`, Swagger UI at
   `/api/docs/swagger/`, ReDoc at `/api/docs/redoc/`, auth endpoint schema
