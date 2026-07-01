@@ -10,6 +10,9 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Added local console email backend support for manual auth testing and Django
+  admin visibility/actions for email verification metadata and resending
+  verification codes to unverified accounts.
 - Added a proposed MVP free hosting decision and implementation plan covering
   Vercel frontend hosting, Render or Cloud Run Django hosting, Neon or Aiven
   PostgreSQL hosting, production environment setup, and manual blockers for
