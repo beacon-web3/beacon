@@ -35,6 +35,41 @@ def test_production_security_settings_are_configurable(settings):
     assert settings.DEFAULT_FROM_EMAIL == "security@beacon.test"
 
 
+def test_local_development_uses_console_email_backend(settings):
+    env = os.environ.copy()
+    env.update(
+        {
+            "DJANGO_DEBUG": "True",
+            "DATABASE_URL": "sqlite:///:memory:",
+        }
+    )
+    env.pop("EMAIL_BACKEND", None)
+    code = """
+import json
+import beacon_api.settings as settings
+
+print(json.dumps({
+    "DEBUG": settings.DEBUG,
+    "EMAIL_BACKEND": settings.EMAIL_BACKEND,
+}))
+"""
+
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=os.path.dirname(os.path.dirname(__file__)),
+        env=env,
+    )
+
+    parsed_settings = json.loads(result.stdout)
+    assert parsed_settings == {
+        "DEBUG": True,
+        "EMAIL_BACKEND": "django.core.mail.backends.console.EmailBackend",
+    }
+
+
 def test_production_security_settings_are_parsed_from_environment(tmp_path):
     database_path = tmp_path / "settings.sqlite3"
     env = os.environ.copy()
@@ -67,6 +102,7 @@ print(json.dumps({
     "SECURE_HSTS_INCLUDE_SUBDOMAINS": settings.SECURE_HSTS_INCLUDE_SUBDOMAINS,
     "SECURE_HSTS_PRELOAD": settings.SECURE_HSTS_PRELOAD,
     "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
+    "EMAIL_BACKEND": settings.EMAIL_BACKEND,
     "AUTH_LOGIN_THROTTLE_RATE": settings.AUTH_THROTTLE_RATES["auth_login"],
 }))
 """
@@ -90,5 +126,6 @@ print(json.dumps({
         "SECURE_HSTS_INCLUDE_SUBDOMAINS": True,
         "SECURE_HSTS_PRELOAD": True,
         "DEFAULT_FROM_EMAIL": "security@beacon.test",
+        "EMAIL_BACKEND": "django.core.mail.backends.smtp.EmailBackend",
         "AUTH_LOGIN_THROTTLE_RATE": "7/min",
     }
