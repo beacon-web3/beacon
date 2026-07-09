@@ -1,6 +1,8 @@
 # Backend Swagger OpenAPI Docs
 
-Status: Completed
+## Status
+
+Completed
 
 ## Context
 
@@ -20,9 +22,9 @@ Relevant specs and docs:
 - `docs/architecture/system-design.md`
 - `docs/development/testing.md`
 - `apps/api/README.md`
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/0007-backend-auth-hardening.md`
-- `docs/plans/0013-google-social-auth.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0007-backend-auth-hardening.md`
+- `docs/plans/completed/0013-google-social-auth.md`
 
 ## User Decisions
 

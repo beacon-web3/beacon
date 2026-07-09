@@ -1,6 +1,8 @@
 # Runtime Toolchain Upgrade Plan
 
-Status: Verified
+## Status
+
+Completed
 
 ## Context
 

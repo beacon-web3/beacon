@@ -1,6 +1,8 @@
 # Google Social Auth
 
-Status: Implemented - code review remediation complete
+## Status
+
+Completed
 
 ## Context
 
@@ -20,8 +22,8 @@ Relevant specs and docs:
 - `docs/architecture/system-design.md`
 - `docs/api/openapi.md`
 - `docs/development/testing.md`
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/0007-backend-auth-hardening.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0007-backend-auth-hardening.md`
 
 ## User Decisions
 
@@ -330,9 +332,9 @@ fix the implementation and tests so the feature meets the plan and ADR.
   concurrent/race handling, username normalization/collisions, and callback
   throttling, but the current tests only cover start throttling and happy/basic
   callback paths.
-- References: `docs/plans/0013-google-social-auth.md:133`,
-  `docs/plans/0013-google-social-auth.md:144`,
-  `docs/plans/0013-google-social-auth.md:163`,
+- References: `docs/plans/completed/0013-google-social-auth.md:133`,
+  `docs/plans/completed/0013-google-social-auth.md:144`,
+  `docs/plans/completed/0013-google-social-auth.md:163`,
   `apps/api/tests/auth/test_social_auth.py:219`.
 - Required solution: Add the missing tests and keep the plan's acceptance criteria
   unchanged. The implementation is not complete until these cases pass.

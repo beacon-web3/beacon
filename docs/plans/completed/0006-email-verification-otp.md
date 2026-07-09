@@ -1,6 +1,8 @@
 # Email Verification OTP
 
-Status: Complete
+## Status
+
+Completed
 
 ## Context
 
@@ -15,7 +17,7 @@ Relevant specs:
 - `docs/product/user-stories.md`
 - `docs/architecture/system-design.md`
 - `docs/api/openapi.md`
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
 
 ## Decisions
 
@@ -71,5 +73,5 @@ Relevant specs:
 
 ## Follow-Up
 
-- Production IP throttles were added in `docs/plans/0007-backend-auth-hardening.md`.
+- Production IP throttles were added in `docs/plans/completed/0007-backend-auth-hardening.md`.
   Rate values should still be tuned after real traffic and abuse metrics exist.

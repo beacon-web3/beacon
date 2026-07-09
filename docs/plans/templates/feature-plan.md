@@ -31,7 +31,7 @@ Out of scope:
 - Technical decisions:
 - Open questions:
 
-## Tasks
+## Phases
 
 ### Task 1: Short Task Name
 

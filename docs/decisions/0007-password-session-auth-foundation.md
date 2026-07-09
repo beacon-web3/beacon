@@ -54,7 +54,7 @@ frontend entry is a UI detail and does not change the API contract.
 
 ## Links
 
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
 - `docs/api/openapi.md`
 - `docs/product/open-questions.md`
 - `docs/tokenomics/rewards.md`

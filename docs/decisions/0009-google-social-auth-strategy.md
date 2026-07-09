@@ -91,7 +91,7 @@ auto-linking.
 
 ## Links
 
-- `docs/plans/0013-google-social-auth.md`
+- `docs/plans/completed/0013-google-social-auth.md`
 - `docs/api/openapi.md`
 - `docs/product/user-stories.md`
 - `docs/decisions/0007-password-session-auth-foundation.md`
