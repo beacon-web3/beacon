@@ -50,23 +50,35 @@ Templates live in `docs/plans/templates/`.
 - Update a plan when scope changes during implementation.
 - Update `CHANGELOG.md` when a completed plan produces meaningful project
   changes.
+- Move completed plan files into `docs/plans/completed/` and keep active,
+  draft, in-progress, superseded, or cancelled plans at the top level unless the
+  archive structure changes.
 
-## Index
+## Active Plans
 
 | ID   | Plan | Status    |
 |------| --- |-----------|
-| 0001 | [Documentation foundation](0001-documentation-foundation.md) | Completed |
-| 0002 | [Frontend design system foundation](0002-frontend-design-system.md) | Completed |
-| 0003 | [Homepage clarity and French localization](0003-homepage-clarity-localization.md) | Completed |
-| 0004 | [Auth entry UI refresh](0004-auth-entry-ui-refresh.md) | Completed |
-| 0005 | [Password auth and profile foundation](0005-password-auth-and-profile-foundation.md) | Completed |
-| 0006 | [Email verification OTP](0006-email-verification-otp.md) | Complete  |
-| 0007 | [Backend auth hardening](0007-backend-auth-hardening.md) | Complete  |
-| 0008 | [Auth error handling improvements](0008-auth-error-handling.md) | Completed |
-| 0009 | [Backend Localization](0009-backend-localization.md) | Completed |
-| 0010 | [Auth test split](0010-auth-api-test-split.md) | Completed |
-| 0011 | [Library upgrade plan](0011-library-upgrade-plan.md) | Completed |
-| 0012 | [Runtime Toolchain Upgrade Plan](0012-runtime-toolchain-upgrade-plan.md) | Completed |
-| 0013 | [Google Social Auth](0013-google-social-auth.md) | Completed |
-| 0014 | [Backend Swagger OpenAPI Docs](0014-backend-swagger-openapi.md) | Completed |
 | 0015 | [MVP free hosting setup](0015-mvp-free-hosting-setup.md) | Draft |
+| 0016 | [Recommendation lifecycle data model](0016-recommendation-lifecycle-data-model.md) | Draft |
+
+## Completed Plans
+
+Completed plans are archived in `docs/plans/completed/` to keep active planning
+easy to scan while preserving implementation history.
+
+| ID   | Plan | Status    |
+|------| --- |-----------|
+| 0001 | [Documentation foundation](completed/0001-documentation-foundation.md) | Completed |
+| 0002 | [Frontend design system foundation](completed/0002-frontend-design-system.md) | Completed |
+| 0003 | [Homepage clarity and French localization](completed/0003-homepage-clarity-localization.md) | Completed |
+| 0004 | [Auth entry UI refresh](completed/0004-auth-entry-ui-refresh.md) | Completed |
+| 0005 | [Password auth and profile foundation](completed/0005-password-auth-and-profile-foundation.md) | Completed |
+| 0006 | [Email verification OTP](completed/0006-email-verification-otp.md) | Completed |
+| 0007 | [Backend auth hardening](completed/0007-backend-auth-hardening.md) | Completed |
+| 0008 | [Auth error handling improvements](completed/0008-auth-error-handling.md) | Completed |
+| 0009 | [Backend Localization](completed/0009-backend-localization.md) | Completed |
+| 0010 | [Auth test split](completed/0010-auth-api-test-split.md) | Completed |
+| 0011 | [Library upgrade plan](completed/0011-library-upgrade-plan.md) | Completed |
+| 0012 | [Runtime Toolchain Upgrade Plan](completed/0012-runtime-toolchain-upgrade-plan.md) | Completed |
+| 0013 | [Google Social Auth](completed/0013-google-social-auth.md) | Completed |
+| 0014 | [Backend Swagger OpenAPI Docs](completed/0014-backend-swagger-openapi.md) | Completed |

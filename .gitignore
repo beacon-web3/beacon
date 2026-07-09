@@ -13,6 +13,9 @@
 .env.*
 !.env.example
 
+# Local learning notes
+docs/development/local-docker-setup.md
+
 # Dependencies and build output placeholders for future tooling
 node_modules/
 dist/

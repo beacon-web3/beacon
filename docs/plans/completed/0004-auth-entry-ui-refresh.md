@@ -17,8 +17,8 @@ changing the underlying email-only API behavior.
 - `docs/product/mvp.md`
 - `docs/architecture/system-design.md`
 - `docs/api/openapi.md`
-- `docs/plans/0002-frontend-design-system.md`
-- `docs/plans/0003-homepage-clarity-localization.md`
+- `docs/plans/completed/0002-frontend-design-system.md`
+- `docs/plans/completed/0003-homepage-clarity-localization.md`
 
 ## Scope
 

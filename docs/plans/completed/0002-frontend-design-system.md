@@ -1,6 +1,8 @@
 # Frontend Design System Foundation
 
-Status: Completed
+## Status
+
+Completed
 
 ## Context
 

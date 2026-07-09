@@ -1,6 +1,8 @@
 # Password Auth and Profile Foundation
 
-Status: Completed
+## Status
+
+Completed
 
 ## Context
 

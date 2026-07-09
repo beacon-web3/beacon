@@ -1,6 +1,8 @@
 # MVP Free Hosting Setup
 
-Status: Draft
+## Status
+
+Draft
 
 ## Context
 

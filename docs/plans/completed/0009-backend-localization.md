@@ -1,6 +1,8 @@
 # Backend Localization
 
-Status: Completed
+## Status
+
+Completed
 
 ## Context
 
@@ -12,11 +14,11 @@ Relevant specs and docs:
 
 - `docs/api/openapi.md`
 - `docs/development/testing.md`
-- `docs/plans/0003-homepage-clarity-localization.md`
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/0006-email-verification-otp.md`
-- `docs/plans/0007-backend-auth-hardening.md`
-- `docs/plans/0008-auth-error-handling.md`
+- `docs/plans/completed/0003-homepage-clarity-localization.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0006-email-verification-otp.md`
+- `docs/plans/completed/0007-backend-auth-hardening.md`
+- `docs/plans/completed/0008-auth-error-handling.md`
 
 ## Decisions
 

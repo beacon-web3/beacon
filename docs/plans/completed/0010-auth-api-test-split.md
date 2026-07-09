@@ -1,6 +1,8 @@
 # Auth Test Split
 
-Status: Completed
+## Status
+
+Completed
 
 ## Context
 
@@ -18,11 +20,11 @@ conflicts.
 Relevant docs and plans:
 
 - `docs/development/testing.md`
-- `docs/plans/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/0006-email-verification-otp.md`
-- `docs/plans/0007-backend-auth-hardening.md`
-- `docs/plans/0008-auth-error-handling.md`
-- `docs/plans/0009-backend-localization.md`
+- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
+- `docs/plans/completed/0006-email-verification-otp.md`
+- `docs/plans/completed/0007-backend-auth-hardening.md`
+- `docs/plans/completed/0008-auth-error-handling.md`
+- `docs/plans/completed/0009-backend-localization.md`
 
 ## Decisions
 
