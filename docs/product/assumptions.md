@@ -20,6 +20,7 @@ Status values:
 | Duplicate-risk flow | Low-risk submissions can create immediately; risky submissions require creator warning and manual review | Accepted | Rejected risky submissions keep SOL locked until the normal lock period ends. |
 | Duplicate detection algorithm | High-sensitivity title/author/work-or-series matching | Draft | Exact scoring, thresholds, and review tooling remain unresolved. |
 | Recommendation lifecycle | Permanent discoverer credit with single active recommendation cycles and reactivation after inactivity | Accepted | See `docs/decisions/0011-hybrid-recommendation-lifecycle.md`. |
+| Reactivation moderation | No moderation review by default for valid, undisputed inactive pages | Accepted | Flagged, disputed, duplicate-reported, unsafe metadata, or unsafe link cases require review before reactivation. See `docs/decisions/0014-reactivation-moderation-policy.md`. |
 | Curator stake | At least `0.2 SOL` locked for two weeks | Draft | Needs price, abuse, and UX review. |
 | Historical recommender stake additions | Original discoverer and prior reactivators may add locked SOL for future upvote/support credit share | Accepted | Formula, caps, and anti-whale controls remain unresolved. |
 | Recommendation inactivity window | No locked recommender SOL plus 90 days with no new support | Accepted | See `docs/decisions/0013-recommendation-inactivity-window.md`. |

@@ -20,6 +20,9 @@ Changelog. Use date-based entries until formal versioning starts.
 - Accepted the MVP recommendation inactivity rule as zero locked recommender SOL
   plus 90 days with no new support before an active cycle becomes eligible for
   inactive status.
+- Accepted the MVP reactivation moderation policy: no moderation review by
+  default for valid, undisputed inactive pages, with review required for flagged,
+  disputed, duplicate-reported, or unsafe pages.
 
 ### Changed
 
@@ -32,8 +35,9 @@ Changelog. Use date-based entries until formal versioning starts.
   canonical identity while leaving duplicate scoring, metadata enrichment, and
   manual-review service levels unresolved.
 - Aligned recommendation lifecycle docs with the accepted zero-locked-SOL and
-  90-day inactivity rule while leaving reactivation moderation and reward split
-  policy unresolved.
+  90-day inactivity rule while leaving reward split policy unresolved.
+- Aligned product and lifecycle planning docs with the accepted default
+  reactivation moderation policy.
 
 ## 2026-07-01
 

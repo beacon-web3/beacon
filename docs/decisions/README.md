@@ -42,6 +42,7 @@ Each record should include:
 | 0011 | [Hybrid recommendation lifecycle](0011-hybrid-recommendation-lifecycle.md) | Accepted |
 | 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
 | 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
+| 0014 | [Reactivation moderation policy](0014-reactivation-moderation-policy.md) | Accepted |
 
 ## Maintenance Rules
 

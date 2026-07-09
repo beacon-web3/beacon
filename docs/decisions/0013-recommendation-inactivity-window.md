@@ -45,10 +45,10 @@ The UI must warn a recommender before a withdrawal that would leave no SOL locke
 on the active cycle, because that action can start the inactivity window if no
 new support arrives.
 
-This decision only resolves the inactivity duration. It does not resolve whether
-inactive recommendations require moderation review before reactivation, the base
-stake required for reactivation, or reward split formulas across historical
-recommenders.
+This decision only resolves the inactivity trigger and duration. It does not
+resolve the base stake required for reactivation or reward split formulas across
+historical recommenders. `0014-reactivation-moderation-policy.md` resolves the
+default reactivation moderation rule.
 
 ## Alternatives Considered
 
@@ -93,8 +93,8 @@ recommenders.
   exact automation mechanism remains an implementation detail.
 - Product and tokenomics docs should no longer list the inactivity duration as an
   unresolved question.
-- Reactivation moderation, reactivation base stake, historical recommender credit
-  formulas, and anti-whale controls remain unresolved.
+- Reactivation base stake, historical recommender credit formulas, and anti-whale
+  controls remain unresolved.
 
 ## Related Specs
 

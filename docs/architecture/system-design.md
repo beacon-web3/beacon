@@ -57,6 +57,8 @@ Responsibilities:
   recommender participation records.
 * Inactivity-window evaluation based on zero locked recommender SOL plus 90 days
   with no new support for recommendation cycles.
+* Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe
+  canonical pages that require review before reactivation.
 * Duplicate detection and moderation workflows.
 * Ranking and discovery algorithms.
 * Search and filtering.
@@ -84,7 +86,7 @@ Responsibilities:
 * Signup, login, logout, and password reset flows.
 * Create recommendation flows.
 * Duplicate-risk warnings and manual-review status for candidate pages.
-* Reactivate inactive recommendation flows.
+* Reactivate inactive recommendation flows, including review-blocked page states.
 * Historical recommender stake-addition and withdrawal-warning flows.
 * Support/upvote flows.
 * Wallet connection.
@@ -130,6 +132,7 @@ Core concepts for future specification:
 * Duplicate report
 * Recommendation activation cycle
 * Recommendation inactivity eligibility timestamp
+* Recommendation reactivation blocker status
 * Active cycle locked recommender SOL balance
 * Historical recommender participant
 * Recommender stake position

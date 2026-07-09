@@ -9,11 +9,10 @@ implementation.
 - What exact duplicate-risk scoring and matching algorithm should Beacon use
   before immediate canonical page creation?
 - What manual review service level is acceptable for duplicate-risk candidate
-  pages?
+  pages and review-blocked reactivations?
 - What book metadata source should Beacon use for author data, categories,
   external links, enrichment, and optional cover images?
 - Should curator notes have length, moderation, or quality requirements?
-- Should inactive recommendations require moderation review before reactivation?
 - What profile signals best represent curator reputation without turning Beacon
   into a pure financial leaderboard?
 

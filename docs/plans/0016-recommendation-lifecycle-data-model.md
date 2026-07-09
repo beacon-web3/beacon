@@ -32,6 +32,10 @@ first-discoverer model to the hybrid lifecycle accepted in
   the recommendation can become inactive.
 - An inactive recommendation can be reactivated by another eligible recommender
   staking the required base SOL.
+- Reactivation does not require moderation review by default for valid,
+  undisputed inactive pages.
+- Flagged, disputed, duplicate-reported, unsafe metadata, or unsafe link cases
+  require review before reactivation.
 - Historical discovery, activation, support, badge, and reputation records remain
   visible even when current active credit changes.
 - The exact future credit and reward split formulas are intentionally unresolved
@@ -53,6 +57,7 @@ Relevant specs and docs:
 - `docs/decisions/0011-hybrid-recommendation-lifecycle.md`
 - `docs/decisions/0012-canonical-work-series-identity.md`
 - `docs/decisions/0013-recommendation-inactivity-window.md`
+- `docs/decisions/0014-reactivation-moderation-policy.md`
 - `docs/api/openapi.md`
 - `apps/api/accounts/models.py`
 - `apps/api/accounts/migrations/`
@@ -70,6 +75,8 @@ The implementation should support:
 - High-sensitivity duplicate-risk detection and manual review state for candidate
   pages that may duplicate existing canonical pages.
 - Active/inactive lifecycle for recommendations.
+- Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe
+  canonical pages.
 - Locked recommender SOL balance tracking for inactivity eligibility.
 - Multiple recommender participants over time.
 - Stake-backed historical recommender credit-share tracking for future support.
@@ -104,6 +111,10 @@ implementation starts:
   locked and can start the inactivity window.
 - An inactive recommendation can be reactivated by an eligible recommender who
   stakes at least the required base minimum.
+- Reactivation does not require moderation review by default for valid,
+  undisputed inactive pages.
+- Pages that are flagged, disputed, duplicate-reported, or have unsafe metadata or
+  links require review before reactivation.
 - Users who have never activated or reactivated a page cannot stake into it while
   it is active.
 - Historical recommender future-credit share may be affected by currently locked
@@ -169,6 +180,9 @@ Acceptance criteria:
   history, and future upvote/support credit share.
 - [x] Specs define MVP canonical identity as a standalone book work or recognized
   series, with series-level pages only for recognized series.
+- [x] Specs define no moderation review by default for valid, undisputed inactive
+  page reactivation, with review required for flagged, disputed,
+  duplicate-reported, or unsafe pages.
 
 Verification:
 
@@ -598,13 +612,12 @@ Estimated scope: Small.
 
 - What exact duplicate-risk scoring and matching algorithm should be used?
 - What manual review service level is acceptable for duplicate-risk candidate
-  pages?
+  pages and review-blocked reactivations?
 - Is future historical recommender credit always linear by locked SOL amount?
 - Should there be a cap on credit share from extra stake?
 - What minimum additional stake should be required when a historical recommender
   increases future credit share?
 - What base stake is required to reactivate an inactive recommendation?
-- Should inactive recommendations require moderation review before reactivation?
 - How should reward splits work across multiple recommender participants and
   multiple support cohorts?
 - Are badge transfers allowed, restricted, or discouraged?

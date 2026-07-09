@@ -67,6 +67,10 @@ Acceptance criteria:
 * I can see that a recommendation becomes eligible for inactive status only after
   no recommender SOL remains locked and 90 days pass with no new support.
 * I can reactivate an inactive recommendation by locking the required base stake.
+* If the page is valid and undisputed, I do not have to wait for moderation
+  review before reactivation.
+* If the page is flagged, disputed, duplicate-reported, or has unsafe metadata or
+  links, I can see that reactivation requires review first.
 * I cannot become a new staked recommender for a page while another active
   recommendation cycle is still active.
 * After reactivation, the page still shows the original discoverer, prior

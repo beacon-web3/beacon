@@ -56,6 +56,11 @@ then lock the required base SOL to reactivate the recommendation. Reactivation
 preserves the canonical page, discoverer credit, previous supporters, badges, and
 recommender history.
 
+Reactivation does not require moderation review by default when the page is
+valid, inactive, and undisputed. Reactivation requires review first if the page is
+flagged, disputed, duplicate-reported, or has unsafe metadata, unsafe links, or
+other integrity issues.
+
 ### Curator Stake
 
 A curator creates a book or series recommendation by locking at least `0.2 SOL`
@@ -183,7 +188,8 @@ The MVP is successful if it demonstrates:
 * What exact duplicate-risk scoring and matching algorithm should be used?
 * What metadata source should be used for enrichment after canonical identity is
   based on title, authors, and work-or-series review?
-* What manual review service level is acceptable for duplicate-risk candidates?
+* What manual review service level is acceptable for duplicate-risk candidates
+  and review-blocked reactivations?
 * Which MVP balances and authorities must be program-controlled before launch?
 * Which early-stage authorities can remain under disclosed multisig control?
 * Should Solana event monitoring run in Django, a separate worker/indexer,
