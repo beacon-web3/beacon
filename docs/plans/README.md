@@ -1,6 +1,6 @@
 # Implementation Plans
 
-This directory tracks implementation plans for multi-step Beacon work.
+This directory tracks implementation plans for multistep Beacon work.
 
 Plans translate approved specs and decisions into small, verifiable tasks. They
 are not product specs and should not introduce product policy that is missing
@@ -51,7 +51,7 @@ Templates live in `docs/plans/templates/`.
 - Update `CHANGELOG.md` when a completed plan produces meaningful project
   changes.
 - Move completed plan files into `docs/plans/completed/` and keep active,
-  draft, in-progress, superseded, or cancelled plans at the top level unless the
+  draft, in-progress, superseded, or canceled plans at the top level unless the
   archive structure changes.
 
 ## Active Plans
