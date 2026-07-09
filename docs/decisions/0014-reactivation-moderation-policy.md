@@ -12,7 +12,7 @@ Accepted
 
 Beacon's hybrid recommendation lifecycle allows an inactive canonical standalone
 book work or recognized series page to be reactivated by a new eligible
-recommender who locks the required base SOL.
+recommender who locks at least the required `0.2 SOL` minimum.
 
 The MVP needs to decide whether every reactivation should require manual
 moderation. Beacon already applies duplicate-risk and manual-review gates during
@@ -26,15 +26,17 @@ For MVP, inactive recommendation reactivation does not require moderation review
 by default.
 
 If a canonical page is valid, inactive, and not under dispute, an eligible user
-can reactivate it immediately by locking the required base SOL.
+can reactivate it immediately by locking at least the required `0.2 SOL`
+minimum.
 
 Moderation review is required before reactivation only when the page is flagged,
 disputed, duplicate-reported, or has unsafe metadata, unsafe links, or other
 integrity issues that require human review.
 
-This decision does not resolve the base stake required for reactivation, reward
-split formulas across historical recommenders, or the exact moderation service
-level for flagged or disputed pages.
+This decision does not resolve reward split formulas across historical
+recommenders or the exact moderation service level for flagged or disputed pages.
+`0015-minimum-recommender-stake-no-deposit-cap.md` resolves the MVP minimum stake
+required for reactivation.
 
 ## Alternatives Considered
 

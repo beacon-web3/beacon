@@ -52,9 +52,9 @@ is not released immediately; it remains locked until the normal lock period ends
 Each canonical page has at most one active recommendation cycle at a time. If no
 recommender SOL remains locked on the active cycle and the cycle has 90 days with
 no new support, it becomes eligible for inactive status. A new eligible user can
-then lock the required base SOL to reactivate the recommendation. Reactivation
-preserves the canonical page, discoverer credit, previous supporters, badges, and
-recommender history.
+then lock at least the required `0.2 SOL` minimum to reactivate the
+recommendation. Reactivation preserves the canonical page, discoverer credit,
+previous supporters, badges, and recommender history.
 
 Reactivation does not require moderation review by default when the page is
 valid, inactive, and undisputed. Reactivation requires review first if the page is
@@ -64,24 +64,41 @@ other integrity issues.
 ### Curator Stake
 
 A curator creates a book or series recommendation by locking at least `0.2 SOL`
-for a minimum of two weeks.
+for a minimum of two weeks. `0.2 SOL` is the MVP minimum, not an exact stake;
+there is no maximum deposit cap on locked recommender SOL.
 
-The lock acts as spam resistance and a signal of conviction. The exact stake amount is a draft parameter and may need adjustment based on SOL price, abuse patterns, and launch conditions.
+This rule applies to recommender participants with locked SOL, not ordinary
+supporters contributing `0.01 SOL`. A recommender participant must have either
+`0 SOL` locked or at least `0.2 SOL` locked. Later top-ups above an existing
+qualifying locked balance must be at least `0.05 SOL`.
+
+The lock acts as spam resistance and a signal of conviction. Extra locked SOL
+must not be presented as guaranteed yield, guaranteed rewards, or uncapped
+influence.
 
 The original discoverer and prior reactivators are historical recommenders for
 that page. They may lock additional SOL at any time to increase their share of
 future upvote/support credit, but additional stake must not rewrite past support
 credit, badges, discoverer credit, or reputation history.
 
+If extra locked SOL affects future upvote/support credit, rewards, ranking, or
+visibility, it must use diminishing returns rather than linear weighting. The
+exact curve and parameters remain unresolved.
+
 Users who have never activated or reactivated a page cannot stake into that page
 while it is active. They must wait until the current recommendation cycle becomes
-inactive and then reactivate it with the required base stake.
+inactive and then reactivate it by locking at least the required `0.2 SOL`
+minimum.
 
 Partial stake withdrawals do not start the inactivity window while any
 recommender SOL remains locked, including the required base stake currently set
 at `0.2 SOL`. If a withdrawal would leave no SOL locked on the active cycle,
 Beacon must warn the recommender that the page can become inactive after 90 days
 with no new support.
+
+Withdrawals must not leave a recommender locked balance above `0 SOL` but below
+`0.2 SOL`. A withdrawal that would cross below `0.2 SOL` must either be rejected
+or treated as a full withdrawal to `0 SOL` with the full-withdrawal warning.
 
 ### Support / Upvote
 
@@ -180,9 +197,8 @@ The MVP is successful if it demonstrates:
 
 ## Open Questions
 
-* Should the `0.2 SOL` curator stake be fixed, dynamic, or governance-adjustable?
-* Should additional historical recommender stake have a cap, diminishing returns,
-  or fixed staking window?
+* What exact diminishing-returns curve, cap, or fixed staking window should apply
+  to additional historical recommender stake?
 * Should locked curator stake yield go entirely to the treasury or be split?
 * Should milestone rewards be step-based, continuous, or hybrid?
 * What exact duplicate-risk scoring and matching algorithm should be used?

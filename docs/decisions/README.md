@@ -43,6 +43,9 @@ Each record should include:
 | 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
 | 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
 | 0014 | [Reactivation moderation policy](0014-reactivation-moderation-policy.md) | Accepted |
+| 0015 | [Minimum recommender stake with no deposit cap](0015-minimum-recommender-stake-no-deposit-cap.md) | Accepted |
+| 0016 | [Diminishing returns for extra recommender stake](0016-diminishing-returns-for-extra-recommender-stake.md) | Accepted |
+| 0017 | [Recommender stake balance and top-up minimums](0017-recommender-stake-balance-and-top-up-minimums.md) | Accepted |
 
 ## Maintenance Rules
 

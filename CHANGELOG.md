@@ -23,6 +23,14 @@ Changelog. Use date-based entries until formal versioning starts.
 - Accepted the MVP reactivation moderation policy: no moderation review by
   default for valid, undisputed inactive pages, with review required for flagged,
   disputed, duplicate-reported, or unsafe pages.
+- Accepted the MVP recommender stake policy: `0.2 SOL` minimum to activate or
+  reactivate a recommendation, with no maximum deposit cap for eligible
+  recommenders.
+- Accepted diminishing returns as the MVP anti-whale principle for any extra
+  locked-SOL influence on future credit, rewards, ranking, or visibility.
+- Accepted the MVP recommender stake balance rule: recommender participants must
+  hold either `0 SOL` or at least `0.2 SOL`, and later top-ups above a qualifying
+  balance must be at least `0.05 SOL`.
 
 ### Changed
 
@@ -38,6 +46,14 @@ Changelog. Use date-based entries until formal versioning starts.
   90-day inactivity rule while leaving reward split policy unresolved.
 - Aligned product and lifecycle planning docs with the accepted default
   reactivation moderation policy.
+- Aligned tokenomics, product, architecture, and lifecycle planning docs with the
+  accepted minimum-stake and no-deposit-cap policy while leaving credit weighting
+  and anti-whale controls unresolved.
+- Aligned tokenomics, staking, product, architecture, and lifecycle planning docs
+  with the accepted diminishing-returns principle while leaving the exact curve,
+  caps, stake increments, and reward split formulas unresolved.
+- Aligned product, tokenomics, staking, architecture, and lifecycle planning docs
+  with accepted recommender balance and top-up minimum rules.
 
 ## 2026-07-01
 

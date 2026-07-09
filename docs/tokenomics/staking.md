@@ -42,7 +42,14 @@ withdraw user principal outside the documented lock and release rules.
 
 For the recommendation lifecycle, the original discoverer and prior reactivators
 may add locked SOL to increase future upvote/support credit share. That extra
-stake must not change historical credit or create a user-facing yield product.
+stake must not change historical credit or create a user-facing yield product. If
+extra locked SOL affects future credit, rewards, ranking, or visibility, it must
+use diminishing returns rather than linear weighting.
+
+Recommender participant balances must be either `0 SOL` or at least `0.2 SOL`.
+Later top-ups above an existing qualifying locked balance must be at least
+`0.05 SOL`. Withdrawal flows must not leave locked recommender dust balances
+between `0 SOL` and `0.2 SOL`.
 
 ## Yield Allocation Options
 
@@ -140,6 +147,6 @@ The product should show:
 * What staking risk disclosures are required before launch?
 * How can native staking be implemented while preserving program-controlled
   custody and timely recommender stake withdrawal?
-* Should extra historical recommender stake have caps, diminishing returns, or
-  fixed staking windows?
+* What exact diminishing-returns curve, cap, or fixed staking window should apply
+  to extra historical recommender stake?
 * Which staking authority addresses must be visible in the treasury dashboard?

@@ -41,7 +41,8 @@ Acceptance criteria:
   that proceeding sends my candidate page to manual review.
 * If I proceed with a duplicate-risk candidate, I understand my locked SOL remains
   locked for the normal lock period even if manual review rejects the page.
-* I can see the amount and duration of the required stake before confirming.
+* I can see the minimum stake, my chosen locked amount, and the lock duration
+  before confirming.
 * I can see when my stake unlocks.
 * If I withdraw only part of my locked SOL and some SOL remains locked, I
   understand that this does not start the inactivity window.
@@ -52,6 +53,8 @@ Acceptance criteria:
   standalone work or series page.
 * If I discovered or previously reactivated a page, I can lock additional SOL to
   increase my share of future upvote/support credit.
+* I can only keep a recommender locked balance of `0 SOL` or at least `0.2 SOL`;
+  later top-ups above an existing qualifying balance must be at least `0.05 SOL`.
 * Adding more SOL does not change past supporter credit, badges, or discoverer
   history.
 
@@ -66,7 +69,10 @@ Acceptance criteria:
 * I can see whether a recommendation page is active or inactive.
 * I can see that a recommendation becomes eligible for inactive status only after
   no recommender SOL remains locked and 90 days pass with no new support.
-* I can reactivate an inactive recommendation by locking the required base stake.
+* I can reactivate an inactive recommendation by locking at least the required
+  `0.2 SOL` minimum stake.
+* Ordinary supporters who contribute `0.01 SOL` are not subject to recommender
+  locked-balance rules.
 * If the page is valid and undisputed, I do not have to wait for moderation
   review before reactivation.
 * If the page is flagged, disputed, duplicate-reported, or has unsafe metadata or

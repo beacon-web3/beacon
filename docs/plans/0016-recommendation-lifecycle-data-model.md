@@ -23,23 +23,27 @@ first-discoverer model to the hybrid lifecycle accepted in
 - The first valid recommender receives permanent historical discoverer credit.
 - A page has at most one active recommendation cycle at a time.
 - A new user can recommend or reactivate that page only when the current cycle is
-  inactive and they stake the required base SOL.
+  inactive and they stake at least the required `0.2 SOL` minimum.
 - The original discoverer and prior reactivators may add locked SOL at any time
   to increase their share of future upvote/support credit.
+- `0.2 SOL` is the MVP activation and reactivation minimum, with no maximum
+  deposit cap on locked recommender SOL.
 - Additional stake must not rewrite past support credit, badges, discoverer
   credit, or reputation history.
+- Extra locked SOL must use diminishing returns if it affects future credit,
+  rewards, ranking, or visibility.
 - If no recommender SOL remains locked and no new support arrives for 90 days,
   the recommendation can become inactive.
 - An inactive recommendation can be reactivated by another eligible recommender
-  staking the required base SOL.
+  staking at least the required `0.2 SOL` minimum.
 - Reactivation does not require moderation review by default for valid,
   undisputed inactive pages.
 - Flagged, disputed, duplicate-reported, unsafe metadata, or unsafe link cases
   require review before reactivation.
 - Historical discovery, activation, support, badge, and reputation records remain
   visible even when current active credit changes.
-- The exact future credit and reward split formulas are intentionally unresolved
-  and must not be implemented in this plan.
+- The exact future credit curve and reward split formulas are intentionally
+  unresolved and must not be implemented in this plan.
 
 Relevant specs and docs:
 
@@ -58,6 +62,8 @@ Relevant specs and docs:
 - `docs/decisions/0012-canonical-work-series-identity.md`
 - `docs/decisions/0013-recommendation-inactivity-window.md`
 - `docs/decisions/0014-reactivation-moderation-policy.md`
+- `docs/decisions/0015-minimum-recommender-stake-no-deposit-cap.md`
+- `docs/decisions/0016-diminishing-returns-for-extra-recommender-stake.md`
 - `docs/api/openapi.md`
 - `apps/api/accounts/models.py`
 - `apps/api/accounts/migrations/`
@@ -78,8 +84,14 @@ The implementation should support:
 - Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe
   canonical pages.
 - Locked recommender SOL balance tracking for inactivity eligibility.
+- Minimum stake enforcement and uncapped locked-amount storage for eligible
+  recommender deposits.
+- Recommender stake balance validation requiring either `0 SOL` or at least
+  `0.2 SOL`, plus `0.05 SOL` minimum top-ups above an existing qualifying
+  balance.
 - Multiple recommender participants over time.
 - Stake-backed historical recommender credit-share tracking for future support.
+- Diminishing-returns-ready stake amount storage without encoding a final formula.
 - Support/upvote history.
 - User bookmarks.
 - Curator follows.
@@ -109,8 +121,15 @@ implementation starts:
   recommender SOL remains locked.
 - Withdrawal flows must warn a recommender before a withdrawal that leaves no SOL
   locked and can start the inactivity window.
+- Withdrawal flows must not leave a recommender locked balance above `0 SOL` but
+  below `0.2 SOL`; such withdrawals must be rejected or treated as full
+  withdrawals to `0 SOL`.
 - An inactive recommendation can be reactivated by an eligible recommender who
-  stakes at least the required base minimum.
+  stakes at least the required `0.2 SOL` minimum.
+- Eligible recommenders may lock more than `0.2 SOL`; there is no maximum deposit
+  cap in the MVP product policy.
+- Eligible recommender top-ups above an existing qualifying balance must be at
+  least `0.05 SOL` per increase.
 - Reactivation does not require moderation review by default for valid,
   undisputed inactive pages.
 - Pages that are flagged, disputed, duplicate-reported, or have unsafe metadata or
@@ -121,9 +140,13 @@ implementation starts:
   stake, not permanent first-mover ownership alone.
 - Historical recommender participation remains visible even when active credit is
   zero.
+- Ordinary `0.01 SOL` supporters are not subject to recommender locked-balance
+  rules.
 - Additional stake does not rewrite past support credit, badges, discoverer
   credit, or reputation history.
-- The exact future-credit and reward formulas for multiple historical
+- Extra locked SOL must use diminishing returns if it affects future credit,
+  rewards, ranking, or visibility.
+- The exact future-credit curve and reward formulas for multiple historical
   recommender participants remain open questions and are not implemented.
 
 ## Architecture Decisions
@@ -212,9 +235,8 @@ Acceptance criteria:
   addition rights without finalizing the formula.
 - [x] `docs/product/open-questions.md` records unresolved questions about reward
   split formulas across historical recommender participants.
-- [x] `docs/product/open-questions.md` records unresolved questions about stake
-  caps, minimum stake additions, whale concentration, and
-  future-credit eligibility.
+- [x] `docs/product/open-questions.md` records unresolved questions about the
+  exact diminishing-returns curve, stake caps, and future-credit eligibility.
 - [x] Any unresolved badge transfer, metadata, or minting policy remains open
   rather than being decided by model code.
 
@@ -601,7 +623,7 @@ Estimated scope: Small.
 | --- | --- | --- |
 | Model encodes unresolved reward policy too early | High | Store stake/support/badge history only; keep formulas in open questions until approved. |
 | Single recommendation table becomes overloaded | Medium | Keep canonical page in one model for MVP, but separate recommender participation, support, badges, bookmarks, and follows. |
-| Stake-weighted credit creates whale concentration | Medium | Record caps or nonlinear weighting as open questions before implementation. |
+| Uncapped deposits create whale-concentration risk if mapped linearly to credit | Medium | Store locked amounts and require diminishing returns; keep the exact curve, caps, and stake increments open before implementation. |
 | Duplicate or volume-level pages fragment canonical support | High | Use standalone-work or series-level identity, high-sensitivity duplicate-risk detection, manual review for risky candidates, and duplicate reports. |
 | Migration rewrite breaks existing local databases | Medium | Treat current local data as disposable; document reset steps; do not use this approach after real users exist. |
 | Backend appears authoritative for funds | High | Store on-chain references and indexed state only; keep custody and economic execution on-chain per architecture docs. |
@@ -613,11 +635,9 @@ Estimated scope: Small.
 - What exact duplicate-risk scoring and matching algorithm should be used?
 - What manual review service level is acceptable for duplicate-risk candidate
   pages and review-blocked reactivations?
-- Is future historical recommender credit always linear by locked SOL amount?
+- What exact diminishing-returns curve should apply to future historical
+  recommender credit from locked SOL amount?
 - Should there be a cap on credit share from extra stake?
-- What minimum additional stake should be required when a historical recommender
-  increases future credit share?
-- What base stake is required to reactivate an inactive recommendation?
 - How should reward splits work across multiple recommender participants and
   multiple support cohorts?
 - Are badge transfers allowed, restricted, or discouraged?

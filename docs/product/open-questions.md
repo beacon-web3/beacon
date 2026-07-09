@@ -18,16 +18,13 @@ implementation.
 
 ## Tokenomics
 
-- Should the `0.2 SOL` curator stake be fixed, dynamic, or governance-adjustable?
 - Should support remain fixed at `0.01 SOL`, or should it vary by category,
   network conditions, or governance setting?
 - Should milestone rewards be step-based, continuous, or hybrid?
 - How should future upvote/support credit be split among the original discoverer
   and prior reactivators?
-- Should historical recommender stake additions be linear, capped, time-weighted,
-  or subject to diminishing returns?
-- What minimum additional stake should be required when a historical recommender
-  increases future credit share?
+- What exact diminishing-returns curve, cap, or time-weighting rule should apply
+  to historical recommender stake additions?
 - How should rewards behave when a recommendation stalls below the next
   milestone?
 - What anti-farming thresholds or delays should apply before rewards are paid?

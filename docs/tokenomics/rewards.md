@@ -7,7 +7,13 @@ This document captures the draft Beacon rewards model. The numbers are working a
 ### Create Recommendation
 
 A curator creates a book or series recommendation by locking at least `0.2 SOL`
-for a minimum of two weeks.
+for a minimum of two weeks. `0.2 SOL` is the MVP minimum, not an exact stake;
+there is no maximum deposit cap on locked recommender SOL.
+
+Recommender participant balances must be either `0 SOL` or at least `0.2 SOL`.
+Later top-ups above an existing qualifying locked balance must be at least
+`0.05 SOL`. These recommender stake rules do not apply to ordinary supporters who
+contribute `0.01 SOL`.
 
 The curator stake is intended to:
 
@@ -26,7 +32,13 @@ future upvote/support credit.
 Additional stake affects future credit only. It must not rewrite past supporter
 cohorts, badge history, discoverer credit, or already-earned reputation.
 Partial withdrawals do not start the inactivity window while any recommender SOL
-remains locked.
+remains locked, but withdrawals must not leave a recommender balance between
+`0 SOL` and `0.2 SOL`.
+
+Extra locked SOL must not be framed as guaranteed yield, guaranteed rewards, or
+uncapped influence. If additional stake affects future credit, rewards, ranking,
+or visibility, it must use diminishing returns rather than linear weighting. The
+exact curve and parameters remain unresolved.
 
 ### Support Recommendation
 
@@ -176,6 +188,6 @@ Mitigations to evaluate:
   and prior reactivators?
 * Should later stake additions increase visibility, future support-credit share,
   both, or neither?
-* Should additional historical recommender stake have a cap, diminishing returns,
-  or fixed staking window?
+* What exact diminishing-returns curve, cap, or fixed staking window should apply
+  to additional historical recommender stake?
 * What parameters make self-farming economically unattractive?

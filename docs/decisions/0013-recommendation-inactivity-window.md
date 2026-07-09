@@ -13,7 +13,7 @@ Accepted
 Beacon's hybrid recommendation lifecycle allows a canonical standalone book work
 or recognized series page to move from an active recommendation cycle to an
 inactive state, after which an eligible new recommender can reactivate it by
-locking the required base SOL.
+locking at least the required `0.2 SOL` minimum.
 
 The MVP needs a concrete inactivity window before backend models, scheduled
 checks, API states, and user-facing reactivation copy can be implemented. That
@@ -46,9 +46,10 @@ on the active cycle, because that action can start the inactivity window if no
 new support arrives.
 
 This decision only resolves the inactivity trigger and duration. It does not
-resolve the base stake required for reactivation or reward split formulas across
-historical recommenders. `0014-reactivation-moderation-policy.md` resolves the
-default reactivation moderation rule.
+resolve reward split formulas across historical recommenders.
+`0014-reactivation-moderation-policy.md` resolves the default reactivation
+moderation rule. `0015-minimum-recommender-stake-no-deposit-cap.md` resolves the
+MVP activation and reactivation minimum stake.
 
 ## Alternatives Considered
 
@@ -93,8 +94,8 @@ default reactivation moderation rule.
   exact automation mechanism remains an implementation detail.
 - Product and tokenomics docs should no longer list the inactivity duration as an
   unresolved question.
-- Reactivation base stake, historical recommender credit formulas, and anti-whale
-  controls remain unresolved.
+- Historical recommender credit formulas and anti-whale controls remain
+  unresolved.
 
 ## Related Specs
 
