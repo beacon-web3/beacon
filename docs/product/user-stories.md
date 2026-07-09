@@ -43,6 +43,11 @@ Acceptance criteria:
   locked for the normal lock period even if manual review rejects the page.
 * I can see the amount and duration of the required stake before confirming.
 * I can see when my stake unlocks.
+* If I withdraw only part of my locked SOL and some SOL remains locked, I
+  understand that this does not start the inactivity window.
+* If I try to withdraw all locked SOL from an active recommendation cycle, Beacon
+  warns me that the recommendation can become inactive after 90 days with no new
+  support.
 * I receive permanent discoverer credit if I am the first valid curator for that
   standalone work or series page.
 * If I discovered or previously reactivated a page, I can lock additional SOL to
@@ -59,6 +64,8 @@ status without losing their history.
 Acceptance criteria:
 
 * I can see whether a recommendation page is active or inactive.
+* I can see that a recommendation becomes eligible for inactive status only after
+  no recommender SOL remains locked and 90 days pass with no new support.
 * I can reactivate an inactive recommendation by locking the required base stake.
 * I cannot become a new staked recommender for a page while another active
   recommendation cycle is still active.
@@ -68,12 +75,14 @@ Acceptance criteria:
 
 ## Supporter
 
-As a supporter, I want to support a book with a small SOL contribution so that I can publicly signal conviction and potentially earn reputation or rewards if the book becomes widely supported.
+As a supporter, I want to support a book or series recommendation with a small
+SOL contribution so that I can publicly signal conviction and potentially earn
+reputation or rewards if the recommendation becomes widely supported.
 
 Acceptance criteria:
 
 * I can see the support cost before confirming.
-* I can see my supporter number for the book.
+* I can see my supporter number for the recommendation.
 * I receive a badge or collectible proving support.
 * I can see the next reward or badge milestone.
 * My support is credited to the recommendation state that existed when I
@@ -86,16 +95,17 @@ As an early supporter, I want my early support to be visible so that my taste an
 Acceptance criteria:
 
 * My profile shows successful early support history.
-* Book pages show early supporter cohorts.
+* Recommendation pages show early supporter cohorts.
 * Badges upgrade when book milestones are reached.
 
 ## Reader
 
-As a reader, I want to browse books ranked by community conviction so that I can find books worth my attention.
+As a reader, I want to browse book and series recommendations ranked by community
+conviction so that I can find works worth my attention.
 
 Acceptance criteria:
 
-* I can browse trending and highly supported books.
+* I can browse trending and highly supported recommendations.
 * I can distinguish standalone book pages from series-level pages.
 * I can inspect who discovered a book, who previously reactivated it, and who
   supported it early.

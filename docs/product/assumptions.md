@@ -22,7 +22,7 @@ Status values:
 | Recommendation lifecycle | Permanent discoverer credit with single active recommendation cycles and reactivation after inactivity | Accepted | See `docs/decisions/0011-hybrid-recommendation-lifecycle.md`. |
 | Curator stake | At least `0.2 SOL` locked for two weeks | Draft | Needs price, abuse, and UX review. |
 | Historical recommender stake additions | Original discoverer and prior reactivators may add locked SOL for future upvote/support credit share | Accepted | Formula, caps, and anti-whale controls remain unresolved. |
-| Recommendation inactivity window | Undecided | Draft | Required before implementing automatic inactive state transitions. |
+| Recommendation inactivity window | No locked recommender SOL plus 90 days with no new support | Accepted | See `docs/decisions/0013-recommendation-inactivity-window.md`. |
 | Support contribution | `0.01 SOL` per support/upvote | Draft | Needs price, fee, and accessibility review. |
 | Support semantics | Support is conviction, not a refundable vote | Accepted | Core positioning and risk-control language. |
 | Badge semantics | Badge proves participation and discovery history | Accepted | Must not imply book, IP, or cover-art ownership. |

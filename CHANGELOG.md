@@ -17,6 +17,9 @@ Changelog. Use date-based entries until formal versioning starts.
 - Accepted the canonical work and series identity decision covering series-level
   MVP pages, high-sensitivity duplicate-risk detection, duplicate reports, and
   manual review for risky candidate pages.
+- Accepted the MVP recommendation inactivity rule as zero locked recommender SOL
+  plus 90 days with no new support before an active cycle becomes eligible for
+  inactive status.
 
 ### Changed
 
@@ -28,6 +31,9 @@ Changelog. Use date-based entries until formal versioning starts.
   question, and lifecycle plan docs with standalone-work or series-level
   canonical identity while leaving duplicate scoring, metadata enrichment, and
   manual-review service levels unresolved.
+- Aligned recommendation lifecycle docs with the accepted zero-locked-SOL and
+  90-day inactivity rule while leaving reactivation moderation and reward split
+  policy unresolved.
 
 ## 2026-07-01
 

@@ -49,10 +49,12 @@ manual review before it becomes canonical. The creator must still lock SOL for t
 candidate. If review rejects the candidate as duplicate or invalid, the locked SOL
 is not released immediately; it remains locked until the normal lock period ends.
 
-Each canonical page has at most one active recommendation cycle at a time. If the
-active cycle becomes inactive, a new eligible user can lock the required base SOL
-to reactivate the recommendation. Reactivation preserves the canonical page,
-discoverer credit, previous supporters, badges, and recommender history.
+Each canonical page has at most one active recommendation cycle at a time. If no
+recommender SOL remains locked on the active cycle and the cycle has 90 days with
+no new support, it becomes eligible for inactive status. A new eligible user can
+then lock the required base SOL to reactivate the recommendation. Reactivation
+preserves the canonical page, discoverer credit, previous supporters, badges, and
+recommender history.
 
 ### Curator Stake
 
@@ -70,6 +72,12 @@ Users who have never activated or reactivated a page cannot stake into that page
 while it is active. They must wait until the current recommendation cycle becomes
 inactive and then reactivate it with the required base stake.
 
+Partial stake withdrawals do not start the inactivity window while any
+recommender SOL remains locked, including the required base stake currently set
+at `0.2 SOL`. If a withdrawal would leave no SOL locked on the active cycle,
+Beacon must warn the recommender that the page can become inactive after 90 days
+with no new support.
+
 ### Support / Upvote
 
 Users support a recommendation by contributing `0.01 SOL`.
@@ -85,10 +93,10 @@ The badge represents support history, not ownership of the book or its intellect
 
 Draft badge tiers:
 
-* Bronze when the book reaches 100 supporters.
-* Silver when the book reaches 1,000 supporters.
-* Gold when the book reaches 10,000 supporters.
-* Diamond when the book reaches 100,000 supporters.
+* Bronze when the recommendation reaches 100 supporters.
+* Silver when the recommendation reaches 1,000 supporters.
+* Gold when the recommendation reaches 10,000 supporters.
+* Diamond when the recommendation reaches 100,000 supporters.
 
 ### Public Treasury Dashboard
 
@@ -168,7 +176,6 @@ The MVP is successful if it demonstrates:
 ## Open Questions
 
 * Should the `0.2 SOL` curator stake be fixed, dynamic, or governance-adjustable?
-* What exact inactivity window moves an active recommendation cycle to inactive?
 * Should additional historical recommender stake have a cap, diminishing returns,
   or fixed staking window?
 * Should locked curator stake yield go entirely to the treasury or be split?

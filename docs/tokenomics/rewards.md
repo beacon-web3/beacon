@@ -15,14 +15,18 @@ The curator stake is intended to:
 * Signal conviction.
 * Create a base of locked SOL that can potentially be staked.
 
-Each book has at most one active recommendation cycle. A new user can activate or
-reactivate the recommendation only when the current cycle is inactive. The
-original discoverer and prior reactivators are historical recommenders and may
-lock additional SOL at any time to increase their share of future upvote/support
-credit.
+Each canonical recommendation page has at most one active recommendation cycle. A
+new user can activate or reactivate the recommendation only when the current
+cycle is inactive. For MVP, an active cycle becomes eligible for inactive status
+only after no recommender SOL remains locked and 90 days pass with no new
+support. The original discoverer and prior reactivators are historical
+recommenders and may lock additional SOL at any time to increase their share of
+future upvote/support credit.
 
 Additional stake affects future credit only. It must not rewrite past supporter
 cohorts, badge history, discoverer credit, or already-earned reputation.
+Partial withdrawals do not start the inactivity window while any recommender SOL
+remains locked.
 
 ### Support Recommendation
 
@@ -45,14 +49,14 @@ The following milestone numbers are historical draft examples. They still requir
 simulation and must be updated before implementation to account for the hybrid
 recommendation lifecycle and any split among eligible historical recommenders.
 
-If 10 users support a book:
+If 10 users support a recommendation:
 
 * `0.05 SOL` goes to the eligible recommender share.
 * `0.05 SOL` goes to treasury.
 
 ### 100 Supporters
 
-When a book reaches 100 supporters, the next pool is distributed as:
+When a recommendation reaches 100 supporters, the next pool is distributed as:
 
 * `0.2 SOL` to the eligible recommender share.
 * `0.5 SOL` split among the first 10 supporters.
@@ -62,7 +66,7 @@ Each of the first 10 supporters receives `0.05 SOL` from this milestone, equal t
 
 ### 1,000 Supporters
 
-When a book reaches 1,000 supporters, the next pool is distributed as:
+When a recommendation reaches 1,000 supporters, the next pool is distributed as:
 
 * `1 SOL` to the eligible recommender share.
 * `7 SOL` split among the first 100 supporters.
@@ -72,7 +76,7 @@ Each of the first 100 supporters receives `0.07 SOL` from this milestone.
 
 ### 10,000 Supporters
 
-When a book reaches 10,000 supporters, the next pool is distributed as:
+When a recommendation reaches 10,000 supporters, the next pool is distributed as:
 
 * `5 SOL` to the eligible recommender share.
 * `90 SOL` split among the first 1,000 supporters.
@@ -84,7 +88,7 @@ Each of the first 1,000 supporters receives `0.09 SOL` from this milestone.
 
 The milestone model intentionally rewards early conviction more than late participation.
 
-However, it creates a risk: many users may support recommendations that stall before the next reward tier. For example, voter 10,001 may not receive financial rewards unless the book reaches 100,000 supporters.
+However, it creates a risk: many users may support recommendations that stall before the next reward tier. For example, supporter 10,001 may not receive financial rewards unless the recommendation reaches 100,000 supporters.
 
 To reduce frustration, the product should make milestone progress explicit:
 
@@ -103,10 +107,10 @@ The badge provides an immediate non-financial reward and supports the broader go
 
 Draft badge evolution:
 
-* Bronze: book reaches 100 supporters.
-* Silver: book reaches 1,000 supporters.
-* Gold: book reaches 10,000 supporters.
-* Diamond: book reaches 100,000 supporters.
+* Bronze: recommendation reaches 100 supporters.
+* Silver: recommendation reaches 1,000 supporters.
+* Gold: recommendation reaches 10,000 supporters.
+* Diamond: recommendation reaches 100,000 supporters.
 
 Badges should not represent ownership of book IP.
 

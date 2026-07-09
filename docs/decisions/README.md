@@ -41,6 +41,7 @@ Each record should include:
 | 0010 | [MVP free hosting stack](0010-mvp-free-hosting-stack.md) | Proposed |
 | 0011 | [Hybrid recommendation lifecycle](0011-hybrid-recommendation-lifecycle.md) | Accepted |
 | 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
+| 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
 
 ## Maintenance Rules
 

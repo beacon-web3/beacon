@@ -28,8 +28,8 @@ first-discoverer model to the hybrid lifecycle accepted in
   to increase their share of future upvote/support credit.
 - Additional stake must not rewrite past support credit, badges, discoverer
   credit, or reputation history.
-- If all stake is withdrawn and no new support arrives for a defined inactivity
-  window, such as three months, the recommendation can become inactive.
+- If no recommender SOL remains locked and no new support arrives for 90 days,
+  the recommendation can become inactive.
 - An inactive recommendation can be reactivated by another eligible recommender
   staking the required base SOL.
 - Historical discovery, activation, support, badge, and reputation records remain
@@ -52,6 +52,7 @@ Relevant specs and docs:
 - `docs/decisions/0008-trust-minimized-protocol-custody.md`
 - `docs/decisions/0011-hybrid-recommendation-lifecycle.md`
 - `docs/decisions/0012-canonical-work-series-identity.md`
+- `docs/decisions/0013-recommendation-inactivity-window.md`
 - `docs/api/openapi.md`
 - `apps/api/accounts/models.py`
 - `apps/api/accounts/migrations/`
@@ -69,6 +70,7 @@ The implementation should support:
 - High-sensitivity duplicate-risk detection and manual review state for candidate
   pages that may duplicate existing canonical pages.
 - Active/inactive lifecycle for recommendations.
+- Locked recommender SOL balance tracking for inactivity eligibility.
 - Multiple recommender participants over time.
 - Stake-backed historical recommender credit-share tracking for future support.
 - Support/upvote history.
@@ -94,10 +96,12 @@ implementation starts:
   canonical.
 - Rejected duplicate-risk candidates do not immediately release locked SOL; the
   normal lock period still applies.
-- A recommendation can become inactive when all active stake is withdrawn and no
-  support/upvote has arrived for the configured inactivity window.
-- The initial inactivity window is a draft assumption, for example three months,
-  not a finalized economic parameter unless explicitly accepted.
+- A recommendation can become inactive when no support/upvote has arrived for 90
+  days after no recommender SOL remains locked on the active cycle.
+- Partial stake withdrawals do not start the inactivity window while any
+  recommender SOL remains locked.
+- Withdrawal flows must warn a recommender before a withdrawal that leaves no SOL
+  locked and can start the inactivity window.
 - An inactive recommendation can be reactivated by an eligible recommender who
   stakes at least the required base minimum.
 - Users who have never activated or reactivated a page cannot stake into it while
@@ -188,14 +192,14 @@ implementation does not silently invent policy.
 
 Acceptance criteria:
 
-- [x] `docs/product/assumptions.md` adds a draft assumption for the recommendation
+- [x] `docs/product/assumptions.md` records the accepted 90-day recommendation
   inactivity window.
 - [x] `docs/product/assumptions.md` records accepted historical recommender stake
   addition rights without finalizing the formula.
 - [x] `docs/product/open-questions.md` records unresolved questions about reward
   split formulas across historical recommender participants.
 - [x] `docs/product/open-questions.md` records unresolved questions about stake
-  caps, minimum stake additions, whale concentration, inactivity timing, and
+  caps, minimum stake additions, whale concentration, and
   future-credit eligibility.
 - [x] Any unresolved badge transfer, metadata, or minting policy remains open
   rather than being decided by model code.
@@ -592,8 +596,6 @@ Estimated scope: Small.
 
 ## Open Questions
 
-- What exact inactivity window should move a recommendation from active to
-  inactive?
 - What exact duplicate-risk scoring and matching algorithm should be used?
 - What manual review service level is acceptable for duplicate-risk candidate
   pages?

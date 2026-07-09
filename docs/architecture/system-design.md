@@ -55,6 +55,8 @@ Responsibilities:
   workflows for risky candidate pages.
 * Canonical recommendation pages, active/inactive lifecycle state, and historical
   recommender participation records.
+* Inactivity-window evaluation based on zero locked recommender SOL plus 90 days
+  with no new support for recommendation cycles.
 * Duplicate detection and moderation workflows.
 * Ranking and discovery algorithms.
 * Search and filtering.
@@ -83,7 +85,7 @@ Responsibilities:
 * Create recommendation flows.
 * Duplicate-risk warnings and manual-review status for candidate pages.
 * Reactivate inactive recommendation flows.
-* Historical recommender stake-addition flows.
+* Historical recommender stake-addition and withdrawal-warning flows.
 * Support/upvote flows.
 * Wallet connection.
 * Transaction previews.
@@ -127,6 +129,8 @@ Core concepts for future specification:
 * Candidate recommendation page pending duplicate-risk review
 * Duplicate report
 * Recommendation activation cycle
+* Recommendation inactivity eligibility timestamp
+* Active cycle locked recommender SOL balance
 * Historical recommender participant
 * Recommender stake position
 * Supporter

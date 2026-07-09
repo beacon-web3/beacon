@@ -49,6 +49,9 @@ historical recommender stake rights are now part of the product model.
 `0012-canonical-work-series-identity.md` further specifies that the canonical MVP
 page can represent a standalone book work or a recognized series.
 
+`0013-recommendation-inactivity-window.md` specifies the MVP inactivity rule as
+zero locked recommender SOL plus 90 days with no new support.
+
 ## Alternatives Considered
 
 ### Permanent discoverer only

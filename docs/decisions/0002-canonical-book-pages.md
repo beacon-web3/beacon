@@ -16,7 +16,8 @@ reputation, confuse reward eligibility, and create abuse opportunities.
 
 ## Decision
 
-Each book should have one canonical Beacon page.
+Each standalone book work or recognized book series should have one canonical
+Beacon page.
 
 The first valid curator to create the page receives permanent discoverer credit.
 Later users support or, when eligible, reactivate the existing page rather than
@@ -40,7 +41,7 @@ inside a series.
   accounting, and increases duplicate spam.
 - Rejected.
 
-### Multiple curator pages per book
+### Multiple curator pages per work or series
 
 - Pros: Allows personal recommendation essays and competing narratives.
 - Cons: Harder to define canonical rewards and support milestones.
