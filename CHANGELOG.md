@@ -10,6 +10,29 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Accepted the hybrid recommendation lifecycle decision covering permanent
+  discoverer credit, single active recommendation cycles, reactivation after
+  inactivity, and historical recommender stake additions for future
+  upvote/support credit.
+- Accepted the canonical work and series identity decision covering series-level
+  MVP pages, high-sensitivity duplicate-risk detection, duplicate reports, and
+  manual review for risky candidate pages.
+
+### Changed
+
+- Aligned MVP, vision, user story, treasury, tokenomics, staking, architecture,
+  assumptions, open question, whitepaper-outline, and lifecycle plan docs with
+  the accepted hybrid recommendation lifecycle while leaving reward formulas,
+  inactivity timing, and anti-whale controls unresolved.
+- Aligned product, architecture, tokenomics, risk, whitepaper, assumptions, open
+  question, and lifecycle plan docs with standalone-work or series-level
+  canonical identity while leaving duplicate scoring, metadata enrichment, and
+  manual-review service levels unresolved.
+
+## 2026-07-01
+
+### Added
+
 - Added local console email backend support for manual auth testing and Django
   admin visibility/actions for email verification metadata and resending
   verification codes to unverified accounts.

@@ -13,22 +13,29 @@ recommendations, support/upvotes, bookmarks, curator follows, badge history,
 reputation history, or the proposed recommender lifecycle.
 
 The product direction for recommendations has changed from a simple permanent
-first-discoverer model to a stake-backed active recommender model:
+first-discoverer model to the hybrid lifecycle accepted in
+`docs/decisions/0011-hybrid-recommendation-lifecycle.md`:
 
-- A book keeps one canonical Beacon recommendation page.
-- Any user who stakes the required SOL can recommend or reactivate that book.
-- Active recommendation credit belongs only to recommender participants with
-  currently locked stake.
-- Active credit can be split by locked SOL amount when multiple recommenders
-  have active stake.
+- A standalone book work or recognized book series keeps one canonical Beacon
+  recommendation page.
+- Recognized series are series-level only for MVP; individual-volume pages require
+  a future explicit product or governance decision.
+- The first valid recommender receives permanent historical discoverer credit.
+- A page has at most one active recommendation cycle at a time.
+- A new user can recommend or reactivate that page only when the current cycle is
+  inactive and they stake the required base SOL.
+- The original discoverer and prior reactivators may add locked SOL at any time
+  to increase their share of future upvote/support credit.
+- Additional stake must not rewrite past support credit, badges, discoverer
+  credit, or reputation history.
 - If all stake is withdrawn and no new support arrives for a defined inactivity
   window, such as three months, the recommendation can become inactive.
-- An inactive recommendation can be reactivated by another recommender staking
-  SOL.
+- An inactive recommendation can be reactivated by another eligible recommender
+  staking the required base SOL.
 - Historical discovery, activation, support, badge, and reputation records remain
   visible even when current active credit changes.
-- The exact reward split formula is intentionally unresolved and must not be
-  implemented in this plan.
+- The exact future credit and reward split formulas are intentionally unresolved
+  and must not be implemented in this plan.
 
 Relevant specs and docs:
 
@@ -43,6 +50,8 @@ Relevant specs and docs:
 - `docs/decisions/0002-canonical-book-pages.md`
 - `docs/decisions/0003-discovery-first-positioning.md`
 - `docs/decisions/0008-trust-minimized-protocol-custody.md`
+- `docs/decisions/0011-hybrid-recommendation-lifecycle.md`
+- `docs/decisions/0012-canonical-work-series-identity.md`
 - `docs/api/openapi.md`
 - `apps/api/accounts/models.py`
 - `apps/api/accounts/migrations/`
@@ -55,10 +64,13 @@ specs are still draft.
 
 The implementation should support:
 
-- One canonical recommendation page per book identity.
+- One canonical recommendation page per standalone-work or recognized-series
+  identity.
+- High-sensitivity duplicate-risk detection and manual review state for candidate
+  pages that may duplicate existing canonical pages.
 - Active/inactive lifecycle for recommendations.
 - Multiple recommender participants over time.
-- Stake-backed active recommender credit tracking.
+- Stake-backed historical recommender credit-share tracking for future support.
 - Support/upvote history.
 - User bookmarks.
 - Curator follows.
@@ -74,25 +86,38 @@ implementation starts:
 
 - The canonical product object is a `BookRecommendation` or equivalent, not a
   generic post.
+- The canonical product object can represent either a standalone book work or a
+  recognized book series, but not an individual series volume during MVP.
 - The recommendation contains both book metadata and Beacon-specific
   recommendation state for MVP simplicity.
+- Duplicate-risk candidates can remain pending manual review before becoming
+  canonical.
+- Rejected duplicate-risk candidates do not immediately release locked SOL; the
+  normal lock period still applies.
 - A recommendation can become inactive when all active stake is withdrawn and no
   support/upvote has arrived for the configured inactivity window.
 - The initial inactivity window is a draft assumption, for example three months,
   not a finalized economic parameter unless explicitly accepted.
-- An inactive recommendation can be reactivated by any eligible recommender who
-  stakes at least the required minimum.
-- Active recommender credit is based on currently locked stake, not permanent
-  first-mover ownership.
+- An inactive recommendation can be reactivated by an eligible recommender who
+  stakes at least the required base minimum.
+- Users who have never activated or reactivated a page cannot stake into it while
+  it is active.
+- Historical recommender future-credit share may be affected by currently locked
+  stake, not permanent first-mover ownership alone.
 - Historical recommender participation remains visible even when active credit is
   zero.
-- The exact reward formula for multiple recommender participants remains an open
-  question and is not implemented.
+- Additional stake does not rewrite past support credit, badges, discoverer
+  credit, or reputation history.
+- The exact future-credit and reward formulas for multiple historical
+  recommender participants remain open questions and are not implemented.
 
 ## Architecture Decisions
 
 - Use a single canonical recommendation page model for MVP instead of separate
   neutral `Book` and `Recommendation` tables.
+- Store enough identity fields to distinguish standalone work versus series pages,
+  normalize title/author matching, track duplicate-risk review state, and support
+  duplicate reports.
 - Add a separate recommender participation/stake table so one canonical page can
   have multiple recommender activation periods and stake positions over time.
 - Link support/upvotes to the canonical recommendation and, when relevant, the
@@ -127,21 +152,23 @@ defined before any schema work begins.
 
 Acceptance criteria:
 
-- [ ] `docs/product/mvp.md` describes one canonical page per book with active and
-  inactive states.
-- [ ] `docs/product/mvp.md` explains that reactivation preserves the canonical
+- [x] `docs/product/mvp.md` describes one canonical page per standalone work or
+  recognized series with active and inactive states.
+- [x] `docs/product/mvp.md` explains that reactivation preserves the canonical
   page, historical supports, badges, and recommender history.
-- [ ] `docs/product/user-stories.md` includes user-facing behavior for creating,
+- [x] `docs/product/user-stories.md` includes user-facing behavior for creating,
   supporting, bookmarking, following curators, viewing upvote/support history,
   viewing badges, and viewing reputation.
-- [ ] Product copy avoids describing support as a refundable vote or guaranteed
+- [x] Product copy avoids describing support as a refundable vote or guaranteed
   investment return.
-- [ ] Specs distinguish active recommender credit from historical discovery
-  history.
+- [x] Specs distinguish active recommendation status, historical discovery
+  history, and future upvote/support credit share.
+- [x] Specs define MVP canonical identity as a standalone book work or recognized
+  series, with series-level pages only for recognized series.
 
 Verification:
 
-- [ ] Documentation review confirms there is no conflict between `mvp.md`,
+- [x] Documentation review confirms there is no conflict between `mvp.md`,
   `user-stories.md`, and the discovery-first positioning guardrails.
 
 Dependencies: None.
@@ -161,21 +188,21 @@ implementation does not silently invent policy.
 
 Acceptance criteria:
 
-- [ ] `docs/product/assumptions.md` adds a draft assumption for the recommendation
-  inactivity window, such as three months.
-- [ ] `docs/product/assumptions.md` adds a draft assumption for stake-weighted
-  active recommender credit if approved as the working model.
-- [ ] `docs/product/open-questions.md` records unresolved questions about reward
-  split formulas across multiple recommender participants.
-- [ ] `docs/product/open-questions.md` records unresolved questions about stake
+- [x] `docs/product/assumptions.md` adds a draft assumption for the recommendation
+  inactivity window.
+- [x] `docs/product/assumptions.md` records accepted historical recommender stake
+  addition rights without finalizing the formula.
+- [x] `docs/product/open-questions.md` records unresolved questions about reward
+  split formulas across historical recommender participants.
+- [x] `docs/product/open-questions.md` records unresolved questions about stake
   caps, minimum stake additions, whale concentration, inactivity timing, and
-  active-credit eligibility.
-- [ ] Any unresolved badge transfer, metadata, or minting policy remains open
+  future-credit eligibility.
+- [x] Any unresolved badge transfer, metadata, or minting policy remains open
   rather than being decided by model code.
 
 Verification:
 
-- [ ] Documentation review confirms all unresolved tokenomics and badge mechanics
+- [x] Documentation review confirms all unresolved tokenomics and badge mechanics
   remain listed as draft assumptions or open questions.
 
 Dependencies: Task 1.
@@ -189,34 +216,36 @@ Files likely touched:
 
 Estimated scope: Medium.
 
-### Task 3: Add Decision Record For Stake-Backed Recommendation Lifecycle
+### Task 3: Add Decision Record For Hybrid Recommendation Lifecycle
 
 Description: Add an ADR/product decision record documenting why Beacon is using a
-canonical recommendation page with active stake-backed recommender credit instead
-of a permanent first-discoverer-only model.
+canonical recommendation page with permanent discoverer credit, single active
+recommendation cycles, and historical recommender stake additions instead of a
+permanent first-discoverer-only model.
 
 Acceptance criteria:
 
-- [ ] New decision record is added under `docs/decisions/` with the next
+- [x] New decision record is added under `docs/decisions/` with the next
   sequential ID.
-- [ ] Decision status is `Proposed` unless the product decision is explicitly
-  accepted before writing.
-- [ ] Decision explains the active recommender credit model, historical discovery
-  history, reactivation behavior, and unresolved reward formula.
-- [ ] Alternatives considered include permanent first-discoverer credit, separate
-  `Book` and `Recommendation` tables, and generic posts/upvotes.
-- [ ] `docs/decisions/README.md` is updated.
+- [x] Decision status is `Accepted` because the product decision was explicitly
+  approved before writing.
+- [x] Decision explains the active cycle model, historical discovery history,
+  reactivation behavior, historical recommender stake rights, and unresolved
+  reward formula.
+- [x] Alternatives considered include permanent discoverer-only credit, fully
+  open active staking, and separate competing recommendation pages.
+- [x] `docs/decisions/README.md` is updated.
 
 Verification:
 
-- [ ] Decision record links to the relevant specs and does not contradict product
+- [x] Decision record links to the relevant specs and does not contradict product
   guardrails.
 
 Dependencies: Tasks 1 and 2.
 
 Files likely touched:
 
-- `docs/decisions/0011-stake-backed-recommendation-lifecycle.md`
+- `docs/decisions/0011-hybrid-recommendation-lifecycle.md`
 - `docs/decisions/README.md`
 
 Estimated scope: Small.
@@ -273,6 +302,10 @@ Acceptance criteria:
 
 - [ ] Proposed schema includes `BookRecommendation` or the chosen canonical page
   model.
+- [ ] Proposed schema identifies whether each canonical page represents a
+  standalone work or recognized series.
+- [ ] Proposed schema includes duplicate-risk/manual-review state for candidate
+  pages and a way to record duplicate reports.
 - [ ] Proposed schema includes a recommender participant/stake-position model for
   active and historical recommender credit.
 - [ ] Proposed schema includes support/upvote history.
@@ -337,9 +370,10 @@ clear field names.
 
 Acceptance criteria:
 
-- [ ] Canonical recommendation page model stores required MVP book metadata:
-  title, author, curator note or description, external reference link, category
-  or genre, creation timestamp, active state, and activity timestamps.
+- [ ] Canonical recommendation page model stores required MVP book or series
+  metadata: page type, title, author or authors, curator note or description,
+  external reference link, category or genre, creation timestamp, active state,
+  duplicate-risk/manual-review state, and activity timestamps.
 - [ ] Recommender participant model records account, recommendation, locked stake
   amount, lock timestamps, reclaim timestamp, active eligibility, and optional
   on-chain references.
@@ -406,11 +440,15 @@ state transitions that can be tested without Solana integration.
 Acceptance criteria:
 
 - [ ] Tests cover canonical recommendation uniqueness rules selected by the spec.
+- [ ] Tests cover standalone-work versus series page type constraints selected by
+  the schema design.
+- [ ] Tests cover duplicate-risk/manual-review state transitions that are in scope
+  for the backend model.
 - [ ] Tests cover duplicate bookmark prevention.
 - [ ] Tests cover duplicate curator follow prevention.
 - [ ] Tests cover support supporter-number uniqueness per recommendation.
-- [ ] Tests cover active recommender credit eligibility based on locked versus
-  reclaimed stake without implementing reward formulas.
+- [ ] Tests cover future-credit eligibility for historical recommenders based on
+  locked versus reclaimed stake without implementing reward formulas.
 - [ ] Tests cover inactive eligibility conditions as pure backend state rules if
   those rules are implemented in model/query helpers.
 
@@ -546,6 +584,7 @@ Estimated scope: Small.
 | Model encodes unresolved reward policy too early | High | Store stake/support/badge history only; keep formulas in open questions until approved. |
 | Single recommendation table becomes overloaded | Medium | Keep canonical page in one model for MVP, but separate recommender participation, support, badges, bookmarks, and follows. |
 | Stake-weighted credit creates whale concentration | Medium | Record caps or nonlinear weighting as open questions before implementation. |
+| Duplicate or volume-level pages fragment canonical support | High | Use standalone-work or series-level identity, high-sensitivity duplicate-risk detection, manual review for risky candidates, and duplicate reports. |
 | Migration rewrite breaks existing local databases | Medium | Treat current local data as disposable; document reset steps; do not use this approach after real users exist. |
 | Backend appears authoritative for funds | High | Store on-chain references and indexed state only; keep custody and economic execution on-chain per architecture docs. |
 | Badge model implies book/IP ownership | High | Use participation language only; keep metadata and transfer policy unresolved until approved. |
@@ -555,10 +594,14 @@ Estimated scope: Small.
 
 - What exact inactivity window should move a recommendation from active to
   inactive?
-- Is active recommender credit always linear by locked SOL amount?
+- What exact duplicate-risk scoring and matching algorithm should be used?
+- What manual review service level is acceptable for duplicate-risk candidate
+  pages?
+- Is future historical recommender credit always linear by locked SOL amount?
 - Should there be a cap on credit share from extra stake?
-- Can previous recommenders add stake while another recommender is active?
-- What minimum stake is required to join or rejoin active recommender credit?
+- What minimum additional stake should be required when a historical recommender
+  increases future credit share?
+- What base stake is required to reactivate an inactive recommendation?
 - Should inactive recommendations require moderation review before reactivation?
 - How should reward splits work across multiple recommender participants and
   multiple support cohorts?

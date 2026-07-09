@@ -26,7 +26,7 @@ Instead of treating every like or rating as equal, Beacon asks users to put a sm
 
 Beacon combines:
 
-* Economic commitment through locked curator stakes and paid support.
+* Economic commitment through locked recommender stakes and paid support.
 * Reputation through visible discovery history and NFT badges.
 * Community curation through transparent ranking and support signals.
 * Sustainable funding through treasury inflows, staking yield, and community-approved revenue streams.

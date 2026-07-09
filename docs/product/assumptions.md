@@ -15,8 +15,14 @@ Status values:
 | Assumption | Current Value | Status | Notes |
 | --- | --- | --- | --- |
 | MVP content category | Books only | Accepted | See `docs/decisions/0001-books-first-mvp.md`. |
-| Book page model | One canonical page per book | Accepted | See `docs/decisions/0002-canonical-book-pages.md`. |
+| Book page model | One canonical page per standalone book work or recognized series | Accepted | See `docs/decisions/0002-canonical-book-pages.md` and `docs/decisions/0012-canonical-work-series-identity.md`. |
+| Series page model | Recognized series are series-level only for MVP | Accepted | Individual-volume pages require a future explicit product or governance decision. |
+| Duplicate-risk flow | Low-risk submissions can create immediately; risky submissions require creator warning and manual review | Accepted | Rejected risky submissions keep SOL locked until the normal lock period ends. |
+| Duplicate detection algorithm | High-sensitivity title/author/work-or-series matching | Draft | Exact scoring, thresholds, and review tooling remain unresolved. |
+| Recommendation lifecycle | Permanent discoverer credit with single active recommendation cycles and reactivation after inactivity | Accepted | See `docs/decisions/0011-hybrid-recommendation-lifecycle.md`. |
 | Curator stake | At least `0.2 SOL` locked for two weeks | Draft | Needs price, abuse, and UX review. |
+| Historical recommender stake additions | Original discoverer and prior reactivators may add locked SOL for future upvote/support credit share | Accepted | Formula, caps, and anti-whale controls remain unresolved. |
+| Recommendation inactivity window | Undecided | Draft | Required before implementing automatic inactive state transitions. |
 | Support contribution | `0.01 SOL` per support/upvote | Draft | Needs price, fee, and accessibility review. |
 | Support semantics | Support is conviction, not a refundable vote | Accepted | Core positioning and risk-control language. |
 | Badge semantics | Badge proves participation and discovery history | Accepted | Must not imply book, IP, or cover-art ownership. |

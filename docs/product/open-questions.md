@@ -6,11 +6,15 @@ implementation.
 
 ## Product
 
-- How should duplicate books be detected and resolved before a canonical page is
-  created?
-- What book metadata source should Beacon use for identity, author data,
-  categories, external links, and optional cover images?
+- What exact duplicate-risk scoring and matching algorithm should Beacon use
+  before immediate canonical page creation?
+- What manual review service level is acceptable for duplicate-risk candidate
+  pages?
+- What book metadata source should Beacon use for author data, categories,
+  external links, enrichment, and optional cover images?
 - Should curator notes have length, moderation, or quality requirements?
+- What exact inactivity window moves an active recommendation cycle to inactive?
+- Should inactive recommendations require moderation review before reactivation?
 - What profile signals best represent curator reputation without turning Beacon
   into a pure financial leaderboard?
 
@@ -20,6 +24,12 @@ implementation.
 - Should support remain fixed at `0.01 SOL`, or should it vary by category,
   network conditions, or governance setting?
 - Should milestone rewards be step-based, continuous, or hybrid?
+- How should future upvote/support credit be split among the original discoverer
+  and prior reactivators?
+- Should historical recommender stake additions be linear, capped, time-weighted,
+  or subject to diminishing returns?
+- What minimum additional stake should be required when a historical recommender
+  increases future credit share?
 - How should rewards behave when a recommendation stalls below the next
   milestone?
 - What anti-farming thresholds or delays should apply before rewards are paid?

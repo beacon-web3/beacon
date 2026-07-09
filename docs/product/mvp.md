@@ -24,17 +24,51 @@ Required book metadata:
 
 Cover images and rich metadata can be added after licensing and data-source decisions are made.
 
-### One Permanent Page Per Book
+### One Permanent Page Per Book Work Or Series
 
-Each book should have one canonical Beacon page.
+Each standalone book work or recognized book series should have one canonical
+Beacon page. Beacon should not create separate MVP pages for editions, ISBNs,
+translations, box sets, or individual volumes inside a recognized series.
 
-The first valid curator to create the page receives permanent discoverer credit. Later users support the existing page instead of creating fragmented duplicate markets for the same book.
+For MVP, a recognized series is represented only by the series-level canonical
+page. Individual-volume pages can be reconsidered later only through an explicit
+product or governance decision.
+
+The first valid curator to create the page receives permanent historical
+discoverer credit. Later activity happens on the same page instead of creating
+fragmented duplicate markets for the same work or series.
+
+Users create a candidate page by entering a title and author or authors. Beacon
+must run a high-sensitivity duplicate-risk check before immediate creation. If
+duplicate risk is low, the canonical page can be created immediately and users can
+later report duplicates. If duplicate risk is detected, Beacon must show likely
+duplicate pages and warn the creator before they continue.
+
+If the creator proceeds after seeing duplicate risk, the candidate page requires
+manual review before it becomes canonical. The creator must still lock SOL for the
+candidate. If review rejects the candidate as duplicate or invalid, the locked SOL
+is not released immediately; it remains locked until the normal lock period ends.
+
+Each canonical page has at most one active recommendation cycle at a time. If the
+active cycle becomes inactive, a new eligible user can lock the required base SOL
+to reactivate the recommendation. Reactivation preserves the canonical page,
+discoverer credit, previous supporters, badges, and recommender history.
 
 ### Curator Stake
 
-A curator creates a book recommendation by locking at least `0.2 SOL` for a minimum of two weeks.
+A curator creates a book or series recommendation by locking at least `0.2 SOL`
+for a minimum of two weeks.
 
 The lock acts as spam resistance and a signal of conviction. The exact stake amount is a draft parameter and may need adjustment based on SOL price, abuse patterns, and launch conditions.
+
+The original discoverer and prior reactivators are historical recommenders for
+that page. They may lock additional SOL at any time to increase their share of
+future upvote/support credit, but additional stake must not rewrite past support
+credit, badges, discoverer credit, or reputation history.
+
+Users who have never activated or reactivated a page cannot stake into that page
+while it is active. They must wait until the current recommendation cycle becomes
+inactive and then reactivate it with the required base stake.
 
 ### Support / Upvote
 
@@ -44,7 +78,8 @@ Support is not a refundable vote. It represents conviction and may make the supp
 
 ### NFT Badge
 
-Each supporter should receive an NFT badge or equivalent on-chain collectible proving participation in a specific book recommendation.
+Each supporter should receive an NFT badge or equivalent on-chain collectible
+proving participation in a specific book or series recommendation.
 
 The badge represents support history, not ownership of the book or its intellectual property.
 
@@ -122,7 +157,7 @@ and any Solana event monitoring that cannot safely run on a sleeping web service
 
 The MVP is successful if it demonstrates:
 
-* Users create book recommendations despite the stake requirement.
+* Users create book or series recommendations despite the stake requirement.
 * Users support recommendations even when financial rewards are uncertain.
 * NFT badges and curator profiles create non-financial motivation.
 * The treasury model is understandable and publicly verifiable.
@@ -133,10 +168,15 @@ The MVP is successful if it demonstrates:
 ## Open Questions
 
 * Should the `0.2 SOL` curator stake be fixed, dynamic, or governance-adjustable?
+* What exact inactivity window moves an active recommendation cycle to inactive?
+* Should additional historical recommender stake have a cap, diminishing returns,
+  or fixed staking window?
 * Should locked curator stake yield go entirely to the treasury or be split?
 * Should milestone rewards be step-based, continuous, or hybrid?
-* How should duplicate books be detected and resolved?
-* What metadata source should be used for book identity?
+* What exact duplicate-risk scoring and matching algorithm should be used?
+* What metadata source should be used for enrichment after canonical identity is
+  based on title, authors, and work-or-series review?
+* What manual review service level is acceptable for duplicate-risk candidates?
 * Which MVP balances and authorities must be program-controlled before launch?
 * Which early-stage authorities can remain under disclosed multisig control?
 * Should Solana event monitoring run in Django, a separate worker/indexer,

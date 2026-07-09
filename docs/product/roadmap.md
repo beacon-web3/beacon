@@ -22,8 +22,8 @@ assumptions.
 
 Key outcomes:
 
-- Users can create book recommendation records locally.
-- Users can view canonical book pages and support counts.
+- Users can create standalone book work or series recommendation records locally.
+- Users can view canonical recommendation pages and support counts.
 - API and frontend contracts are documented.
 - Local tests cover the core non-chain business logic.
 

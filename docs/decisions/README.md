@@ -39,6 +39,8 @@ Each record should include:
 | 0008 | [Trust-minimized protocol custody](0008-trust-minimized-protocol-custody.md) | Proposed |
 | 0009 | [Google social auth strategy](0009-google-social-auth-strategy.md) | Accepted |
 | 0010 | [MVP free hosting stack](0010-mvp-free-hosting-stack.md) | Proposed |
+| 0011 | [Hybrid recommendation lifecycle](0011-hybrid-recommendation-lifecycle.md) | Accepted |
+| 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
 
 ## Maintenance Rules
 

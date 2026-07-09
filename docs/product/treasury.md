@@ -18,7 +18,7 @@ Potential sources:
 
 * Treasury share from support activity.
 * Yield from staked treasury SOL.
-* Yield from locked curator stake SOL.
+* Yield from locked recommender stake SOL.
 * Community-approved affiliate revenue.
 * Community-approved sponsored placements.
 * Community-approved premium analytics or business tools.

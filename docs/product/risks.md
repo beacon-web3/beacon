@@ -34,11 +34,12 @@ Mitigation directions:
 
 ## Popularity Bias
 
-Well-known books may dominate support because they are already familiar.
+Well-known books or series may dominate support because they are already
+familiar.
 
 Mitigation directions:
 
-* Use one canonical page per book.
+* Use one canonical page per standalone book work or recognized series.
 * Preserve first-discoverer credit.
 * Add freshness and category-specific ranking.
 * Highlight emerging books separately from all-time leaders.

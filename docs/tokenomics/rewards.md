@@ -6,7 +6,8 @@ This document captures the draft Beacon rewards model. The numbers are working a
 
 ### Create Recommendation
 
-A curator creates a book recommendation by locking at least `0.2 SOL` for a minimum of two weeks.
+A curator creates a book or series recommendation by locking at least `0.2 SOL`
+for a minimum of two weeks.
 
 The curator stake is intended to:
 
@@ -14,9 +15,18 @@ The curator stake is intended to:
 * Signal conviction.
 * Create a base of locked SOL that can potentially be staked.
 
+Each book has at most one active recommendation cycle. A new user can activate or
+reactivate the recommendation only when the current cycle is inactive. The
+original discoverer and prior reactivators are historical recommenders and may
+lock additional SOL at any time to increase their share of future upvote/support
+credit.
+
+Additional stake affects future credit only. It must not rewrite past supporter
+cohorts, badge history, discoverer credit, or already-earned reputation.
+
 ### Support Recommendation
 
-A supporter contributes `0.01 SOL` to support a book recommendation.
+A supporter contributes `0.01 SOL` to support a book or series recommendation.
 
 Support is non-refundable and may create eligibility for:
 
@@ -31,16 +41,20 @@ The initial concept uses milestone-based rewards. Later supporters do not receiv
 
 ### 10 Supporters
 
+The following milestone numbers are historical draft examples. They still require
+simulation and must be updated before implementation to account for the hybrid
+recommendation lifecycle and any split among eligible historical recommenders.
+
 If 10 users support a book:
 
-* `0.05 SOL` goes to the original curator.
+* `0.05 SOL` goes to the eligible recommender share.
 * `0.05 SOL` goes to treasury.
 
 ### 100 Supporters
 
 When a book reaches 100 supporters, the next pool is distributed as:
 
-* `0.2 SOL` to the original curator.
+* `0.2 SOL` to the eligible recommender share.
 * `0.5 SOL` split among the first 10 supporters.
 * `0.25 SOL` to treasury.
 
@@ -50,7 +64,7 @@ Each of the first 10 supporters receives `0.05 SOL` from this milestone, equal t
 
 When a book reaches 1,000 supporters, the next pool is distributed as:
 
-* `1 SOL` to the original curator.
+* `1 SOL` to the eligible recommender share.
 * `7 SOL` split among the first 100 supporters.
 * `2.25 SOL` to treasury.
 
@@ -60,7 +74,7 @@ Each of the first 100 supporters receives `0.07 SOL` from this milestone.
 
 When a book reaches 10,000 supporters, the next pool is distributed as:
 
-* `5 SOL` to the original curator.
+* `5 SOL` to the eligible recommender share.
 * `90 SOL` split among the first 1,000 supporters.
 * `7.25 SOL` to treasury.
 
@@ -82,7 +96,8 @@ To reduce frustration, the product should make milestone progress explicit:
 
 ## NFT Badge Layer
 
-Every supporter should receive an NFT badge or equivalent collectible for the specific book recommendation.
+Every supporter should receive an NFT badge or equivalent collectible for the
+specific book or series recommendation.
 
 The badge provides an immediate non-financial reward and supports the broader goal of building reputation for taste.
 
@@ -126,8 +141,10 @@ Famous books may attract more support than genuinely under-discovered books.
 
 Mitigations to evaluate:
 
-* One canonical page per book.
+* One canonical page per standalone book work or recognized series.
 * Discovery credit for the first valid curator.
+* Single active recommendation cycles with reactivation only after inactivity.
+* Extra stake rights limited to the original discoverer and prior reactivators.
 * Ranking formulas that include freshness, category, velocity, and early conviction.
 
 ### Ponzi Perception
@@ -151,6 +168,10 @@ Mitigations to evaluate:
 
 * Should rewards remain milestone-based or become continuous?
 * What exact percentage should stay in treasury at each milestone?
-* Should the original curator receive permanent future participation in rewards?
-* Should later stake additions increase visibility without changing discoverer credit?
+* How should the eligible recommender share be split among the original discoverer
+  and prior reactivators?
+* Should later stake additions increase visibility, future support-credit share,
+  both, or neither?
+* Should additional historical recommender stake have a cap, diminishing returns,
+  or fixed staking window?
 * What parameters make self-farming economically unattractive?
