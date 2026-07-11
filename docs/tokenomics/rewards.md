@@ -52,9 +52,12 @@ Support is non-refundable and may create eligibility for:
 * Profile reputation.
 * Governance participation.
 
-## Draft Milestone Model
+## Step-Based Milestone Model
 
-The initial concept uses milestone-based rewards. Later supporters do not receive immediate financial rewards unless the recommendation reaches a future milestone.
+For MVP, Beacon uses step-based milestone rewards. Rewards are evaluated only
+when a recommendation reaches defined supporter-count milestones. Later
+supporters do not receive immediate financial rewards unless the recommendation
+reaches a future milestone.
 
 ### 10 Supporters
 
@@ -178,12 +181,10 @@ Mitigations to evaluate:
 
 * NFT badge value and profile reputation.
 * Visible milestone progress.
-* Continuous or hybrid reward pools.
 * Periodic rewards funded by staking yield or community-approved treasury programs.
 
 ## Open Questions
 
-* Should rewards remain milestone-based or become continuous?
 * What exact percentage should stay in treasury at each milestone?
 * How should the eligible recommender share be split among the original discoverer
   and prior reactivators?

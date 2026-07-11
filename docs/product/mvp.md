@@ -200,7 +200,6 @@ The MVP is successful if it demonstrates:
 * What exact diminishing-returns curve, cap, or fixed staking window should apply
   to additional historical recommender stake?
 * Should locked curator stake yield go entirely to the treasury or be split?
-* Should milestone rewards be step-based, continuous, or hybrid?
 * What exact duplicate-risk scoring and matching algorithm should be used?
 * What metadata source should be used for enrichment after canonical identity is
   based on title, authors, and work-or-series review?

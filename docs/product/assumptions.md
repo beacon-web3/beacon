@@ -28,7 +28,7 @@ Status values:
 | Support semantics | Support is conviction, not a refundable vote | Accepted | Core positioning and risk-control language. |
 | Badge semantics | Badge proves participation and discovery history | Accepted | Must not imply book, IP, or cover-art ownership. |
 | Badge tiers | Bronze 100, Silver 1,000, Gold 10,000, Diamond 100,000 | Draft | Needs UX, metadata, and contract feasibility review. |
-| Reward model | Milestone-based curator, early supporter, and treasury splits | Needs simulation | See `docs/tokenomics/rewards.md`. |
+| Reward timing | Step-based milestone reward evaluation for MVP | Accepted | Exact thresholds, formulas, and splits still need simulation. See `docs/decisions/0019-step-based-milestone-rewards.md` and `docs/tokenomics/rewards.md`. |
 | Treasury split | 80% Community Treasury, up to 20% Operating Reserve | Proposed | Applies only to treasury inflows. |
 | Staking strategy | Prefer native SOL staking over DeFi yield | Proposed | Requires security/legal review before launch. |
 | Governance model | Participation-based governance, no launch token | Accepted | See `docs/decisions/0004-no-governance-token-at-launch.md`. |

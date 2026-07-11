@@ -32,6 +32,8 @@ Changelog. Use date-based entries until formal versioning starts.
   hold either `0 SOL` or at least `0.2 SOL`, and later top-ups above a qualifying
   balance must be at least `0.05 SOL`.
 - Accepted fixed `0.01 SOL` support/upvote contributions for MVP.
+- Accepted step-based milestone reward evaluation for MVP while leaving exact
+  thresholds, formulas, and splits unresolved.
 
 ### Changed
 
@@ -57,6 +59,8 @@ Changelog. Use date-based entries until formal versioning starts.
   with accepted recommender balance and top-up minimum rules.
 - Aligned product, tokenomics, architecture, assumptions, open questions, and
   lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
+- Aligned product, tokenomics, risk, assumptions, and open question docs with
+  accepted step-based milestone reward timing.
 
 ## 2026-07-01
 

@@ -54,7 +54,6 @@ Mitigation directions:
 * Make milestone progress visible.
 * Provide immediate badge rewards.
 * Build profile reputation around early support.
-* Consider continuous or hybrid reward models.
 * Consider periodic community-funded rewards for high-quality stalled recommendations.
 
 ## Governance Fatigue

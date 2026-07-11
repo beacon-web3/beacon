@@ -18,7 +18,6 @@ implementation.
 
 ## Tokenomics
 
-- Should milestone rewards be step-based, continuous, or hybrid?
 - How should future upvote/support credit be split among the original discoverer
   and prior reactivators?
 - What exact diminishing-returns curve, cap, or time-weighting rule should apply
