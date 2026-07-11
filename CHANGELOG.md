@@ -64,6 +64,8 @@ Changelog. Use date-based entries until formal versioning starts.
 - Added bookmarks, curator follows, and badge history to architecture backend
   product concepts and data model concepts.
 - Added recommendation lifecycle API planning note to OpenAPI docs.
+- Hidden unused third-party admin models (allauth, sites, auth Group) from
+  Django admin to show only the Account model.
 
 ## 2026-07-01
 

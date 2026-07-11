@@ -92,7 +92,6 @@ GOOGLE_OAUTH_REDIRECT_URI = env("GOOGLE_OAUTH_REDIRECT_URI")
 # Application definition
 
 INSTALLED_APPS = [
-    "accounts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -107,6 +106,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "drf_spectacular",
+    "accounts",
 ]
 
 MIDDLEWARE = [
