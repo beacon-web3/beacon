@@ -55,6 +55,9 @@ Responsibilities:
   workflows for risky candidate pages.
 * Canonical recommendation pages, active/inactive lifecycle state, and historical
   recommender participation records.
+* User bookmarks for recommendation pages.
+* Curator follow relationships between accounts.
+* Badge/NFT participation history or eligibility cache.
 * Minimum `0.2 SOL` activation and reactivation stake enforcement with no maximum
   deposit cap for eligible recommenders.
 * Recommender stake balance validation requiring `0 SOL` or at least `0.2 SOL`,
@@ -147,6 +150,8 @@ Core concepts for future specification:
 * Support transaction
 * Reward milestone
 * Badge
+* User bookmark
+* Curator follow
 * Treasury account
 * Governance proposal
 * Governance vote

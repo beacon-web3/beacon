@@ -300,3 +300,14 @@ Responses:
 * `400 Bad Request` when the token is invalid or password validation fails.
 * `429 Too Many Requests` when reset confirmation attempts exceed the configured
   throttle.
+
+## Recommendation Lifecycle (Planned)
+
+API endpoints for the recommendation lifecycle will follow after the backend
+data model is approved and implemented. Planned surfaces include creating and
+reactivating canonical recommendation pages, managing recommender stake
+references, supporting/upvoting recommendations, bookmarking, following
+curators, listing badges, and reading reputation or profile summaries.
+
+These endpoints are not yet implemented and will be documented here once
+designed.

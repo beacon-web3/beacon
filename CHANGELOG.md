@@ -61,6 +61,9 @@ Changelog. Use date-based entries until formal versioning starts.
   lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
 - Aligned product, tokenomics, risk, assumptions, and open question docs with
   accepted step-based milestone reward timing.
+- Added bookmarks, curator follows, and badge history to architecture backend
+  product concepts and data model concepts.
+- Added recommendation lifecycle API planning note to OpenAPI docs.
 
 ## 2026-07-01
 

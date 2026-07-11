@@ -299,19 +299,19 @@ product state and Solana-owned economic state.
 
 Acceptance criteria:
 
-- [ ] `docs/architecture/system-design.md` lists canonical recommendation pages,
+- [x] `docs/architecture/system-design.md` lists canonical recommendation pages,
   recommender participants, support history, bookmarks, curator follows, badge
   history, and reputation history as backend product concepts.
-- [ ] Architecture docs state that economic custody, stake locks, support
+- [x] Architecture docs state that economic custody, stake locks, support
   transfers, and reward release remain on-chain or on-chain-indexed when
   implemented.
-- [ ] `docs/api/openapi.md` receives a planning note or future endpoint section
+- [x] `docs/api/openapi.md` receives a planning note or future endpoint section
   for recommendation lifecycle APIs if useful.
-- [ ] No API endpoint is documented as implemented before code exists.
+- [x] No API endpoint is documented as implemented before code exists.
 
 Verification:
 
-- [ ] Documentation review confirms architecture, API, and product docs use the
+- [x] Documentation review confirms architecture, API, and product docs use the
   same vocabulary.
 
 Dependencies: Tasks 1-3.
@@ -327,11 +327,11 @@ Estimated scope: Small.
 
 Do not start model implementation until this checkpoint is complete.
 
-- [ ] Product specs reflect the new recommendation lifecycle.
-- [ ] Assumptions and open questions capture unresolved policy.
-- [ ] Decision record is added and indexed.
-- [ ] Architecture docs define off-chain versus on-chain responsibility.
-- [ ] Human review confirms the product direction is ready for schema work.
+- [x] Product specs reflect the new recommendation lifecycle.
+- [x] Assumptions and open questions capture unresolved policy.
+- [x] Decision record is added and indexed.
+- [x] Architecture docs define off-chain versus on-chain responsibility.
+- [x] Human review confirms the product direction is ready for schema work.
 
 ## Phase 2: Design Backend Data Model
 
