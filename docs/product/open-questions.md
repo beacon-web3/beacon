@@ -18,8 +18,6 @@ implementation.
 
 ## Tokenomics
 
-- Should support remain fixed at `0.01 SOL`, or should it vary by category,
-  network conditions, or governance setting?
 - Should milestone rewards be step-based, continuous, or hybrid?
 - How should future upvote/support credit be split among the original discoverer
   and prior reactivators?

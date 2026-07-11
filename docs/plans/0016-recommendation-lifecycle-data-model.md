@@ -160,6 +160,8 @@ implementation starts:
   have multiple recommender activation periods and stake positions over time.
 - Link support/upvotes to the canonical recommendation and, when relevant, the
   active lifecycle period for later reward analysis.
+- Store support/upvote records with the fixed MVP contribution amount of
+  `0.01 SOL`.
 - Store on-chain transaction signatures, program account addresses, and indexed
   economic state as references or cache fields only; Solana programs remain the
   source of truth for trust-sensitive custody and fund movement.
@@ -348,7 +350,8 @@ Acceptance criteria:
   pages and a way to record duplicate reports.
 - [ ] Proposed schema includes a recommender participant/stake-position model for
   active and historical recommender credit.
-- [ ] Proposed schema includes support/upvote history.
+- [ ] Proposed schema includes support/upvote history with fixed `0.01 SOL` MVP
+  contribution accounting.
 - [ ] Proposed schema includes bookmarks.
 - [ ] Proposed schema includes curator follows.
 - [ ] Proposed schema includes badge/NFT history or eligibility cache.

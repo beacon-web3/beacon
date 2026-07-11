@@ -102,7 +102,7 @@ or treated as a full withdrawal to `0 SOL` with the full-withdrawal warning.
 
 ### Support / Upvote
 
-Users support a recommendation by contributing `0.01 SOL`.
+Users support a recommendation by contributing a fixed `0.01 SOL` for MVP.
 
 Support is not a refundable vote. It represents conviction and may make the supporter eligible for milestone rewards, badge upgrades, and reputation.
 

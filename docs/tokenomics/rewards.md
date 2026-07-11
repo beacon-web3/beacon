@@ -42,7 +42,8 @@ exact curve and parameters remain unresolved.
 
 ### Support Recommendation
 
-A supporter contributes `0.01 SOL` to support a book or series recommendation.
+A supporter contributes a fixed `0.01 SOL` to support a book or series
+recommendation during MVP.
 
 Support is non-refundable and may create eligibility for:
 

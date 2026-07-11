@@ -61,6 +61,7 @@ Responsibilities:
   plus `0.05 SOL` minimum top-ups above an existing qualifying balance.
 * Diminishing-returns weighting for any future extra-stake influence on credit,
   rewards, ranking, or visibility.
+* Fixed `0.01 SOL` MVP support/upvote contribution accounting.
 * Inactivity-window evaluation based on zero locked recommender SOL plus 90 days
   with no new support for recommendation cycles.
 * Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe

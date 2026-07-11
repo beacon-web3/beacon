@@ -91,7 +91,7 @@ reputation or rewards if the recommendation becomes widely supported.
 
 Acceptance criteria:
 
-* I can see the support cost before confirming.
+* I can see the fixed `0.01 SOL` support cost before confirming.
 * I can see my supporter number for the recommendation.
 * I receive a badge or collectible proving support.
 * I can see the next reward or badge milestone.

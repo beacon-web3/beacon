@@ -31,6 +31,7 @@ Changelog. Use date-based entries until formal versioning starts.
 - Accepted the MVP recommender stake balance rule: recommender participants must
   hold either `0 SOL` or at least `0.2 SOL`, and later top-ups above a qualifying
   balance must be at least `0.05 SOL`.
+- Accepted fixed `0.01 SOL` support/upvote contributions for MVP.
 
 ### Changed
 
@@ -54,6 +55,8 @@ Changelog. Use date-based entries until formal versioning starts.
   caps, stake increments, and reward split formulas unresolved.
 - Aligned product, tokenomics, staking, architecture, and lifecycle planning docs
   with accepted recommender balance and top-up minimum rules.
+- Aligned product, tokenomics, architecture, assumptions, open questions, and
+  lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
 
 ## 2026-07-01
 
