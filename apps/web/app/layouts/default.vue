@@ -16,7 +16,7 @@ async function handleLogout() {
 }
 
 onMounted(() => {
-  if (accountStore.status === 'idle') {
+  if (accountStore.status !== 'success') {
     accountStore.fetchAccount()
   }
 })

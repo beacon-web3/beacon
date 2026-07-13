@@ -36,7 +36,7 @@ const socialAuthSucceeded = computed(() => route.query.social_auth === 'success'
 
       <div class="mt-6">
         <UAlert
-          v-if="socialAuthSucceeded && accountStore.account"
+          v-if="socialAuthSucceeded"
           role="status"
           color="success"
           variant="soft"
