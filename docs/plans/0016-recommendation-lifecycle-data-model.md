@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Approved
 
 ## Context
 
@@ -64,6 +64,9 @@ Relevant specs and docs:
 - `docs/decisions/0014-reactivation-moderation-policy.md`
 - `docs/decisions/0015-minimum-recommender-stake-no-deposit-cap.md`
 - `docs/decisions/0016-diminishing-returns-for-extra-recommender-stake.md`
+- `docs/decisions/0017-recommender-stake-balance-and-top-up-minimums.md`
+- `docs/decisions/0018-fixed-support-contribution.md`
+- `docs/decisions/0019-step-based-milestone-rewards.md`
 - `docs/api/openapi.md`
 - `apps/api/accounts/models.py`
 - `apps/api/accounts/migrations/`
@@ -342,29 +345,493 @@ before editing `models.py`.
 
 Acceptance criteria:
 
-- [ ] Proposed schema includes `BookRecommendation` or the chosen canonical page
+- [x] Proposed schema includes `BookRecommendation` or the chosen canonical page
   model.
-- [ ] Proposed schema identifies whether each canonical page represents a
+- [x] Proposed schema identifies whether each canonical page represents a
   standalone work or recognized series.
-- [ ] Proposed schema includes duplicate-risk/manual-review state for candidate
+- [x] Proposed schema includes duplicate-risk/manual-review state for candidate
   pages and a way to record duplicate reports.
-- [ ] Proposed schema includes a recommender participant/stake-position model for
+- [x] Proposed schema includes a recommender participant/stake-position model for
   active and historical recommender credit.
-- [ ] Proposed schema includes support/upvote history with fixed `0.01 SOL` MVP
+- [x] Proposed schema includes support/upvote history with fixed `0.01 SOL` MVP
   contribution accounting.
-- [ ] Proposed schema includes bookmarks.
-- [ ] Proposed schema includes curator follows.
-- [ ] Proposed schema includes badge/NFT history or eligibility cache.
-- [ ] Proposed schema includes enough fields to support reputation aggregation
+- [x] Proposed schema includes bookmarks.
+- [x] Proposed schema includes curator follows.
+- [x] Proposed schema includes badge/NFT history or eligibility cache.
+- [x] Proposed schema includes enough fields to support reputation aggregation
   later without defining the final formula.
-- [ ] Proposed schema identifies all uniqueness constraints and indexes.
-- [ ] Proposed schema identifies fields that are authoritative on-chain versus
+- [x] Proposed schema identifies all uniqueness constraints and indexes.
+- [x] Proposed schema identifies fields that are authoritative on-chain versus
   backend cache/reference fields.
 
 Verification:
 
-- [ ] Schema review confirms no unresolved reward formula is encoded in database
+- [x] Schema review confirms no unresolved reward formula is encoded in database
   fields or model methods.
+
+Dependencies: Spec Approval checkpoint.
+
+Files likely touched:
+
+- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- Optional schema note under `docs/architecture/` if the design becomes too large
+  for the plan.
+
+Estimated scope: Medium.
+
+#### Schema Design
+
+All models live in a new `recommendations` Django app (see Task 6). The schema
+below uses Django field types; PostgreSQL details are noted where relevant.
+
+##### BookRecommendation
+
+Canonical page model. One record per standalone book work or recognized series.
+Contains both book metadata and Beacon-specific recommendation lifecycle state
+for MVP simplicity.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `creator` | FK(Account, on_delete=PROTECT) | The original discoverer. Immutable after creation. `related_name="created_recommendations"`. |
+| `page_type` | CharField(20) | Choices: `STANDALONE_WORK`, `RECOGNIZED_SERIES`. |
+| `title` | TextField | User-entered title. |
+| `title_normalized` | TextField | Lowercased, whitespace-trimmed copy of `title` for duplicate detection. The `Lower()` in the canonical unique constraint is defensive; this field should already be stored lowercase. |
+| `author_names` | TextField | User-entered author(s). |
+| `author_names_normalized` | TextField | Lowercased, whitespace-trimmed copy of `author_names` for duplicate detection. Same normalization rules as `title_normalized`. |
+| `description` | TextField(blank) | Curator note or description. |
+| `external_reference_url` | URLField(blank, null) | Optional external link. |
+| `category` | FK(Category, null, blank, on_delete=SET_NULL) | Genre or category. Optional for MVP; null means uncategorized. |
+| `status` | CharField(20) | Choices: `ACTIVE`, `INACTIVE`. Lifecycle state of the current recommendation cycle. |
+| `is_canonical` | BooleanField(default=False) | True once the page is approved. Candidate pages have False. |
+| `duplicate_risk_status` | CharField(20) | Choices: `LOW_RISK`, `HIGH_RISK`, `NEEDS_REVIEW`. Set at creation time. |
+| `review_status` | CharField(20) | Choices: `NOT_REQUIRED`, `PENDING`, `APPROVED`, `REJECTED`. Manual review state for duplicate-risk candidates. |
+| `current_recommender` | FK(Account, null, on_delete=SET_NULL) | The account currently staked on the active cycle. Null when inactive. `related_name="active_recommendations"`. |
+| `recommendation_cycle_number` | PositiveIntegerField(default=0) | Incremented on each activation. 0 means never activated. |
+| `activated_at` | DateTimeField(null) | When the current active cycle started. Null when inactive. |
+| `deactivated_at` | DateTimeField(null) | When the last active cycle ended. Null if never deactivated. |
+| `last_support_at` | DateTimeField(null) | Timestamp of most recent valid support on this page. Used for inactivity window calculation. |
+| `support_count` | PositiveIntegerField(default=0) | Denormalized total support count for list queries. |
+| `on_chain_program_account` | CharField(64, blank, null) | Solana program account address. Backend cache; Solana is source of truth for custody. |
+| `on_chain_recommendation_seed` | CharField(64, blank, null) | PDA seed or address. Backend cache. |
+| `created_at` | DateTimeField(auto_now_add) | |
+| `updated_at` | DateTimeField(auto_now) | |
+
+Constraints:
+
+```python
+# One canonical page per unique (normalized title, normalized author, page type)
+UniqueConstraint(
+    Lower("title_normalized"),
+    Lower("author_names_normalized"),
+    "page_type",
+    condition=Q(is_canonical=True),
+    name="bookrecommendation_canonical_work_unique",
+)
+
+# Indexes
+Index(fields=["status", "-created_at"])           # Active recommendation listing
+Index(fields=["-support_count"])                   # Trending/popular queries
+Index(fields=["creator", "-created_at"])            # Creator profile page
+Index(fields=["category", "status", "-support_count"])  # Category browse
+Index(fields=["last_support_at"])                   # Inactivity scanning
+```
+
+##### Category
+
+Lookup table for book genres/categories. Kept as a model for future governance
+and filtering flexibility rather than a hardcoded CharField choices list.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `name` | CharField(100, unique) | Display name. |
+| `slug` | SlugField(unique) | URL-safe identifier. |
+| `is_active` | BooleanField(default=True) | Soft-disable without deleting. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+##### DuplicateReport
+
+Records user-submitted duplicate reports against a canonical or candidate page.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `reporter` | FK(Account, on_delete=PROTECT) | The user reporting the duplicate. `related_name="duplicate_reports_filed"`. |
+| `recommendation` | FK(BookRecommendation, on_delete=CASCADE) | The page being reported. `related_name="duplicate_reports"`. |
+| `suspected_duplicate_of` | FK(BookRecommendation, null, on_delete=SET_NULL) | The existing page it may duplicate. Null if reporter is unsure. `related_name="suspected_duplicates"`. |
+| `reason` | TextField(blank) | Optional explanation. |
+| `status` | CharField(20) | Choices: `PENDING`, `CONFIRMED_DUPLICATE`, `NOT_DUPLICATE`. Default `PENDING`. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+Constraints:
+
+```python
+UniqueConstraint(
+    "reporter",
+    "recommendation",
+    name="duplicatereport_one_per_reporter_per_recommendation",
+)
+
+# Prevent a report from pointing to itself as a suspected duplicate
+CheckConstraint(
+    ~Q(recommendation=F("suspected_duplicate_of")),
+    name="duplicatereport_no_self_reference",
+)
+
+Index(fields=["recommendation", "status"])   # Admin review queue
+Index(fields=["status", "-created_at"])      # Pending reports listing
+```
+
+##### RecommenderParticipant
+
+Tracks each account that activates or reactivates a recommendation page and
+their locked SOL position. Historical recommender stake additions are recorded
+as new rows or updated `locked_amount` on the same row. The exact diminishing-
+returns credit curve is not encoded.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `account` | FK(Account, on_delete=PROTECT) | The recommender. `related_name="recommender_participations"`. |
+| `recommendation` | FK(BookRecommendation, on_delete=CASCADE) | The page. `related_name="recommender_participants"`. |
+| `locked_amount_lamports` | BigIntegerField | Current locked SOL in lamports. Backend cache; Solana is source of truth for custody. Must be 0 or >= 200_000_000 (0.2 SOL). |
+| `initial_lock_at` | DateTimeField | When this recommender first locked SOL for this page. |
+| `last_stake_change_at` | DateTimeField(null) | When the locked amount last changed. |
+| `reclaimed_at` | DateTimeField(null) | When all locked SOL was reclaimed. Null while any SOL remains locked. |
+| `is_active` | BooleanField(default=False) | True if this recommender is the current active staker on the active cycle. |
+| `reactivation_number` | PositiveIntegerField(default=0) | Which activation cycle this participant belongs to. 0 = original activation, 1 = first reactivation, and so on. This is the per-participant cycle counter and corresponds to `BookRecommendation.recommendation_cycle_number` at the page level. |
+| `on_chain_stake_account` | CharField(64, blank, null) | Solana stake account or PDA reference. Backend cache. |
+| `on_chain_lock_transaction` | CharField(88, blank, null) | Transaction signature of the lock. Backend cache. |
+| `on_chain_reclaim_transaction` | CharField(88, blank, null) | Transaction signature of the reclaim. Backend cache. |
+| `created_at` | DateTimeField(auto_now_add) | |
+| `updated_at` | DateTimeField(auto_now) | |
+
+Constraints:
+
+```python
+# One active recommender per recommendation (partial unique index)
+# PostgreSQL partial unique index: only one row where is_active=True per recommendation
+UniqueConstraint(
+    "recommendation",
+    condition=Q(is_active=True),
+    name="recommenderparticipant_one_active_per_recommendation",
+)
+
+# No dust balances: application-level validation enforces 0 or >= 0.2 SOL.
+# DB-level CHECK constraint as a safety net.
+# The project uses Django 5.2+ which supports __gte in CheckConstraint.
+CheckConstraint(
+    Q(locked_amount_lamports=0) | Q(locked_amount_lamports__gte=200_000_000),
+    name="recommenderparticipant_no_dust_balance",
+)
+
+# Indexes
+Index(fields=["recommendation", "is_active"])                    # Find active recommender
+Index(fields=["account", "-created_at"])                          # Account's participation history
+Index(fields=["recommendation", "reactivation_number"])           # Cycle-based queries
+Index(fields=["recommendation", "locked_amount_lamports"])        # Stake-weighted queries
+```
+
+##### Support
+
+Records each 0.01 SOL support contribution. Immutable once created.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `supporter` | FK(Account, on_delete=PROTECT) | The user who supported. `related_name="supports_given"`. |
+| `recommendation` | FK(BookRecommendation, on_delete=CASCADE) | The page supported. `related_name="supports"`. |
+| `supporter_number` | PositiveIntegerField | Global ordinal support number for this recommendation across all cycles (1, 2, 3...). Never resets between activation cycles. |
+| `amount_lamports` | BigIntegerField(default=10_000_000) | Fixed 0.01 SOL (10,000,000 lamports) for MVP. |
+| `recommendation_cycle_number` | PositiveIntegerField | Which activation cycle this support belongs to. |
+| `created_at` | DateTimeField(auto_now_add) | |
+| `on_chain_support_transaction` | CharField(88, blank, null) | Transaction signature. Backend cache. |
+| `on_chain_support_account` | CharField(64, blank, null) | Program account or PDA. Backend cache. |
+
+Constraints:
+
+```python
+UniqueConstraint(
+    "recommendation",
+    "supporter_number",
+    name="support_supporter_number_unique_per_recommendation",
+)
+UniqueConstraint(
+    "supporter",
+    "recommendation",
+    name="support_one_per_supporter_per_recommendation",
+)
+
+# Indexes
+Index(fields=["recommendation", "supporter_number"])  # Support list ordering
+Index(fields=["supporter", "-created_at"])             # Account support history
+Index(fields=["recommendation", "recommendation_cycle_number"])  # Cycle-based queries
+Index(fields=["created_at"])                            # Time-based queries
+```
+
+##### Bookmark
+
+Simple many-to-many with uniqueness enforcement.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `account` | FK(Account, on_delete=CASCADE) | `related_name="bookmarks"`. |
+| `recommendation` | FK(BookRecommendation, on_delete=CASCADE) | `related_name="bookmarks_by_users"`. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+Constraints:
+
+```python
+UniqueConstraint(
+    "account",
+    "recommendation",
+    name="bookmark_one_per_account_per_recommendation",
+)
+
+Index(fields=["account", "-created_at"])          # User's bookmarks page
+Index(fields=["recommendation", "-created_at"])   # Reverse lookup (who bookmarked, newest first)
+```
+
+##### CuratorFollow
+
+Follow relationships between accounts. Self-follow is prevented by a
+database-level CHECK constraint.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `follower` | FK(Account, related_name="following", on_delete=CASCADE) | The user following. |
+| `followee` | FK(Account, related_name="followers", on_delete=CASCADE) | The curator being followed. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+Constraints:
+
+```python
+UniqueConstraint(
+    "follower",
+    "followee",
+    name="curatorfollow_one_per_pair",
+)
+CheckConstraint(
+    ~Q(follower=F("followee")),
+    name="curatorfollow_no_self_follow",
+)
+
+Index(fields=["followee", "-created_at"])  # Who follows this curator
+Index(fields=["follower", "-created_at"])   # Who this user follows
+```
+
+##### Badge
+
+Tracks badge eligibility and participation state. Does not imply book IP,
+cover-art, or intellectual-property ownership. Actual NFT minting remains
+on-chain.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `account` | FK(Account, on_delete=PROTECT) | The badge holder. `related_name="badges"`. |
+| `recommendation` | FK(BookRecommendation, on_delete=CASCADE) | The page this badge is for. `related_name="badges"`. |
+| `tier` | CharField(20) | Choices: `BRONZE` (100 supporters), `SILVER` (1,000), `GOLD` (10,000), `DIAMOND` (100,000). Thresholds are draft assumptions from `docs/tokenomics/rewards.md` and may change. |
+| `earned_at` | DateTimeField | When the badge was earned based on the supporter milestone. Intentionally separate from `created_at` to allow backdated badge grants if a milestone is reached after a delay. |
+| `on_chain_mint_transaction` | CharField(88, blank, null) | NFT mint transaction signature. Backend cache. |
+| `on_chain_mint_account` | CharField(64, blank, null) | NFT mint account address. Backend cache. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+Constraints:
+
+```python
+UniqueConstraint(
+    "account",
+    "recommendation",
+    "tier",
+    name="badge_one_per_tier_per_account_per_recommendation",
+)
+
+# NOTE: This constraint allows the same account to earn the same tier badge
+# on the same recommendation across multiple reactivation cycles. Each badge
+# row is a historical record of when the milestone was reached. This is
+# intentional: badges are immutable participation records, not per-cycle state.
+
+Index(fields=["account", "-earned_at"])                    # Profile badge display
+Index(fields=["recommendation", "tier"])                   # Milestone queries
+Index(fields=["recommendation", "account"])                # Check if user has badge
+```
+
+##### ReputationEvent
+
+Event-sourced reputation history. Individual events are recorded; the
+aggregate formula is not implemented. The `Account.reputation_score` field
+can be updated by a future aggregation process.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | BigAutoField PK | |
+| `account` | FK(Account, on_delete=PROTECT) | `related_name="reputation_events"`. |
+| `event_type` | CharField(50, choices=REPUTATION_EVENT_TYPES) | e.g., `DISCOVERY`, `REACTIVATION`, `SUPPORT_RECEIVED`, `BADGE_EARNED`. Stored as string, not enum, for flexibility. Define `REPUTATION_EVENT_TYPES` choices on the field for admin and validation clarity. |
+| `points` | DecimalField(12, 2) | Points for this event. Can be positive or negative. |
+| `recommendation` | FK(BookRecommendation, null, on_delete=SET_NULL) | Associated page, if any. `related_name="reputation_events"`. |
+| `description` | TextField(blank) | Human-readable event description. |
+| `created_at` | DateTimeField(auto_now_add) | |
+
+Constraints:
+
+```python
+Index(fields=["account", "-created_at"])        # Account reputation timeline
+Index(fields=["account", "event_type"])          # Filter by event type
+Index(fields=["recommendation"])                  # Reverse lookup
+```
+
+#### Field Authorship Summary
+
+The following categorization clarifies which fields are backend-authored,
+on-chain-authored, or indexed/cache references:
+
+| Field | Authorship | Source of Truth |
+| --- | --- | --- |
+| BookRecommendation.* (metadata) | Backend | Backend |
+| BookRecommendation.status | Backend | Backend (mirrors on-chain cycle state) |
+| BookRecommendation.current_recommender | Backend | Backend |
+| BookRecommendation.on_chain_* | Cache | Solana programs |
+| RecommenderParticipant.locked_amount_lamports | Cache | Solana programs |
+| RecommenderParticipant.is_active | Backend | Backend |
+| RecommenderParticipant.on_chain_* | Cache | Solana programs |
+| Support.* (all) | Backend | Backend |
+| Support.on_chain_* | Cache | Solana programs |
+| Badge.tier | Backend | Backend (milestone thresholds) |
+| Badge.on_chain_* | Cache | Solana programs |
+| ReputationEvent.* | Backend | Backend |
+
+#### Concurrency Considerations
+
+The following concurrency risks exist in the schema and must be addressed during
+implementation:
+
+**`Support.supporter_number` race condition:** Two concurrent support requests
+could read the same maximum `supporter_number` and create duplicate ordinals,
+violating the `support_supporter_number_unique_per_recommendation` constraint.
+The implementation must use one of:
+
+- `SELECT FOR UPDATE` on the `BookRecommendation` row before computing the next
+  `supporter_number`, or
+- A `Max("supporter_number") + 1` inside `select_for_update()`, or
+- Application-level advisory locking per recommendation.
+
+**`BookRecommendation.support_count` denormalization:** The denormalized
+`support_count` must be updated atomically on each new support. The
+implementation should use `F("support_count") + 1` in an `UPDATE` statement
+rather than reading and writing the count. The `last_support_at` timestamp
+cannot be atomically updated with the count in a single statement; the
+implementation should use a single `UPDATE` with a conditional timestamp
+assignment via PostgreSQL `GREATEST`:
+
+```python
+BookRecommendation.objects.filter(pk=recommendation_pk).update(
+    support_count=F("support_count") + 1,
+    last_support_at=Greatest("last_support_at", Value(support_created_at)),
+)
+```
+
+This avoids lost updates from concurrent support actions. Using `GREATEST`
+ensures `last_support_at` only advances forward.
+
+**`RecommenderParticipant` one-active-per-recommendation constraint:** Django's
+ORM does not validate partial unique constraints at the application level. The
+implementation must handle `IntegrityError` on concurrent `is_active` toggles
+and retry or return a user-facing error. Using `select_for_update()` on the
+parent `BookRecommendation` row before toggling `is_active` is recommended.
+
+#### Implementation Notes
+
+**`__str__` methods:** Every model should define a `__str__` method for Django
+admin usability and debugging. Suggested representations:
+
+- `BookRecommendation`: `f"{self.title} by {self.author_names}"`
+- `Category`: `self.name`
+- `DuplicateReport`: `f"Report #{self.pk} on {self.recommendation}"`
+- `RecommenderParticipant`: `f"{self.account} on {self.recommendation}"`
+- `Support`: `f"Support #{self.supporter_number} by {self.supporter}"`
+- `Bookmark`: `f"{self.account} → {self.recommendation}"`
+- `CuratorFollow`: `f"{self.follower} → {self.followee}"`
+- `Badge`: `f"{self.tier} for {self.recommendation} ({self.account})"`
+- `ReputationEvent`: `f"{self.event_type} for {self.account}"`
+
+**`related_name` on FK fields:** Several FK fields should specify explicit
+`related_name` values to avoid ambiguous reverse accessor names and Django
+deprecation warnings. All `related_name` values are listed in the model field
+tables above. Key entries:
+
+- `BookRecommendation.creator` → `related_name="created_recommendations"`
+- `BookRecommendation.current_recommender` → `related_name="active_recommendations"`
+- `DuplicateReport.reporter` → `related_name="duplicate_reports_filed"`
+- `DuplicateReport.recommendation` → `related_name="duplicate_reports"`
+- `DuplicateReport.suspected_duplicate_of` → `related_name="suspected_duplicates"`
+- `RecommenderParticipant.account` → `related_name="recommender_participations"`
+- `RecommenderParticipant.recommendation` → `related_name="recommender_participants"`
+- `Support.supporter` → `related_name="supports_given"`
+- `Support.recommendation` → `related_name="supports"`
+- `Bookmark.account` → `related_name="bookmarks"`
+- `Bookmark.recommendation` → `related_name="bookmarks_by_users"` (differs from `Bookmark.account` to avoid ambiguity since both target models use `bookmarks`)
+- `CuratorFollow.follower` → `related_name="following"`
+- `CuratorFollow.followee` → `related_name="followers"`
+- `Badge.account` → `related_name="badges"`
+- `Badge.recommendation` → `related_name="badges"`
+- `ReputationEvent.account` → `related_name="reputation_events"`
+- `ReputationEvent.recommendation` → `related_name="reputation_events"`
+
+**Duplicate report scope:** `DuplicateReport` allows reporting both canonical
+and candidate (non-canonical) pages. The `suspected_duplicate_of` field may
+reference any other `BookRecommendation` regardless of its `is_canonical` status.
+Application-level validation should prevent a user from filing a report where
+`suspected_duplicate_of` is the same record as `recommendation` (enforced by the
+`duplicatereport_no_self_reference` CHECK constraint).
+
+**`on_delete` behavior:** All FK fields specify explicit `on_delete` values as
+listed in the schema tables. Key design decisions:
+- `PROTECT` on account FKs where historical records must not be silently
+  deleted (creator, supporter, reporter, recommender account, badge account,
+  reputation event account).
+- `CASCADE` on recommendation FKs for child records that should not outlive
+  their parent page (supports, duplicate reports, bookmarks, recommender
+  participants, badges).
+- `SET_NULL` on nullable FKs where the reference is optional (current
+  recommender, category, suspected duplicate of, reputation event
+  recommendation).
+
+**Default `ordering`:** Models with expected list-heavy access patterns should
+define `ordering` in their `Meta` class:
+- `Support`: `ordering = ["recommendation", "supporter_number"]`
+- `Bookmark`: `ordering = ["-created_at"]`
+- `Badge`: `ordering = ["-earned_at"]`
+- `ReputationEvent`: `ordering = ["-created_at"]`
+- `DuplicateReport`: `ordering = ["-created_at"]`
+- `CuratorFollow`: `ordering = ["-created_at"]`
+
+**`USE_TZ` awareness:** The project uses `USE_TZ = True`. All `auto_now_add`
+and `auto_now` timestamps are stored as UTC by Django's ORM. The plan's
+`created_at`, `updated_at`, `earned_at`, and `last_support_at` fields rely on
+this. No manual timezone conversion should be needed in model code; ensure any
+raw SQL (e.g., the `GREATEST` pattern for `last_support_at`) passes
+timezone-aware datetimes.
+
+**Test layout `__init__.py`:** The existing `tests/accounts/` directory has no
+`__init__.py`, matching the project's pytest discovery convention. The new
+`tests/recommendations/` directory should follow the same pattern — no
+`__init__.py` unless pytest configuration requires it.
+
+#### Verification
+
+- [x] Schema review confirms no unresolved reward formula is encoded in database
+  fields or model methods.
+- [x] All locked SOL amounts are stored in lamports (BigIntegerField) with
+  backend-level CHECK constraints; actual custody remains on-chain.
+- [x] Diminishing-returns principle is captured as a storage requirement (store
+  raw amounts) without encoding a formula.
+- [x] Badge model uses participation language; no ownership or IP implication.
+- [x] Support model stores fixed 0.01 SOL amount with no refundable-vote
+  semantics.
 
 Dependencies: Spec Approval checkpoint.
 
@@ -383,17 +850,80 @@ existing `accounts` app before creating migrations.
 
 Acceptance criteria:
 
-- [ ] Decision records whether to create a new app such as `recommendations` or
+- [x] Decision records whether to create a new app such as `recommendations` or
   keep models in an existing app.
-- [ ] Naming is consistent across models, serializers, API routes, and docs.
-- [ ] If a new app is chosen, `INSTALLED_APPS` and test layout changes are listed.
-- [ ] Boundaries avoid putting product marketplace logic inside account auth
+- [x] Naming is consistent across models, serializers, API routes, and docs.
+- [x] If a new app is chosen, `INSTALLED_APPS` and test layout changes are listed.
+- [x] Boundaries avoid putting product marketplace logic inside account auth
   models.
 
 Verification:
 
-- [ ] Review confirms model ownership is clear and does not create avoidable
+- [x] Review confirms model ownership is clear and does not create avoidable
   coupling with authentication code.
+
+#### Decision: Create a new `recommendations` Django app
+
+Product models must not live in the `accounts` app. The `accounts` app owns
+authentication, session management, social auth, email verification, password
+reset, throttling, and the custom `Account` user model. Mixing marketplace
+product logic (book recommendations, support, badges, curator follows) into
+the auth boundary would create coupling between authentication concerns and
+product domain concerns.
+
+A new Django app named `recommendations` will house all product data models.
+
+#### App layout
+
+```
+apps/api/recommendations/
+├── __init__.py
+├── apps.py              # RecommendationsConfig
+├── models.py            # All product models
+├── admin.py             # Read-only admin review surfaces (Task 8)
+└── migrations/
+    └── __init__.py
+```
+
+#### `INSTALLED_APPS` change
+
+Add to `beacon_api/settings.py`:
+
+```python
+INSTALLED_APPS = [
+    # ... existing apps ...
+    "accounts",
+    "recommendations",  # Product data models
+]
+```
+
+#### Test layout
+
+```
+apps/api/tests/recommendations/
+├── test_models.py       # Constraint and lifecycle tests (Task 9)
+└── test_admin.py        # Admin surface tests (Task 8)
+```
+
+Note: no `__init__.py` in the test directory, matching the existing convention
+in `tests/accounts/`. pytest discovers tests via `testpaths` config.
+
+#### Naming conventions
+
+| Layer | Convention | Examples |
+| --- | --- | --- |
+| Models | PascalCase | `BookRecommendation`, `RecommenderParticipant` |
+| Model table names | app_label lowercase + snake_case | `recommendations_bookrecommendation` |
+| API routes | kebab-case under `/api/recommendations/` | `/api/recommendations/`, `/api/recommendations/{id}/support/` |
+| Serializers | PascalCase + `Serializer` suffix | `BookRecommendationSerializer` |
+| Admin sites | app label prefix | `recommendations` admin section |
+| Docs | product-marketplace terminology, not generic "post" or "upvote" | recommendation, support, curator |
+
+#### Dependencies
+
+The `recommendations` app FK-references `accounts.Account` via
+`settings.AUTH_USER_MODEL`. This is the only cross-app dependency. The
+`accounts` app has no knowledge of the `recommendations` app.
 
 Dependencies: Task 5.
 
@@ -489,11 +1019,27 @@ Acceptance criteria:
   for the backend model.
 - [ ] Tests cover duplicate bookmark prevention.
 - [ ] Tests cover duplicate curator follow prevention.
+- [ ] Tests cover self-follow prevention for curator follows.
 - [ ] Tests cover support supporter-number uniqueness per recommendation.
+- [ ] Tests cover self-reference prevention for duplicate reports.
+- [ ] Tests cover duplicate badge prevention (same tier, same account, same
+  recommendation).
+- [ ] Tests cover reputation event creation and account/recommendation FK
+  relationships.
 - [ ] Tests cover future-credit eligibility for historical recommenders based on
   locked versus reclaimed stake without implementing reward formulas.
 - [ ] Tests cover inactive eligibility conditions as pure backend state rules if
   those rules are implemented in model/query helpers.
+- [ ] Tests cover the `RecommenderParticipant` CHECK constraint (locked amount
+  must be 0 or >= 0.2 SOL), including edge values (1 lamport, 199,999,999
+  lamports).
+- [ ] Tests cover `__str__` representations for all models.
+- [ ] Tests cover `on_delete` behavior: deleting a recommendation cascades
+  child records (supports, bookmarks, badges); deleting an account with
+  creator/supporter/recommender references is blocked by PROTECT.
+- [ ] Tests cover `ReputationEvent.event_type` choices validation.
+- [ ] Tests cover `Badge` allows the same tier badge across different
+  reactivation cycles (intentional per schema design).
 
 Verification:
 
@@ -503,8 +1049,9 @@ Dependencies: Tasks 7 and 8.
 
 Files likely touched:
 
-- `apps/api/tests/.../test_models.py`
-- Test factories or helpers if the project adds them.
+- `apps/api/tests/recommendations/test_models.py`
+- `apps/api/tests/recommendations/factories.py` (use `factory_boy`, already
+  installed as a dev dependency)
 
 Estimated scope: Medium.
 
@@ -645,11 +1192,11 @@ Estimated scope: Small.
   multiple support cohorts?
 - Are badge transfers allowed, restricted, or discouraged?
 - Which reputation signals are stored as events versus aggregates?
-- Which fields are backend-authored, on-chain-authored, or indexed from Solana
-  events?
+- Should `Support` records be allowed during `INACTIVE` recommendation
+  periods, or should support be restricted to `ACTIVE` cycles only?
 
 ## Approval Gate
 
-This plan should remain `Draft` until Phase 1 is reviewed. Implementation should
-not start until the product spec and decision-record updates resolve the core
-recommendation lifecycle vocabulary and active-credit rules.
+This plan is `Approved`. Phase 1 (product spec and decision-record updates) and
+Phase 2 (schema design and app boundaries) are complete. Implementation may
+begin with Phase 3 (Task 7: Add Product Models).
