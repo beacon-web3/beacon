@@ -46,6 +46,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { apiFetch } = useApiFetch()
   const { getApiErrorData, getApiErrorMessage } = useApiErrorMessage()
   const { executeRecaptcha } = useRecaptchaToken()
+  const accountStore = useAccountStore()
 
   const form = reactive<EmailAuthFormState>({
     email: '',
@@ -237,6 +238,9 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         email: response.account?.email ?? form.email,
         username: response.account?.username ?? form.identifier
       })
+      if (isLogin.value) {
+        await accountStore.fetchAccount()
+      }
       if (options.clearOnSuccess) {
         clearFields()
       }

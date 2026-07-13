@@ -12,7 +12,9 @@
     "login": "Connexion",
     "signup": "Accès anticipé",
     "joinWaitlist": "Rejoindre la liste",
-    "changeLanguage": "Changer de langue"
+    "changeLanguage": "Changer de langue",
+    "dashboard": "Tableau de bord",
+    "logout": "Déconnexion"
   },
   "footer": {
     "description": "Beacon est un réseau de découverte et de réputation centré sur les livres. La participation enregistre une conviction et un historique de curation ; ce n'est pas une promesse de profit ni de rendement passif."
