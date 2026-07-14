@@ -142,5 +142,5 @@ test('dashboard confirms a successful social-auth session', async ({ page }) => 
 
   await expect(page.getByText('Google sign-in completed.')).toBeVisible()
   await expect(page.getByText('user@example.com')).toBeVisible()
-  await expect(page.getByText('readerone')).toBeVisible()
+  await expect(page.getByRole('main').getByText('readerone')).toBeVisible()
 })

@@ -21,7 +21,7 @@ export const useAccountStore = defineStore('account', () => {
 
   const account = ref<AccountData | null>(null)
   const status = ref<AccountStatus>('idle')
-  const error = ref<Error | null>(null)
+  const error = ref<string | null>(null)
 
   const isLoggedIn = computed(() => status.value === 'success' && account.value !== null)
 
@@ -38,7 +38,7 @@ export const useAccountStore = defineStore('account', () => {
     } catch (err) {
       account.value = null
       status.value = 'error'
-      error.value = err instanceof Error ? err : new Error(String(err))
+      error.value = err instanceof Error ? err.message : String(err)
     }
   }
 
@@ -55,7 +55,7 @@ export const useAccountStore = defineStore('account', () => {
     } catch (err) {
       account.value = null
       status.value = 'error'
-      error.value = err instanceof Error ? err : new Error(String(err))
+      error.value = err instanceof Error ? err.message : String(err)
       throw err
     }
   }
