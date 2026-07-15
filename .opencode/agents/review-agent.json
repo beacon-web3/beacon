@@ -1,0 +1,61 @@
+{
+  "name": "review-agent",
+  "description": "Read-only code review agent that prints a findings-only report. For small diffs, reviews directly. For wide or multi-domain diffs, orchestrates specialist sub-agents in parallel and consolidates findings. Supports uncommitted, selected files, and branch-wide scopes.",
+  "options": {
+    "mode": {
+      "type": "string",
+      "enum": ["auto", "direct", "orchestrate"],
+      "default": "auto",
+      "description": "Review mode: 'auto' routes to direct or orchestrate based on diff size and domain spread; 'direct' always reviews in-process; 'orchestrate' always spawns specialist sub-agents."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["uncommitted", "selected-files", "branch-all"],
+      "default": "uncommitted",
+      "description": "Review scope mode: 'uncommitted' reviews all uncommitted changes including staged, unstaged, and untracked files; 'selected-files' restricts to provided paths; 'branch-all' compares current branch against base branch."
+    },
+    "paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Files or features to review when scope=selected-files. Accepts file paths or glob patterns (e.g. ['src/api/', 'src/models/*.ts', 'lib/utils.ts']).",
+      "examples": [["src/api/", "src/models/*.ts"], ["lib/utils.ts"], ["apps/web/components/"]]
+    },
+    "baseBranch": {
+      "type": "string",
+      "default": "auto",
+      "description": "Base branch for branch-wide review. Defaults to 'auto', which resolves to the default branch by checking (in order): the remote default branch (e.g. origin/main or origin/master), then the local main or master, then HEAD. Set a branch or ref name (e.g. 'main', 'develop', 'HEAD~5') to compare against a specific base."
+    },
+    "alwaysLoadSkills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["code-review-and-quality", "security-and-hardening", "performance-optimization", "code-simplification"],
+      "description": "Skills to always load for reviews in direct mode. In orchestrate mode, each specialist loads these plus domain-specific skills."
+    },
+    "webSearch": {
+      "type": "boolean",
+      "default": true,
+      "description": "Allow web search to inform best-practice findings."
+    },
+    "includeRiskyAreasBeyondDiff": {
+      "type": "boolean",
+      "default": true,
+      "description": "Consider risky areas beyond the diff (tests, docs, integrations, adjacent code)."
+    },
+    "singleDomainThreshold": {
+      "type": "number",
+      "default": 10,
+      "description": "Maximum files in a single domain before switching from direct review to orchestration in auto mode. Cross-domain diffs always orchestrate regardless of this threshold."
+    },
+    "maxFiles": {
+      "type": "number",
+      "default": 100,
+      "description": "Maximum number of files to review. Warns user if scope exceeds this limit."
+    },
+    "maxDiffLines": {
+      "type": "number",
+      "default": 5000,
+      "description": "Maximum total lines of diff to review. Warns user if diff exceeds this limit."
+    }
+  }
+}
