@@ -256,3 +256,78 @@ different direction.
 
 Do not force heavyweight lifecycle workflows for small, obvious edits. Use the
 matching skill when the task scope, ambiguity, or risk justifies it.
+
+## Custom Agents
+
+### Review Agent
+
+Read-only code review agent. Reviews code without modifying files and outputs
+a findings-only report.
+
+- **Small diffs**: Reviews directly in-process, loading relevant domain skills.
+- **Wide or multi-domain diffs**: Orchestrates specialist sub-agents in parallel
+  (frontend, backend, web3) and consolidates findings into one report.
+- **Modes**: `auto` (default, threshold-based routing), `direct`, `orchestrate`.
+- **Scope**: Default reviews all uncommitted changes including staged, unstaged,
+  and untracked files. Also supports `selected-files` and `branch-all` scopes.
+- **Limits**: Max 100 files, max 5,000 diff lines. Warns and suggests narrowing
+  if exceeded.
+- **Config**: `.opencode/agents/review-agent.json`
+- **Agent instructions**: `.opencode/agents/review-agent.md`
+- **Human docs**: `docs/development/review-agent.md`
+
+Invoke via OpenCode with `review-agent` or invoke the agent by name. Use
+`--mode direct` or `--mode orchestrate` to override auto-routing.
+
+### Lead Developer
+
+Plan-driven implementation agent. Builds features across domains by reading
+tasks from plans or standalone descriptions, with domain-specific validation
+gates and parallel specialist orchestration.
+
+- **Small single-domain tasks**: Implements directly in-process, loading
+  relevant domain skills.
+- **Multi-domain features**: Orchestrates specialist sub-agents in parallel
+  (frontend, backend, web3, shared, documentation) with file ownership
+  boundaries, and handles cross-domain integration itself.
+- **Modes**: `auto` (default, threshold-based routing), `direct`, `orchestrate`.
+- **Validation**: Pre-flight and post-flight checks per domain. Post-flight
+  failures block subsequent tasks.
+- **Limits**: Max 20 tasks per run. Warns and suggests splitting if exceeded.
+- **Config**: `.opencode/agents/lead-developer.json`
+- **Agent instructions**: `.opencode/agents/lead-developer.md`
+- **Human docs**: `docs/development/lead-developer.md`
+
+Invoke via OpenCode with `lead-developer` or invoke the agent by name. Use
+`--mode direct` or `--mode orchestrate` to override auto-routing. Use
+`--plan <filename>` to implement from a plan, or `--task "description"` for a
+standalone task.
+
+### Planner
+
+Spec-aware planning agent. Reads product specs, decisions, assumptions, and
+codebase context to produce structured implementation plans in `docs/plans/`.
+Plans are consumable by the lead-developer agent via `--plan`.
+
+- **Quick plan**: Light context gathering for simple, single-domain features.
+  3-8 tasks.
+- **Full plan**: Thorough context gathering with codebase exploration for
+  complex, multi-domain features. Detailed task decomposition.
+- **Modes**: `auto` (default, routes between quick and full plan), `direct`
+  (always full plan).
+- **Input**: Feature description, spec file paths, or product area scope.
+- **Core skills**: spec-driven-development, planning-and-task-breakdown,
+  context-engineering (always loaded).
+- **Dynamic skills**: Domain-specific skills loaded based on feature scope.
+- **Codebase exploration**: Explores existing patterns (models, views,
+  components, contracts) before decomposing work.
+- **Conflict detection**: Checks existing plans for overlapping scope.
+- **Limits**: Max 20 tasks per plan. Warns and suggests splitting if exceeded.
+- **Config**: `.opencode/agents/planner.json`
+- **Agent instructions**: `.opencode/agents/planner.md`
+- **Human docs**: `docs/development/planner.md`
+
+Invoke via OpenCode with `planner` or invoke the agent by name. Use
+`--description "feature description"` to plan from a description, or
+`--scope "area"` to plan for a product area. Use `--dryRun` to preview without
+writing.

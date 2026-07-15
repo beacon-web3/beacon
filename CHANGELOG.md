@@ -8,8 +8,40 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Fixed
+
+- Review agent now includes untracked (new) files in the default uncommitted
+  scope. Previously, only tracked modified files were reviewed, which meant new
+  implementations, configs, and documentation files were silently skipped.
+
 ### Added
 
+- Added the Review Agent: a read-only code review agent that prints a
+  findings-only report. Supports auto-routing between direct and orchestrate
+  modes, domain-based specialist sub-agents, and uncommitted/selected/branch-wide
+  scopes. Default scope (`uncommitted`) reviews all uncommitted changes
+  (staged + unstaged via `git diff HEAD`). Config at
+  `.opencode/agents/review-agent.json`, agent instructions at
+  `.opencode/agents/review-agent.md`, human docs at
+  `docs/development/review-agent.md`.
+- Added the Lead Developer Agent: a plan-driven implementation agent that builds
+  features across domains with pre-flight and post-flight validation gates.
+  Supports auto-routing between direct and orchestrate modes, five specialist
+  sub-agent types (frontend, backend, web3, shared, documentation) with file
+  ownership boundaries, two-tier skill loading (core + dynamic), and plan status
+  tracking. Config at `.opencode/agents/lead-developer.json`, agent instructions
+  at `.opencode/agents/lead-developer.md`, human docs at
+  `docs/development/lead-developer.md`.
+- Added the Planner Agent: a spec-aware planning agent that reads product specs,
+  decisions, assumptions, and codebase context to produce structured
+  implementation plans in `docs/plans/`. Supports auto-routing between quick
+  plan (light context gathering) and full plan (thorough codebase exploration),
+  three core skills (spec-driven-development, planning-and-task-breakdown,
+  context-engineering), dynamic domain skill loading, conflict detection against
+  existing plans, and direct output to plan files consumable by the lead-developer
+  agent via `--plan`. Config at `.opencode/agents/planner.json`, agent
+  instructions at `.opencode/agents/planner.md`, human docs at
+  `docs/development/planner.md`.
 - Accepted the hybrid recommendation lifecycle decision covering permanent
   discoverer credit, single active recommendation cycles, reactivation after
   inactivity, and historical recommender stake additions for future

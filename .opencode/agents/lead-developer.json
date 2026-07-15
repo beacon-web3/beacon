@@ -1,0 +1,61 @@
+{
+  "name": "lead-developer",
+  "description": "Plan-driven lead implementation agent that builds Beacon features across domains. Routes between direct implementation and parallel specialist orchestration based on task scope. Enforces domain-specific pre-flight and post-flight validation gates.",
+  "options": {
+    "mode": {
+      "type": "string",
+      "enum": ["auto", "direct", "orchestrate"],
+      "default": "auto",
+      "description": "Build mode: 'auto' routes based on task scope and domain spread; 'direct' always implements in-process; 'orchestrate' always spawns specialist sub-agents."
+    },
+    "plan": {
+      "type": "string",
+      "description": "Path to a plan file in docs/plans/ (e.g. '0016-recommendation-lifecycle-data-model.md'). When provided, the agent reads tasks from the plan and implements them sequentially."
+    },
+    "task": {
+      "type": "string",
+      "description": "A standalone task description to implement without a plan file. Mutually exclusive with 'plan'."
+    },
+    "taskIndex": {
+      "type": "number",
+      "description": "Zero-based index of which task from the plan to implement. If omitted and plan is provided, implements all tasks."
+    },
+    "paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Restrict implementation to specific files or directories. In auto mode, this also constrains domain routing."
+    },
+    "baseBranch": {
+      "type": "string",
+      "default": "auto",
+      "description": "Base branch for diffing after implementation. Defaults to auto-detection via remote HEAD or local main/master."
+    },
+    "alwaysLoadSkills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["incremental-implementation", "test-driven-development", "security-and-hardening"],
+      "description": "Core skills to always load for every build. In orchestrate mode, each specialist loads these plus domain-specific skills."
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, show the implementation plan and file changes without modifying any files."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, skip test execution during post-flight checks. Use sparingly."
+    },
+    "singleDomainThreshold": {
+      "type": "number",
+      "default": 5,
+      "description": "Maximum tasks in a single domain before switching from direct to orchestrate in auto mode. Cross-domain tasks always orchestrate regardless of this threshold."
+    },
+    "maxTasks": {
+      "type": "number",
+      "default": 20,
+      "description": "Maximum number of tasks to implement in one run. Warns user if plan exceeds this limit."
+    }
+  }
+}

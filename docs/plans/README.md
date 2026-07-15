@@ -82,3 +82,4 @@ easy to scan while preserving implementation history.
 | 0012 | [Runtime Toolchain Upgrade Plan](completed/0012-runtime-toolchain-upgrade-plan.md) | Completed |
 | 0013 | [Google Social Auth](completed/0013-google-social-auth.md) | Completed |
 | 0014 | [Backend Swagger OpenAPI Docs](completed/0014-backend-swagger-openapi.md) | Completed |
+| 0017 | [Lead developer agent](completed/0017-lead-developer-design.md) | Completed |

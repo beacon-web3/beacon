@@ -1,0 +1,58 @@
+{
+  "name": "planner",
+  "description": "Spec-aware planning agent that reads product specs, decisions, assumptions, and codebase context to produce structured implementation plans in docs/plans/. Plans are consumable by the lead-developer agent via --plan.",
+  "options": {
+    "mode": {
+      "type": "string",
+      "enum": ["auto", "direct"],
+      "default": "auto",
+      "description": "Plan mode: 'auto' routes between quick plan (light context gathering) and full plan (thorough exploration) based on input complexity; 'direct' always produces a full plan."
+    },
+    "description": {
+      "type": "string",
+      "description": "Feature description to plan. If provided, the agent plans around this description. If omitted, the agent reads from specs and scope to infer the feature."
+    },
+    "specs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Paths to specific spec files to reference (e.g. ['docs/product/user-stories.md', 'docs/architecture/system-design.md'])."
+    },
+    "scope": {
+      "type": "string",
+      "description": "Broad product area to plan for (e.g. 'governance', 'rewards', 'wallet-connection'). The agent reads all related specs in that area."
+    },
+    "paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Restrict codebase exploration to specific files or directories for pattern analysis."
+    },
+    "baseBranch": {
+      "type": "string",
+      "default": "auto",
+      "description": "Base branch for conflict detection against existing plans. Defaults to auto-detection via remote HEAD or local main/master."
+    },
+    "alwaysLoadSkills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["spec-driven-development", "planning-and-task-breakdown", "context-engineering"],
+      "description": "Core skills always loaded for every planning session. These define the planning methodology."
+    },
+    "outputPath": {
+      "type": "string",
+      "default": "auto",
+      "description": "Where to write the plan file. 'auto' generates a sequential filename in docs/plans/ (e.g. '0023-feature-name.md'). Set a specific path to override."
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, show the generated plan without writing to file."
+    },
+    "maxTasks": {
+      "type": "number",
+      "default": 20,
+      "description": "Maximum number of tasks to include in the plan. Warns user if the plan exceeds this limit."
+    }
+  }
+}

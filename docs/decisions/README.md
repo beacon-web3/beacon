@@ -48,6 +48,9 @@ Each record should include:
 | 0017 | [Recommender stake balance and top-up minimums](0017-recommender-stake-balance-and-top-up-minimums.md) | Accepted |
 | 0018 | [Fixed support contribution](0018-fixed-support-contribution.md) | Accepted |
 | 0019 | [Step-based milestone rewards](0019-step-based-milestone-rewards.md) | Accepted |
+| 0020 | [Review agent design](0020-review-agent-design.md) | Accepted |
+| 0021 | [Lead developer agent design](0021-lead-developer-design.md) | Accepted |
+| 0022 | [Planner agent design](0022-planner-agent-design.md) | Accepted |
 
 ## Maintenance Rules
 
