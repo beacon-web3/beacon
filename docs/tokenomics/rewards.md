@@ -6,7 +6,14 @@ This document captures the draft Beacon rewards model. The numbers are working a
 
 ### Create Recommendation
 
-A curator creates a book recommendation by locking at least `0.2 SOL` for a minimum of two weeks.
+A curator creates a book or series recommendation by locking at least `0.2 SOL`
+for a minimum of two weeks. `0.2 SOL` is the MVP minimum, not an exact stake;
+there is no maximum deposit cap on locked recommender SOL.
+
+Recommender participant balances must be either `0 SOL` or at least `0.2 SOL`.
+Later top-ups above an existing qualifying locked balance must be at least
+`0.05 SOL`. These recommender stake rules do not apply to ordinary supporters who
+contribute `0.01 SOL`.
 
 The curator stake is intended to:
 
@@ -14,9 +21,29 @@ The curator stake is intended to:
 * Signal conviction.
 * Create a base of locked SOL that can potentially be staked.
 
+Each canonical recommendation page has at most one active recommendation cycle. A
+new user can activate or reactivate the recommendation only when the current
+cycle is inactive. For MVP, an active cycle becomes eligible for inactive status
+only after no recommender SOL remains locked and 90 days pass with no new
+support. The original discoverer and prior reactivators are historical
+recommenders and may lock additional SOL at any time to increase their share of
+future upvote/support credit.
+
+Additional stake affects future credit only. It must not rewrite past supporter
+cohorts, badge history, discoverer credit, or already-earned reputation.
+Partial withdrawals do not start the inactivity window while any recommender SOL
+remains locked, but withdrawals must not leave a recommender balance between
+`0 SOL` and `0.2 SOL`.
+
+Extra locked SOL must not be framed as guaranteed yield, guaranteed rewards, or
+uncapped influence. If additional stake affects future credit, rewards, ranking,
+or visibility, it must use diminishing returns rather than linear weighting. The
+exact curve and parameters remain unresolved.
+
 ### Support Recommendation
 
-A supporter contributes `0.01 SOL` to support a book recommendation.
+A supporter contributes a fixed `0.01 SOL` to support a book or series
+recommendation during MVP.
 
 Support is non-refundable and may create eligibility for:
 
@@ -25,22 +52,29 @@ Support is non-refundable and may create eligibility for:
 * Profile reputation.
 * Governance participation.
 
-## Draft Milestone Model
+## Step-Based Milestone Model
 
-The initial concept uses milestone-based rewards. Later supporters do not receive immediate financial rewards unless the recommendation reaches a future milestone.
+For MVP, Beacon uses step-based milestone rewards. Rewards are evaluated only
+when a recommendation reaches defined supporter-count milestones. Later
+supporters do not receive immediate financial rewards unless the recommendation
+reaches a future milestone.
 
 ### 10 Supporters
 
-If 10 users support a book:
+The following milestone numbers are historical draft examples. They still require
+simulation and must be updated before implementation to account for the hybrid
+recommendation lifecycle and any split among eligible historical recommenders.
 
-* `0.05 SOL` goes to the original curator.
+If 10 users support a recommendation:
+
+* `0.05 SOL` goes to the eligible recommender share.
 * `0.05 SOL` goes to treasury.
 
 ### 100 Supporters
 
-When a book reaches 100 supporters, the next pool is distributed as:
+When a recommendation reaches 100 supporters, the next pool is distributed as:
 
-* `0.2 SOL` to the original curator.
+* `0.2 SOL` to the eligible recommender share.
 * `0.5 SOL` split among the first 10 supporters.
 * `0.25 SOL` to treasury.
 
@@ -48,9 +82,9 @@ Each of the first 10 supporters receives `0.05 SOL` from this milestone, equal t
 
 ### 1,000 Supporters
 
-When a book reaches 1,000 supporters, the next pool is distributed as:
+When a recommendation reaches 1,000 supporters, the next pool is distributed as:
 
-* `1 SOL` to the original curator.
+* `1 SOL` to the eligible recommender share.
 * `7 SOL` split among the first 100 supporters.
 * `2.25 SOL` to treasury.
 
@@ -58,9 +92,9 @@ Each of the first 100 supporters receives `0.07 SOL` from this milestone.
 
 ### 10,000 Supporters
 
-When a book reaches 10,000 supporters, the next pool is distributed as:
+When a recommendation reaches 10,000 supporters, the next pool is distributed as:
 
-* `5 SOL` to the original curator.
+* `5 SOL` to the eligible recommender share.
 * `90 SOL` split among the first 1,000 supporters.
 * `7.25 SOL` to treasury.
 
@@ -70,7 +104,7 @@ Each of the first 1,000 supporters receives `0.09 SOL` from this milestone.
 
 The milestone model intentionally rewards early conviction more than late participation.
 
-However, it creates a risk: many users may support recommendations that stall before the next reward tier. For example, voter 10,001 may not receive financial rewards unless the book reaches 100,000 supporters.
+However, it creates a risk: many users may support recommendations that stall before the next reward tier. For example, supporter 10,001 may not receive financial rewards unless the recommendation reaches 100,000 supporters.
 
 To reduce frustration, the product should make milestone progress explicit:
 
@@ -82,16 +116,17 @@ To reduce frustration, the product should make milestone progress explicit:
 
 ## NFT Badge Layer
 
-Every supporter should receive an NFT badge or equivalent collectible for the specific book recommendation.
+Every supporter should receive an NFT badge or equivalent collectible for the
+specific book or series recommendation.
 
 The badge provides an immediate non-financial reward and supports the broader goal of building reputation for taste.
 
 Draft badge evolution:
 
-* Bronze: book reaches 100 supporters.
-* Silver: book reaches 1,000 supporters.
-* Gold: book reaches 10,000 supporters.
-* Diamond: book reaches 100,000 supporters.
+* Bronze: recommendation reaches 100 supporters.
+* Silver: recommendation reaches 1,000 supporters.
+* Gold: recommendation reaches 10,000 supporters.
+* Diamond: recommendation reaches 100,000 supporters.
 
 Badges should not represent ownership of book IP.
 
@@ -126,8 +161,10 @@ Famous books may attract more support than genuinely under-discovered books.
 
 Mitigations to evaluate:
 
-* One canonical page per book.
+* One canonical page per standalone book work or recognized series.
 * Discovery credit for the first valid curator.
+* Single active recommendation cycles with reactivation only after inactivity.
+* Extra stake rights limited to the original discoverer and prior reactivators.
 * Ranking formulas that include freshness, category, velocity, and early conviction.
 
 ### Ponzi Perception
@@ -144,13 +181,15 @@ Mitigations to evaluate:
 
 * NFT badge value and profile reputation.
 * Visible milestone progress.
-* Continuous or hybrid reward pools.
 * Periodic rewards funded by staking yield or community-approved treasury programs.
 
 ## Open Questions
 
-* Should rewards remain milestone-based or become continuous?
 * What exact percentage should stay in treasury at each milestone?
-* Should the original curator receive permanent future participation in rewards?
-* Should later stake additions increase visibility without changing discoverer credit?
+* How should the eligible recommender share be split among the original discoverer
+  and prior reactivators?
+* Should later stake additions increase visibility, future support-credit share,
+  both, or neither?
+* What exact diminishing-returns curve, cap, or fixed staking window should apply
+  to additional historical recommender stake?
 * What parameters make self-farming economically unattractive?

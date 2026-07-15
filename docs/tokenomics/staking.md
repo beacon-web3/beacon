@@ -7,7 +7,8 @@ This document captures the draft staking model for Beacon-held SOL.
 Beacon may have two main SOL pools:
 
 * Treasury funds accumulated from support activity.
-* Locked curator stakes held for the required lock period.
+* Locked recommender stakes held for active recommendation cycles and historical
+  recommender stake additions.
 
 Both pools can create staking yield, but they have different user expectations and risk constraints.
 
@@ -25,16 +26,30 @@ Potential uses of staking yield:
 
 Treasury staking should be publicly visible in the treasury dashboard.
 
-## Locked Curator Stake Staking
+## Locked Recommender Stake Staking
 
-Curator stakes are locked for at least two weeks. During the lock period, Beacon may stake this SOL if the mechanism preserves the user's ability to reclaim the principal when the lock ends.
+Recommender stakes are locked for at least the required minimum period. During
+the lock period, Beacon may stake this SOL if the mechanism preserves the user's
+ability to reclaim the principal when the lock ends.
 
-The curator should not experience additional withdrawal uncertainty because their stake was staked by the protocol.
+The recommender should not experience additional withdrawal uncertainty because
+their stake was staked by the protocol.
 
-Locked curator stake principal should remain under program-controlled rules, not
+Locked recommender stake principal should remain under program-controlled rules, not
 under a founder, company, or backend-controlled wallet. If staking is introduced,
 the staking path must not create an alternate authority that can redirect or
 withdraw user principal outside the documented lock and release rules.
+
+For the recommendation lifecycle, the original discoverer and prior reactivators
+may add locked SOL to increase future upvote/support credit share. That extra
+stake must not change historical credit or create a user-facing yield product. If
+extra locked SOL affects future credit, rewards, ranking, or visibility, it must
+use diminishing returns rather than linear weighting.
+
+Recommender participant balances must be either `0 SOL` or at least `0.2 SOL`.
+Later top-ups above an existing qualifying locked balance must be at least
+`0.05 SOL`. Withdrawal flows must not leave locked recommender dust balances
+between `0 SOL` and `0.2 SOL`.
 
 ## Yield Allocation Options
 
@@ -50,7 +65,7 @@ Advantages:
 
 Tradeoff:
 
-* Curators receive no direct yield from their locked capital.
+* Recommenders receive no direct yield from their locked capital.
 
 ### Option 2: Split Yield
 
@@ -58,7 +73,7 @@ Part of the yield goes to the curator and part goes to treasury.
 
 Advantages:
 
-* Makes creating recommendations slightly more attractive.
+* Makes creating or reactivating recommendations slightly more attractive.
 * Feels fair to users whose locked capital generated yield.
 
 Tradeoff:
@@ -86,7 +101,7 @@ For the MVP, Beacon should prefer conservative native SOL staking and avoid comp
 Native staking is easier for users to understand and has a clearer risk profile. DeFi yield farming introduces smart contract risk, liquidity risk, protocol risk, and reputational risk that are not necessary for validating the discovery marketplace.
 
 Any staking implementation must preserve clear custody boundaries. Treasury
-staking, curator stake staking, and reward-pool liquidity should be visibly
+staking, recommender stake staking, and reward-pool liquidity should be visibly
 separated in accounting and should not rely on undisclosed private-key control
 over user principal.
 
@@ -117,18 +132,21 @@ The product should show:
 * Staked SOL may not be instantly liquid.
 * Validator performance can affect yield.
 * Slashing and protocol-level risks must be understood for the chosen staking approach.
-* Users may misunderstand staking as a yield guarantee.
+* Users may misunderstand staking as a yield guarantee or as a way to buy past
+  reputation.
 * Treasury loss would damage platform trust.
 * Staking integrations may introduce new authority paths that weaken the
   program-controlled custody model.
 
 ## Open Questions
 
-* Who receives yield from locked curator stakes?
+* Who receives yield from locked recommender stakes?
 * What liquidity buffer is required for unlocks and rewards?
 * Which validators or staking providers are acceptable?
 * Which staking decisions require governance approval?
 * What staking risk disclosures are required before launch?
 * How can native staking be implemented while preserving program-controlled
-  custody and timely curator stake withdrawal?
+  custody and timely recommender stake withdrawal?
+* What exact diminishing-returns curve, cap, or fixed staking window should apply
+  to extra historical recommender stake?
 * Which staking authority addresses must be visible in the treasury dashboard?

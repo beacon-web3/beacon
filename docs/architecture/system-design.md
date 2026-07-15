@@ -17,6 +17,7 @@ Only economic actions that require public verifiability or trust-minimized execu
 Potential on-chain responsibilities:
 
 * Curator stake locking and release.
+* Recommender stake additions and release rules for historical recommenders.
 * Support transaction accounting.
 * Reward pool accounting.
 * Treasury and operating reserve splits.
@@ -49,7 +50,25 @@ The backend should handle product logic that benefits from flexibility, indexing
 
 Responsibilities:
 
-* Book metadata and canonical book identity.
+* Book metadata and canonical standalone-work or series identity.
+* High-sensitivity duplicate-risk detection, duplicate reports, and manual review
+  workflows for risky candidate pages.
+* Canonical recommendation pages, active/inactive lifecycle state, and historical
+  recommender participation records.
+* User bookmarks for recommendation pages.
+* Curator follow relationships between accounts.
+* Badge/NFT participation history or eligibility cache.
+* Minimum `0.2 SOL` activation and reactivation stake enforcement with no maximum
+  deposit cap for eligible recommenders.
+* Recommender stake balance validation requiring `0 SOL` or at least `0.2 SOL`,
+  plus `0.05 SOL` minimum top-ups above an existing qualifying balance.
+* Diminishing-returns weighting for any future extra-stake influence on credit,
+  rewards, ranking, or visibility.
+* Fixed `0.01 SOL` MVP support/upvote contribution accounting.
+* Inactivity-window evaluation based on zero locked recommender SOL plus 90 days
+  with no new support for recommendation cycles.
+* Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe
+  canonical pages that require review before reactivation.
 * Duplicate detection and moderation workflows.
 * Ranking and discovery algorithms.
 * Search and filtering.
@@ -61,7 +80,7 @@ Responsibilities:
 
 The backend can cache and index on-chain state, but it must not be the only source of truth for economic balances.
 
-The backend must not be the custody authority for user deposits, curator stake
+The backend must not be the custody authority for user deposits, recommender stake
 principal, reward pools, or Community Treasury funds. It may prepare transaction
 data, index chain events, and present dashboards, but user-signable transactions
 and program rules must remain the source of truth for trust-sensitive fund
@@ -76,6 +95,9 @@ Responsibilities:
 * Browse and search book recommendations.
 * Signup, login, logout, and password reset flows.
 * Create recommendation flows.
+* Duplicate-risk warnings and manual-review status for candidate pages.
+* Reactivate inactive recommendation flows, including review-blocked page states.
+* Historical recommender stake-addition and withdrawal-warning flows.
 * Support/upvote flows.
 * Wallet connection.
 * Transaction previews.
@@ -115,13 +137,21 @@ See `docs/decisions/0010-mvp-free-hosting-stack.md` and
 
 Core concepts for future specification:
 
-* Book
-* Recommendation
-* Curator
+* Canonical standalone-work or series recommendation page
+* Candidate recommendation page pending duplicate-risk review
+* Duplicate report
+* Recommendation activation cycle
+* Recommendation inactivity eligibility timestamp
+* Recommendation reactivation blocker status
+* Active cycle locked recommender SOL balance
+* Historical recommender participant
+* Recommender stake position
 * Supporter
 * Support transaction
 * Reward milestone
 * Badge
+* User bookmark
+* Curator follow
 * Treasury account
 * Governance proposal
 * Governance vote

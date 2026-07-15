@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 
 from accounts.models import Account
 from accounts.views import send_email_verification_code_best_effort
@@ -74,3 +75,31 @@ class AccountAdmin(UserAdmin):
                 request,
                 f"Queued verification email for {count} unverified account(s).",
             )
+
+
+def _unregister_builtin_models():
+    from django.contrib.admin.sites import NotRegistered
+
+    models_to_unregister = [Group]
+    try:
+        from allauth.account.models import EmailAddress
+        from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
+
+        models_to_unregister += [EmailAddress, SocialAccount, SocialApp, SocialToken]
+    except ImportError:
+        pass
+    try:
+        from django.contrib.sites.models import Site
+
+        models_to_unregister.append(Site)
+    except ImportError:
+        pass
+
+    for model in models_to_unregister:
+        try:
+            admin.site.unregister(model)
+        except NotRegistered:
+            pass
+
+
+_unregister_builtin_models()

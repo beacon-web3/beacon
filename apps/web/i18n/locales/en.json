@@ -12,7 +12,9 @@
     "login": "Log in",
     "signup": "Join early access",
     "joinWaitlist": "Join the waitlist",
-    "changeLanguage": "Change language"
+    "changeLanguage": "Change language",
+    "dashboard": "Dashboard",
+    "logout": "Log out"
   },
   "footer": {
     "description": "Beacon is a books-first discovery and reputation network. Participation records conviction and curation history; it is not a promise of profit or passive yield."

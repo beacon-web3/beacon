@@ -53,6 +53,7 @@ Define:
 Explain:
 
 * Book page creation.
+* Series-level canonical pages for recognized book series during MVP.
 * Curator stake lock.
 * Support transactions.
 * Milestone progress.
@@ -99,7 +100,7 @@ Explain:
 Explain:
 
 * Treasury SOL staking.
-* Locked curator stake staking.
+* Locked recommender stake staking.
 * Conservative native staking preference.
 * Yield allocation options.
 * Liquidity and risk controls.
@@ -172,3 +173,4 @@ List unresolved decisions before launch:
 * Treasury custody and multisig design.
 * Legal jurisdiction and compliance requirements.
 * Book metadata licensing.
+* Duplicate-risk detection and manual review operations.

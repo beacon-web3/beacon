@@ -39,6 +39,15 @@ Each record should include:
 | 0008 | [Trust-minimized protocol custody](0008-trust-minimized-protocol-custody.md) | Proposed |
 | 0009 | [Google social auth strategy](0009-google-social-auth-strategy.md) | Accepted |
 | 0010 | [MVP free hosting stack](0010-mvp-free-hosting-stack.md) | Proposed |
+| 0011 | [Hybrid recommendation lifecycle](0011-hybrid-recommendation-lifecycle.md) | Accepted |
+| 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
+| 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
+| 0014 | [Reactivation moderation policy](0014-reactivation-moderation-policy.md) | Accepted |
+| 0015 | [Minimum recommender stake with no deposit cap](0015-minimum-recommender-stake-no-deposit-cap.md) | Accepted |
+| 0016 | [Diminishing returns for extra recommender stake](0016-diminishing-returns-for-extra-recommender-stake.md) | Accepted |
+| 0017 | [Recommender stake balance and top-up minimums](0017-recommender-stake-balance-and-top-up-minimums.md) | Accepted |
+| 0018 | [Fixed support contribution](0018-fixed-support-contribution.md) | Accepted |
+| 0019 | [Step-based milestone rewards](0019-step-based-milestone-rewards.md) | Accepted |
 
 ## Maintenance Rules
 

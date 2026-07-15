@@ -10,6 +10,67 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Accepted the hybrid recommendation lifecycle decision covering permanent
+  discoverer credit, single active recommendation cycles, reactivation after
+  inactivity, and historical recommender stake additions for future
+  upvote/support credit.
+- Accepted the canonical work and series identity decision covering series-level
+  MVP pages, high-sensitivity duplicate-risk detection, duplicate reports, and
+  manual review for risky candidate pages.
+- Accepted the MVP recommendation inactivity rule as zero locked recommender SOL
+  plus 90 days with no new support before an active cycle becomes eligible for
+  inactive status.
+- Accepted the MVP reactivation moderation policy: no moderation review by
+  default for valid, undisputed inactive pages, with review required for flagged,
+  disputed, duplicate-reported, or unsafe pages.
+- Accepted the MVP recommender stake policy: `0.2 SOL` minimum to activate or
+  reactivate a recommendation, with no maximum deposit cap for eligible
+  recommenders.
+- Accepted diminishing returns as the MVP anti-whale principle for any extra
+  locked-SOL influence on future credit, rewards, ranking, or visibility.
+- Accepted the MVP recommender stake balance rule: recommender participants must
+  hold either `0 SOL` or at least `0.2 SOL`, and later top-ups above a qualifying
+  balance must be at least `0.05 SOL`.
+- Accepted fixed `0.01 SOL` support/upvote contributions for MVP.
+- Accepted step-based milestone reward evaluation for MVP while leaving exact
+  thresholds, formulas, and splits unresolved.
+
+### Changed
+
+- Aligned MVP, vision, user story, treasury, tokenomics, staking, architecture,
+  assumptions, open question, whitepaper-outline, and lifecycle plan docs with
+  the accepted hybrid recommendation lifecycle while leaving reward formulas,
+  inactivity timing, and anti-whale controls unresolved.
+- Aligned product, architecture, tokenomics, risk, whitepaper, assumptions, open
+  question, and lifecycle plan docs with standalone-work or series-level
+  canonical identity while leaving duplicate scoring, metadata enrichment, and
+  manual-review service levels unresolved.
+- Aligned recommendation lifecycle docs with the accepted zero-locked-SOL and
+  90-day inactivity rule while leaving reward split policy unresolved.
+- Aligned product and lifecycle planning docs with the accepted default
+  reactivation moderation policy.
+- Aligned tokenomics, product, architecture, and lifecycle planning docs with the
+  accepted minimum-stake and no-deposit-cap policy while leaving credit weighting
+  and anti-whale controls unresolved.
+- Aligned tokenomics, staking, product, architecture, and lifecycle planning docs
+  with the accepted diminishing-returns principle while leaving the exact curve,
+  caps, stake increments, and reward split formulas unresolved.
+- Aligned product, tokenomics, staking, architecture, and lifecycle planning docs
+  with accepted recommender balance and top-up minimum rules.
+- Aligned product, tokenomics, architecture, assumptions, open questions, and
+  lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
+- Aligned product, tokenomics, risk, assumptions, and open question docs with
+  accepted step-based milestone reward timing.
+- Added bookmarks, curator follows, and badge history to architecture backend
+  product concepts and data model concepts.
+- Added recommendation lifecycle API planning note to OpenAPI docs.
+- Hidden unused third-party admin models (allauth, sites, auth Group) from
+  Django admin to show only the Account model.
+
+## 2026-07-01
+
+### Added
+
 - Added local console email backend support for manual auth testing and Django
   admin visibility/actions for email verification metadata and resending
   verification codes to unverified accounts.

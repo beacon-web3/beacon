@@ -10,8 +10,9 @@ Proposed
 
 ## Context
 
-Beacon may hold SOL in treasury accounts and locked curator stakes. These funds
-could potentially be staked while preserving liquidity and principal accounting.
+Beacon may hold SOL in treasury accounts and locked recommender stakes. These
+funds could potentially be staked while preserving liquidity and principal
+accounting.
 
 DeFi yield strategies may create additional smart-contract, liquidity, custody,
 and perception risks.
@@ -41,7 +42,7 @@ yield.
 ## Consequences
 
 - Contract and backend design should preserve clean principal accounting.
-- Locked curator stake principal must remain reclaimable according to the lock
+- Locked recommender stake principal must remain reclaimable according to the lock
   rules if staking is used.
 - Any staking implementation requires security and legal review before launch.
 

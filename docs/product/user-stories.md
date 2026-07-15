@@ -24,25 +24,79 @@ Acceptance criteria:
 
 ## Curator
 
-As a curator, I want to create a book recommendation by locking SOL so that my recommendation carries a stronger signal than a normal post.
+As a curator, I want to create a book or series recommendation by locking SOL so
+that my recommendation carries a stronger signal than a normal post.
 
 Acceptance criteria:
 
-* I can submit a book recommendation with required metadata.
-* I can see the amount and duration of the required stake before confirming.
+* I can submit a standalone book work or recognized book series recommendation
+  with required metadata.
+* If I submit a recognized series, Beacon treats the series page as canonical and
+  does not create separate MVP pages for individual volumes.
+* Beacon checks my submitted title and author or authors for duplicate risk before
+  immediate page creation.
+* If duplicate risk is low, my page can be created immediately and other users can
+  later report duplicates.
+* If duplicate risk is detected, I can see likely duplicate pages and understand
+  that proceeding sends my candidate page to manual review.
+* If I proceed with a duplicate-risk candidate, I understand my locked SOL remains
+  locked for the normal lock period even if manual review rejects the page.
+* I can see the minimum stake, my chosen locked amount, and the lock duration
+  before confirming.
 * I can see when my stake unlocks.
-* I receive permanent discoverer credit if I am the first valid curator for that book.
+* If I withdraw only part of my locked SOL and some SOL remains locked, I
+  understand that this does not start the inactivity window.
+* If I try to withdraw all locked SOL from an active recommendation cycle, Beacon
+  warns me that the recommendation can become inactive after 90 days with no new
+  support.
+* I receive permanent discoverer credit if I am the first valid curator for that
+  standalone work or series page.
+* If I discovered or previously reactivated a page, I can lock additional SOL to
+  increase my share of future upvote/support credit.
+* I can only keep a recommender locked balance of `0 SOL` or at least `0.2 SOL`;
+  later top-ups above an existing qualifying balance must be at least `0.05 SOL`.
+* Adding more SOL does not change past supporter credit, badges, or discoverer
+  history.
+
+## Reactivator
+
+As a curator, I want to reactivate an inactive book or series recommendation by
+locking SOL so that useful works or series can regain active recommendation
+status without losing their history.
+
+Acceptance criteria:
+
+* I can see whether a recommendation page is active or inactive.
+* I can see that a recommendation becomes eligible for inactive status only after
+  no recommender SOL remains locked and 90 days pass with no new support.
+* I can reactivate an inactive recommendation by locking at least the required
+  `0.2 SOL` minimum stake.
+* Ordinary supporters who contribute `0.01 SOL` are not subject to recommender
+  locked-balance rules.
+* If the page is valid and undisputed, I do not have to wait for moderation
+  review before reactivation.
+* If the page is flagged, disputed, duplicate-reported, or has unsafe metadata or
+  links, I can see that reactivation requires review first.
+* I cannot become a new staked recommender for a page while another active
+  recommendation cycle is still active.
+* After reactivation, the page still shows the original discoverer, prior
+  reactivators, supporters, badges, and support history.
+* After reactivation, I become part of that page's historical recommender set.
 
 ## Supporter
 
-As a supporter, I want to support a book with a small SOL contribution so that I can publicly signal conviction and potentially earn reputation or rewards if the book becomes widely supported.
+As a supporter, I want to support a book or series recommendation with a small
+SOL contribution so that I can publicly signal conviction and potentially earn
+reputation or rewards if the recommendation becomes widely supported.
 
 Acceptance criteria:
 
-* I can see the support cost before confirming.
-* I can see my supporter number for the book.
+* I can see the fixed `0.01 SOL` support cost before confirming.
+* I can see my supporter number for the recommendation.
 * I receive a badge or collectible proving support.
 * I can see the next reward or badge milestone.
+* My support is credited to the recommendation state that existed when I
+  supported it, and later stake changes do not rewrite that history.
 
 ## Early Supporter
 
@@ -51,17 +105,22 @@ As an early supporter, I want my early support to be visible so that my taste an
 Acceptance criteria:
 
 * My profile shows successful early support history.
-* Book pages show early supporter cohorts.
+* Recommendation pages show early supporter cohorts.
 * Badges upgrade when book milestones are reached.
 
 ## Reader
 
-As a reader, I want to browse books ranked by community conviction so that I can find books worth my attention.
+As a reader, I want to browse book and series recommendations ranked by community
+conviction so that I can find works worth my attention.
 
 Acceptance criteria:
 
-* I can browse trending and highly supported books.
-* I can inspect who discovered and supported a book early.
+* I can browse trending and highly supported recommendations.
+* I can distinguish standalone book pages from series-level pages.
+* I can inspect who discovered a book, who previously reactivated it, and who
+  supported it early.
+* I can distinguish active recommendation status from historical discovery and
+  reactivation history.
 * I can distinguish community recommendations from sponsored placements if sponsorships are later approved.
 
 ## Treasury Viewer

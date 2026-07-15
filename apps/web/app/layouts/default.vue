@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const localePath = useLocalePath()
+const accountStore = useAccountStore()
 
 const homeSectionPath = (hash: string) => `${localePath('/')}${hash}`
 
@@ -9,6 +10,16 @@ const navLinks = computed(() => [
   { label: t('nav.howItWorks'), to: homeSectionPath('#how-it-works') },
   { label: t('nav.ledger'), to: homeSectionPath('#ledger') }
 ])
+
+async function handleLogout() {
+  await accountStore.logout()
+}
+
+onMounted(() => {
+  if (accountStore.status !== 'success') {
+    accountStore.fetchAccount()
+  }
+})
 </script>
 
 <template>
@@ -45,20 +56,42 @@ const navLinks = computed(() => [
         variant="ghost"
       />
 
-      <UButton
-        :to="localePath('/login')"
-        :label="t('nav.login')"
-        color="neutral"
-        variant="ghost"
-      />
+      <template v-if="accountStore.isLoggedIn">
+        <UButton
+          :to="localePath('/dashboard')"
+          :label="t('nav.dashboard')"
+          color="neutral"
+          variant="ghost"
+        />
 
-      <UButton
-        :to="localePath('/signup')"
-        :label="t('nav.signup')"
-        color="primary"
-        trailing-icon="i-lucide-arrow-right"
-        class="hidden sm:inline-flex"
-      />
+        <span class="text-sm font-medium text-ink-muted max-w-[10rem] truncate">
+          {{ accountStore.account?.username }}
+        </span>
+
+        <UButton
+          :label="t('nav.logout')"
+          color="neutral"
+          variant="ghost"
+          @click="handleLogout"
+        />
+      </template>
+
+      <template v-else>
+        <UButton
+          :to="localePath('/login')"
+          :label="t('nav.login')"
+          color="neutral"
+          variant="ghost"
+        />
+
+        <UButton
+          :to="localePath('/signup')"
+          :label="t('nav.signup')"
+          color="primary"
+          trailing-icon="i-lucide-arrow-right"
+          class="hidden sm:inline-flex"
+        />
+      </template>
     </template>
   </UHeader>
 

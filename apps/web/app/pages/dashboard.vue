@@ -1,16 +1,4 @@
 <script setup lang="ts">
-type AccountResponse = {
-  account: {
-    id: number
-    email: string
-    username: string
-    display_name: string
-    wallet_address: string | null
-    reputation_score: number
-    account_credit: string
-  }
-}
-
 definePageMeta({
   layout: 'default'
 })
@@ -18,17 +6,10 @@ definePageMeta({
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-const { apiFetch } = useApiFetch()
+const accountStore = useAccountStore()
 
-const { data, status, error } = await useAsyncData('auth-me', () => {
-  return apiFetch<AccountResponse>('/api/auth/me/', {
-    method: 'GET'
-  })
-}, {
-  server: false
-})
+await accountStore.fetchAccount()
 
-const account = computed(() => data.value?.account)
 const socialAuthSucceeded = computed(() => route.query.social_auth === 'success')
 </script>
 
@@ -55,21 +36,21 @@ const socialAuthSucceeded = computed(() => route.query.social_auth === 'success'
 
       <div class="mt-6">
         <UAlert
-          v-if="socialAuthSucceeded && account"
+          v-if="socialAuthSucceeded"
           role="status"
           color="success"
           variant="soft"
           :title="t('dashboard.socialAuthSuccess')"
         />
         <UAlert
-          v-else-if="status === 'pending'"
+          v-else-if="accountStore.status === 'pending'"
           role="status"
           color="neutral"
           variant="soft"
           :title="t('dashboard.loading')"
         />
         <UAlert
-          v-else-if="error"
+          v-else-if="accountStore.error"
           role="alert"
           color="error"
           variant="soft"
@@ -78,7 +59,7 @@ const socialAuthSucceeded = computed(() => route.query.social_auth === 'success'
       </div>
 
       <dl
-        v-if="account"
+        v-if="accountStore.account"
         class="mt-8 grid gap-3 sm:grid-cols-2"
       >
         <div class="rounded-xl border border-rule bg-paper p-4">
@@ -86,7 +67,7 @@ const socialAuthSucceeded = computed(() => route.query.social_auth === 'success'
             {{ t('dashboard.emailLabel') }}
           </dt>
           <dd class="mt-2 text-base font-semibold text-ink">
-            {{ account.email }}
+            {{ accountStore.account.email }}
           </dd>
         </div>
         <div class="rounded-xl border border-rule bg-paper p-4">
@@ -94,13 +75,13 @@ const socialAuthSucceeded = computed(() => route.query.social_auth === 'success'
             {{ t('dashboard.usernameLabel') }}
           </dt>
           <dd class="mt-2 text-base font-semibold text-ink">
-            {{ account.username }}
+            {{ accountStore.account.username }}
           </dd>
         </div>
       </dl>
 
       <div
-        v-if="error"
+        v-if="accountStore.error"
         class="mt-6"
       >
         <UButton
