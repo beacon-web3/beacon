@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Governance Model
+description: Draft governance model covering eligibility, voting weight, decision categories, revenue approval, and upgrade authority.
+tags: [governance, voting, treasury, trust, upgrade-authority]
+timestamp: 2026-07-17
+---
+
 # Governance
 
 Beacon governance should protect trust without turning every product decision into a vote.

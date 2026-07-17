@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: White Paper Outline
+description: Working outline for a future Beacon white paper covering product, incentives, treasury, governance, and risks.
+tags: [whitepaper, outline, documentation, draft]
+timestamp: 2026-07-17
+---
+
 # White Paper Outline
 
 This is the working outline for a future Beacon white paper.

@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Treasury Model
+description: Treasury structure, funding sources, community treasury, operating reserve, and custody phases.
+tags: [treasury, custody, governance, funding, staking]
+timestamp: 2026-07-17
+---
+
 # Treasury
 
 Beacon's treasury model should be public, understandable, and separated from team operating funds.

@@ -1,3 +1,11 @@
+---
+type: Tokenomics Spec
+title: Staking Model
+description: Draft staking model for treasury and locked recommender SOL, yield allocation, and custody boundaries.
+tags: [staking, yield, custody, native-staking, treasury]
+timestamp: 2026-07-17
+---
+
 # Staking
 
 This document captures the draft staking model for Beacon-held SOL.

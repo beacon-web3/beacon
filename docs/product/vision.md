@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Vision
+description: Long-term thesis, positioning, and design principles for Beacon as a discovery and reputation network.
+tags: [vision, positioning, discovery, thesis, principles]
+timestamp: 2026-07-17
+---
+
 # Vision
 
 Beacon is a decentralized discovery network for identifying valuable content before it becomes obvious to everyone else.

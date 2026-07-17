@@ -13,8 +13,9 @@ yield product, guaranteed-profit system, or investment return mechanism.
 ## Canonical Product Specs
 
 Use these documents as the source of truth before designing or implementing
-product behavior:
+product behavior. Start with the OKF bundle index for a full navigation map:
 
+- `docs/index.md` - OKF knowledge bundle index (full document listing).
 - `docs/product/vision.md` - Long-term thesis, positioning, and principles.
 - `docs/product/mvp.md` - Books-first MVP scope, exclusions, and open questions.
 - `docs/product/user-stories.md` - User-facing behavior and acceptance criteria.
