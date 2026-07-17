@@ -43,7 +43,7 @@ Map each changed file to a domain using path prefixes:
 | Path prefix | Domain | Specialist skills |
 |---|---|---|
 | `apps/web/` | Frontend | vue-best-practices, frontend-ui-engineering, nuxt, nuxt-ui, frontend-development-tailwind-design-system |
-| `apps/api/` | Backend | django-backend-development, python-development-python-code-style, python-development-python-error-handling, database-design-postgresql |
+| `apps/api/` | Backend | django-backend-development, python-development-python-code-style, python-development-python-error-handling, database-design-postgresql | Tests require Docker Desktop + PostgreSQL via `scripts/test-postgres.sh` |
 | `apps/contracts/` | Web3 | solana-dev, blockchain-web3-solidity-security |
 | `packages/` | Shared | Depends on package content — classify by examining the changed files |
 | `docs/` | Documentation | documentation-and-adrs |
@@ -161,6 +161,14 @@ After collecting findings from all specialists (and your own cross-domain review
 - python-development-python-testing-patterns
 - database-design-postgresql
 - observability-and-instrumentation (if logging/metrics changed)
+
+**Backend test infrastructure**: All Django tests requiring PostgreSQL must be
+run via `apps/api/scripts/test-postgres.sh` (or `bash scripts/test-postgres.sh`
+from `apps/api/`). This script starts PostgreSQL in Docker Compose, waits for
+readiness, and runs pytest with `DATABASE_URL` set. It requires Docker Desktop
+to be running. When reviewing backend test changes, verify tests are compatible
+with this script (e.g. fixtures use factories that set required fields, no
+hardcoded database URLs outside the script).
 
 **Web3** (`apps/contracts/`):
 - solana-dev

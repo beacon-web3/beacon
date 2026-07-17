@@ -10,15 +10,15 @@
     },
     "plan": {
       "type": "string",
-      "description": "Path to a plan file in docs/plans/ (e.g. '0016-recommendation-lifecycle-data-model.md'). When provided, the agent reads tasks from the plan and implements them sequentially."
+      "description": "Plan file in docs/plans/. Accepts a full filename (e.g. '0016-recommendation-lifecycle-data-model.md') or a plan number (e.g. '0016'). When provided, the agent reads tasks from the plan and implements them sequentially."
     },
     "task": {
       "type": "string",
-      "description": "A standalone task description to implement without a plan file. Mutually exclusive with 'plan'."
+      "description": "Standalone task description to implement without a plan file, OR a 1-based task number when used with --plan (e.g. '3' to implement task #3 from the plan). Mutually exclusive with 'plan' when used as a description."
     },
-    "taskIndex": {
+    "phase": {
       "type": "number",
-      "description": "Zero-based index of which task from the plan to implement. If omitted and plan is provided, implements all tasks."
+      "description": "1-based phase number to implement all tasks from that phase in the plan. Requires --plan. If combined with --task, --task takes precedence."
     },
     "paths": {
       "type": "array",

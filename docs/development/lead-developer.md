@@ -12,12 +12,15 @@ report.
 ## Quick Start
 
 ```
-lead-developer --plan 0016-recommendation-lifecycle-data-model.md           # implement all tasks from plan
-lead-developer --plan 0016-recommendation-lifecycle-data-model.md --taskIndex 2  # implement task #3 only
-lead-developer --task "Add a composable for wallet balance fetching"        # standalone task
-lead-developer --mode direct --plan 0016-...                                # force direct mode
-lead-developer --mode orchestrate --plan 0016-...                           # force specialist spawning
-lead-developer --plan 0016-... --dryRun                                     # show plan without changes
+lead-developer --plan 0018                                            # implement all tasks from plan 0018
+lead-developer --plan 0018-recommendation-lifecycle-api.md            # same, using full filename
+lead-developer --plan 0018 --task 3                                   # implement task #3 only
+lead-developer --plan 0018 --phase 2                                  # implement all tasks in phase 2
+lead-developer --plan 0018 --phase 2 --task 4                         # task #4 only (task takes precedence)
+lead-developer --task "Add a composable for wallet balance fetching"   # standalone task
+lead-developer --mode direct --plan 0018                              # force direct mode
+lead-developer --mode orchestrate --plan 0018                         # force specialist spawning
+lead-developer --plan 0018 --dryRun                                   # show plan without changes
 ```
 
 ## How It Works
@@ -25,6 +28,24 @@ lead-developer --plan 0016-... --dryRun                                     # sh
 The agent resolves input (plan file or task description), classifies tasks by
 domain, and decides whether to implement directly or orchestrate specialist
 sub-agents.
+
+### Plan Resolution
+
+The `--plan` flag accepts either a full filename or a bare plan number:
+
+- `--plan 0018-recommendation-lifecycle-api.md` — resolves directly.
+- `--plan 0018` — searches `docs/plans/` then `docs/plans/completed/` for a
+  file starting with `0018`. Errors if no match or multiple matches.
+
+### Task and Phase Selection
+
+Tasks are numbered **1-based** and globally across all phases in the plan.
+
+- `--task 3` — implement only task #3.
+- `--phase 2` — implement all tasks in phase 2 sequentially.
+- `--phase 2 --task 4` — implement only task #4 (`--task` takes precedence).
+- `--task "Add a composable..."` (without `--plan`) — standalone task
+  description.
 
 ### Routing (Auto Mode)
 
@@ -102,7 +123,7 @@ To prevent merge conflicts between parallel specialists:
 |---|---|
 | All | `git status` (clean workspace check) |
 | Frontend | `npx nuxi typecheck` |
-| Backend | `ruff check .`, `python manage.py makemigrations --check --dry-run` |
+| Backend | `ruff check .`, `python manage.py makemigrations --check --dry-run` (no Docker needed) |
 | Web3 | `cargo check` |
 | Shared | Package-specific lint/type check |
 
@@ -111,19 +132,34 @@ To prevent merge conflicts between parallel specialists:
 | Domain | Commands |
 |---|---|
 | Frontend | `npx nuxi typecheck`, `npm run lint` |
-| Backend | `ruff check .`, `python manage.py test`, `python manage.py makemigrations --check` |
+| Backend | `ruff check .`, `bash scripts/test-postgres.sh tests/ -v` (requires Docker Desktop), `python manage.py makemigrations --check` |
 | Web3 | `cargo check`, `cargo test` |
 | Shared | Package-specific lint + type check |
 | All | `git diff --stat` |
+
+### PostgreSQL via Docker (`test-postgres.sh`)
+
+All Django tests that hit the database must be run through the Docker PostgreSQL
+script rather than relying on a local PostgreSQL install:
+
+```bash
+cd apps/api
+bash scripts/test-postgres.sh tests/ -v                    # all tests
+bash scripts/test-postgres.sh tests/recommendations/ -v    # specific app
+```
+
+The script starts the `postgres` service via Docker Compose, waits for readiness,
+and runs pytest with `DATABASE_URL` pointed at the container. Docker Desktop must
+be running. Pre-flight lint and migration checks do **not** require Docker.
 
 ## Options
 
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `mode` | `auto` \| `direct` \| `orchestrate` | `auto` | Build mode |
-| `plan` | `string` | — | Plan file in `docs/plans/` |
-| `task` | `string` | — | Standalone task description |
-| `taskIndex` | `number` | — | Zero-based index of specific task in plan |
+| `plan` | `string` | — | Plan file in `docs/plans/` (filename or number) |
+| `task` | `string` | — | Standalone task description, or 1-based task number with `--plan` |
+| `phase` | `number` | — | 1-based phase number to run all tasks in that phase |
 | `paths` | `string[]` | `[]` | Restrict to specific files/dirs |
 | `baseBranch` | `string` | `auto` | Base branch for post-implementation diff |
 | `dryRun` | `boolean` | `false` | Show plan without modifying files |

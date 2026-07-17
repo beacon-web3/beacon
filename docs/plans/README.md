@@ -59,7 +59,7 @@ Templates live in `docs/plans/templates/`.
 | ID   | Plan | Status    |
 |------| --- |-----------|
 | 0015 | [MVP free hosting setup](0015-mvp-free-hosting-setup.md) | Draft |
-| 0016 | [Recommendation lifecycle data model](0016-recommendation-lifecycle-data-model.md) | Draft |
+| 0018 | [Recommendation lifecycle API](0018-recommendation-lifecycle-api.md) | Draft |
 
 ## Completed Plans
 
@@ -82,4 +82,5 @@ easy to scan while preserving implementation history.
 | 0012 | [Runtime Toolchain Upgrade Plan](completed/0012-runtime-toolchain-upgrade-plan.md) | Completed |
 | 0013 | [Google Social Auth](completed/0013-google-social-auth.md) | Completed |
 | 0014 | [Backend Swagger OpenAPI Docs](completed/0014-backend-swagger-openapi.md) | Completed |
+| 0016 | [Recommendation lifecycle data model](completed/0016-recommendation-lifecycle-data-model.md) | Completed |
 | 0017 | [Lead developer agent](completed/0017-lead-developer-design.md) | Completed |

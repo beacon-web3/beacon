@@ -87,6 +87,44 @@ docker compose down -v
 
 Then start PostgreSQL and run migrations again.
 
+## Migration Rewrite (Pre-Launch)
+
+Because Beacon has no real users and is unpublished, the migration history was
+consolidated into clean initial migrations:
+
+- `accounts/migrations/0001_initial.py` — Account model with non-unique email
+  and case-insensitive email constraint.
+- `recommendations/migrations/0001_initial.py` — all product models, indexes,
+  and constraints (consolidated from earlier incremental migrations).
+
+If your local database was created before this consolidation, you must reset it.
+The existing local data is disposable development state.
+
+### Reset Steps
+
+1. Drop and recreate the database (or delete the Docker volume):
+
+   ```bash
+   docker compose down -v
+   docker compose up -d postgres
+   ```
+
+2. Run migrations from scratch:
+
+   ```bash
+   cd apps/api
+   .venv/bin/python manage.py migrate
+   ```
+
+3. Verify migration state shows only the intended initial migrations:
+
+   ```bash
+   .venv/bin/python manage.py showmigrations
+   ```
+
+Do not use this migration-rewrite approach after real users exist or after
+deploying to a production-like environment.
+
 ## Notes
 
 The API container is intended for local development. It mounts the `apps/api/` directory into `/app` so code changes are visible without rebuilding the image. Rebuild the image after changing Python dependencies.

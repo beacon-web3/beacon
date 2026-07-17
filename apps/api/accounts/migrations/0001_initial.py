@@ -79,7 +79,7 @@ class Migration(migrations.Migration):
                         verbose_name="last name",
                     ),
                 ),
-                ("email", models.EmailField(max_length=254, unique=True)),
+                ("email", models.EmailField(max_length=254)),
                 (
                     "is_staff",
                     models.BooleanField(

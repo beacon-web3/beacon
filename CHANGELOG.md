@@ -14,6 +14,46 @@ Changelog. Use date-based entries until formal versioning starts.
   scope. Previously, only tracked modified files were reviewed, which meant new
   implementations, configs, and documentation files were silently skipped.
 
+### Changed
+
+- Lead Developer agent: replaced `--taskIndex` (0-based) with `--task` (accepts
+  both 1-based task numbers and standalone descriptions) and added `--phase`
+  flag to implement all tasks in a given phase. `--plan` now accepts bare plan
+  numbers (e.g. `--plan 0018`) in addition to full filenames.
+- Lead Developer agent: added plan resolution by number — searches `docs/plans/`
+  then `docs/plans/completed/` for matching files.
+- Lead Developer agent: added plan parsing that supports both phase-grouped
+  format (`### Phase N: Name` / `#### Task N: Name`) and legacy flat format.
+- Plan template restructured with explicit phase groupings (`### Phase N: Name`
+  containing `#### Task N: Name` tasks with globally numbered tasks).
+- Planner agent now produces phase-grouped plans matching the updated template.
+- Human docs updated with new CLI options, task/phase selection, and plan
+  resolution examples.
+- Aligned MVP, vision, user story, treasury, tokenomics, staking, architecture,
+  assumptions, open question, whitepaper-outline, and lifecycle plan docs with
+  the accepted hybrid recommendation lifecycle while leaving reward formulas,
+  inactivity timing, and anti-whale controls unresolved.
+- Aligned product, architecture, tokenomics, risk, whitepaper, assumptions, open
+  question, and lifecycle plan docs with standalone-work or series-level
+  canonical identity while leaving duplicate scoring, metadata enrichment, and
+  manual-review service levels unresolved.
+- Aligned recommendation lifecycle docs with the accepted zero-locked-SOL and
+  90-day inactivity rule while leaving reward split policy unresolved.
+- Aligned product and lifecycle planning docs with the accepted default
+  reactivation moderation policy.
+- Aligned tokenomics, product, architecture, and lifecycle planning docs with the
+  accepted minimum-stake and no-deposit-cap policy while leaving credit weighting
+  and anti-whale controls unresolved.
+- Aligned tokenomics, staking, product, architecture, and lifecycle planning docs
+  with the accepted diminishing-returns principle while leaving the exact curve,
+  caps, stake increments, and reward split formulas unresolved.
+- Aligned product, tokenomics, staking, architecture, and lifecycle planning docs
+  with accepted recommender balance and top-up minimum rules.
+- Aligned product, tokenomics, architecture, assumptions, open questions, and
+  lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
+- Aligned product, tokenomics, risk, assumptions, and open question docs with
+  accepted step-based milestone reward timing.
+
 ### Added
 
 - Added the Review Agent: a read-only code review agent that prints a
@@ -66,33 +106,6 @@ Changelog. Use date-based entries until formal versioning starts.
 - Accepted fixed `0.01 SOL` support/upvote contributions for MVP.
 - Accepted step-based milestone reward evaluation for MVP while leaving exact
   thresholds, formulas, and splits unresolved.
-
-### Changed
-
-- Aligned MVP, vision, user story, treasury, tokenomics, staking, architecture,
-  assumptions, open question, whitepaper-outline, and lifecycle plan docs with
-  the accepted hybrid recommendation lifecycle while leaving reward formulas,
-  inactivity timing, and anti-whale controls unresolved.
-- Aligned product, architecture, tokenomics, risk, whitepaper, assumptions, open
-  question, and lifecycle plan docs with standalone-work or series-level
-  canonical identity while leaving duplicate scoring, metadata enrichment, and
-  manual-review service levels unresolved.
-- Aligned recommendation lifecycle docs with the accepted zero-locked-SOL and
-  90-day inactivity rule while leaving reward split policy unresolved.
-- Aligned product and lifecycle planning docs with the accepted default
-  reactivation moderation policy.
-- Aligned tokenomics, product, architecture, and lifecycle planning docs with the
-  accepted minimum-stake and no-deposit-cap policy while leaving credit weighting
-  and anti-whale controls unresolved.
-- Aligned tokenomics, staking, product, architecture, and lifecycle planning docs
-  with the accepted diminishing-returns principle while leaving the exact curve,
-  caps, stake increments, and reward split formulas unresolved.
-- Aligned product, tokenomics, staking, architecture, and lifecycle planning docs
-  with accepted recommender balance and top-up minimum rules.
-- Aligned product, tokenomics, architecture, assumptions, open questions, and
-  lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
-- Aligned product, tokenomics, risk, assumptions, and open question docs with
-  accepted step-based milestone reward timing.
 - Added bookmarks, curator follows, and badge history to architecture backend
   product concepts and data model concepts.
 - Added recommendation lifecycle API planning note to OpenAPI docs.
