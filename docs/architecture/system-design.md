@@ -1,3 +1,11 @@
+---
+type: Architecture Spec
+title: System Design
+description: System boundaries, on-chain and off-chain responsibilities, trust model, and economic safety principles.
+tags: [system-design, on-chain, off-chain, trust-boundary, custody]
+timestamp: 2026-07-17
+---
+
 # System Design
 
 Beacon should begin as a modular monolith with carefully limited on-chain responsibilities.

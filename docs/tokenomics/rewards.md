@@ -1,3 +1,11 @@
+---
+type: Tokenomics Spec
+title: Rewards Model
+description: Draft milestone-based reward mechanics, badge tiers, treasury split, and known economic risks.
+tags: [rewards, milestones, badges, treasury-split, economics]
+timestamp: 2026-07-17
+---
+
 # Rewards
 
 This document captures the draft Beacon rewards model. The numbers are working assumptions for specification and simulation, not final audited tokenomics.

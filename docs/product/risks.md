@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Risk Register
+description: Known product, economic, security, trust, and abuse risks with mitigation directions.
+tags: [risks, security, trust, abuse, legal]
+timestamp: 2026-07-17
+---
+
 # Risks
 
 This document tracks known product, economic, security, and trust risks for Beacon.

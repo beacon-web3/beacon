@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Open Questions
+description: Centralized unresolved product, economic, governance, architecture, legal, and launch questions.
+tags: [open-questions, unresolved, product, tokenomics, governance]
+timestamp: 2026-07-17
+---
+
 # Open Questions
 
 This file centralizes unresolved Beacon product, economic, governance,

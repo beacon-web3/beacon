@@ -1,3 +1,11 @@
+---
+type: Assumptions Register
+title: Assumptions Register
+description: Draft assumptions that guide Beacon planning, tracked with review status until accepted or rejected.
+tags: [assumptions, planning, status-tracking, draft]
+timestamp: 2026-07-17
+---
+
 # Assumptions Register
 
 This file tracks draft assumptions that guide Beacon planning but should not be

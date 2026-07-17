@@ -1,3 +1,11 @@
+---
+type: API Spec
+title: OpenAPI Documentation
+description: Backend API endpoints, auth flows, CSRF handling, rate limiting, and OpenAPI schema generation.
+tags: [openapi, auth, endpoints, drf-spectacular, csrf]
+timestamp: 2026-07-17
+---
+
 # OpenAPI
 
 ## Generated API Docs

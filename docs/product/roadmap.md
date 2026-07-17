@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Roadmap
+description: Phase-based product and launch roadmap from spec foundation through category expansion.
+tags: [roadmap, phases, planning, launch]
+timestamp: 2026-07-17
+---
+
 # Roadmap
 
 This roadmap is a planning document, not a delivery promise. Dates should be

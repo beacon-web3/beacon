@@ -1,3 +1,11 @@
+---
+type: Architecture Spec
+title: Monorepo Architecture
+description: Repository layout, application structure, shared packages, and design philosophy for the Beacon monorepo.
+tags: [monorepo, repository, structure, packages]
+timestamp: 2026-07-17
+---
+
 # Monorepo Architecture
 
 ## Overview

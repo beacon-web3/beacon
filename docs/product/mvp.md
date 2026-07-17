@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: Books-First MVP
+description: Scope, exclusions, and acceptance criteria for the books-first discovery marketplace MVP.
+tags: [mvp, scope, books, stake, badges, custody]
+timestamp: 2026-07-17
+---
+
 # MVP
 
 The MVP validates Beacon as a books-first discovery marketplace.

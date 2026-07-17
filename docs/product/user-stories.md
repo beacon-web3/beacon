@@ -1,3 +1,11 @@
+---
+type: Product Spec
+title: User Stories
+description: User-facing behavior and acceptance criteria for all Beacon roles and interactions.
+tags: [user-stories, acceptance-criteria, UX, roles]
+timestamp: 2026-07-17
+---
+
 # User Stories
 
 ## Account User
