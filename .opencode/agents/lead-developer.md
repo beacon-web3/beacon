@@ -48,12 +48,49 @@ orchestrate after resolving input.
 
 ### Step 1: Resolve Input
 
-1. If `plan` is provided: read the plan file from `docs/plans/`, parse the task
-   list, and extract tasks with their acceptance criteria and verification steps.
-2. If `task` is provided: treat as a single standalone task.
-3. If `taskIndex` is provided with `plan`: implement only that specific task.
-4. If neither `plan` nor `task`: check for uncommitted plan changes or ask the
+1. If `plan` is provided: resolve the plan file and parse its tasks (see Plan
+   Resolution and Plan Parsing below).
+2. If `task` is provided without `plan`: treat as a single standalone task.
+3. If `task` is provided with `plan`: implement only that specific task (see
+   Task and Phase Selection below).
+4. If `phase` is provided with `plan`: implement all tasks in that phase (see
+   Task and Phase Selection below).
+5. If neither `plan` nor `task`: check for uncommitted plan changes or ask the
    user for input.
+
+### Plan Resolution
+
+When `plan` is provided, resolve it to a file in `docs/plans/`:
+
+1. If the value is a filename (contains `.md` or `/`): resolve directly against
+   `docs/plans/`.
+2. If the value is a bare number (e.g. `0017`): search `docs/plans/` for a file
+   starting with that number (e.g. `0017-*.md`). If not found there, search
+   `docs/plans/completed/`. If no match or multiple matches, report an error.
+
+### Plan Parsing
+
+Parse the plan file to extract phases and tasks:
+
+1. Look for `## Phase N: Name` headers. Each phase header groups the tasks
+   that follow it until the next phase header or end of the phases section.
+2. Tasks are `#### Task N: Name` headers under their phase. Task numbers are
+   **1-based and global** across all phases (e.g. Phase 1 may contain tasks
+   1-3, Phase 2 contains tasks 4-6).
+3. If the plan has no phase headers (legacy flat format with `### Task N: Name`
+   directly under `## Phases`), treat all tasks as a single implicit phase.
+
+For each task, extract: description, acceptance criteria, verification steps,
+files likely touched, dependencies, and estimated scope.
+
+### Task and Phase Selection
+
+- `--task N` (with `--plan`): implement only task number N (1-based, global
+  across phases).
+- `--phase N` (with `--plan`): implement all tasks in phase N sequentially.
+- `--phase N --task M` (both provided): `--task` takes precedence — implement
+  only task M regardless of phase.
+- `--task` without `--plan`: treat the value as a standalone task description.
 
 ### Step 2: Classify Tasks by Domain
 
@@ -137,7 +174,12 @@ skills loaded and the pre/post-flight checks run.
 - **Core skills**: django-backend-development, python-development-python-code-style
 - **Dynamic skills**: Load on-demand based on task signals
 - **Pre-flight**: `ruff check .`, `python manage.py makemigrations --check --dry-run`
-- **Post-flight**: `ruff check .`, `python manage.py test`, `python manage.py makemigrations --check`
+- **Post-flight**: `ruff check .`, `bash scripts/test-postgres.sh <test_path>`, `python manage.py makemigrations --check`
+- **Database tests**: All Django tests requiring PostgreSQL must be run via
+  `apps/api/scripts/test-postgres.sh` (or `bash scripts/test-postgres.sh` from
+  `apps/api/`). This script starts PostgreSQL in Docker Compose, waits for
+  readiness, and runs pytest with `DATABASE_URL` set. It requires Docker Desktop
+  to be running. Example: `bash scripts/test-postgres.sh tests/ -v`
 
 #### Web3 Specialist
 
@@ -245,7 +287,7 @@ Run BEFORE implementing each task. These confirm the workspace is ready.
 | Domain | Pre-flight commands |
 |---|---|
 | Frontend | `npx nuxi typecheck` (if Nuxt project), `git status` |
-| Backend | `ruff check .`, `python manage.py makemigrations --check --dry-run` |
+| Backend | `ruff check .`, `python manage.py makemigrations --check --dry-run` (no Docker needed for lint/migration checks) |
 | Web3 | `cargo check` (or Solana-equivalent) |
 | Shared | Package-specific lint or type check from package.json/Cargo.toml |
 | Documentation | None |
@@ -260,7 +302,7 @@ Run AFTER implementing each task. These confirm the implementation is valid.
 | Domain | Post-flight commands |
 |---|---|
 | Frontend | `npx nuxi typecheck`, `npm run lint`, verify no console errors |
-| Backend | `ruff check .`, `python manage.py test`, `python manage.py makemigrations --check` |
+| Backend | `ruff check .`, `bash scripts/test-postgres.sh tests/ -v` (requires Docker Desktop running), `python manage.py makemigrations --check` |
 | Web3 | `cargo check`, `cargo test` (or `anchor test`) |
 | Shared | Package-specific lint + type check |
 | Documentation | Verify no broken cross-references |

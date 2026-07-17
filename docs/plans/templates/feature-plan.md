@@ -33,7 +33,9 @@ Out of scope:
 
 ## Phases
 
-### Task 1: Short Task Name
+### Phase 1: Foundation
+
+#### Task 1: Short Task Name
 
 Description: Explain what this task accomplishes.
 

@@ -66,6 +66,21 @@ orchestrator, not by specialists.
 | `docs/` | Documentation | documentation-and-adrs |
 | Root config | Config | Match to the domain they configure |
 
+### Backend Test Infrastructure
+
+All Django tests requiring PostgreSQL run via `apps/api/scripts/test-postgres.sh`
+(or `bash scripts/test-postgres.sh` from `apps/api/`). The script:
+
+1. Checks Docker Desktop is running.
+2. Starts PostgreSQL in Docker Compose (`docker compose up -d postgres`).
+3. Waits for readiness (up to 30s via `pg_isready`).
+4. Runs pytest with `DATABASE_URL` pointing at the Compose database.
+
+When reviewing backend test changes, verify compatibility with this script:
+- Fixtures must set all required model fields (the script does not patch them).
+- No hardcoded database URLs outside the script.
+- Tests that need the database are marked with `@pytest.mark.django_db`.
+
 ## Scopes
 
 - **uncommitted** (default): All uncommitted changes — staged and unstaged modifications (`git diff HEAD`), plus untracked new files (read in full). Excludes `.gitignore`-matched files.

@@ -196,6 +196,36 @@ first, polish last).
 
 ### Task Structure
 
+Group tasks under phase headers using this format in the Phases section:
+
+```markdown
+## Phases
+
+### Phase 1: Foundation
+
+#### Task 1: Short Task Name
+
+Description: What this task accomplishes (1-2 sentences).
+
+Acceptance criteria:
+
+- [ ] Specific, testable condition.
+- [ ] Specific, testable condition.
+
+Verification:
+
+- [ ] Tests pass: `command here`.
+- [ ] Manual check: describe the behavior to verify.
+
+Files likely touched:
+
+- `path/to/file`
+
+Dependencies: None.
+
+Estimated scope: Small.
+```
+
 Each task must include:
 
 - **Description**: What this task accomplishes (1-2 sentences).
@@ -204,6 +234,9 @@ Each task must include:
 - **Files likely touched**: Key files this task will modify or create.
 - **Dependencies**: Which tasks must complete first.
 - **Estimated scope**: Small, Medium, or Large.
+
+Task numbers are **1-based and global** across all phases (e.g. Phase 1 may
+contain tasks 1-3, Phase 2 contains tasks 4-6).
 
 ### Task Sizing Guidelines
 
@@ -278,7 +311,8 @@ After writing the plan, print a summary as your final message:
 - **Open Questions**: any unresolved items flagged during planning.
 - **Conflicts**: any conflicts with existing plans.
 - **Next Steps**: suggest running `lead-developer --plan <filename>` to
-  implement.
+  implement all tasks, `lead-developer --plan <filename> --task N` for a
+  single task, or `lead-developer --plan <filename> --phase N` for a phase.
 
 ## Verification of Your Work
 
