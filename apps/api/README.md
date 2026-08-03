@@ -81,9 +81,10 @@ docker compose run --rm api ruff check .
 
 The `.venv` workflow remains available for quick local development and editor integration.
 
-Use Python 3.14.6 for local virtual environments. The pinned local version is
-recorded in `.python-version`, and the backend Docker image uses the matching
-`python:3.14.6-slim` runtime.
+Use Python 3.14 for local virtual environments (3.14.6 locally). `.python-version`
+records the major.minor pin so Vercel's build can resolve an available patch
+version, and the backend Docker image uses the matching `python:3.14.6-slim`
+runtime.
 
 Run these commands from `apps/api/`.
 
