@@ -24,12 +24,15 @@ from drf_spectacular.views import (
 )
 from rest_framework.permissions import AllowAny
 
+from beacon_api.views import health
+
 public_schema_view = SpectacularAPIView.as_view(
     authentication_classes=[],
     permission_classes=[AllowAny],
 )
 
 urlpatterns = [
+    path("api/health/", health, name="health"),
     path("api/schema/", public_schema_view, name="schema"),
     path(
         "api/docs/swagger/",

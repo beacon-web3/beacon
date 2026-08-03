@@ -75,6 +75,12 @@ Set `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` when backend reCAPTCHA is enabled. When the
 site key is empty, auth forms submit an empty token so local development can run
 with backend `RECAPTCHA_ENABLED=false`.
 
+## Production Deployment
+
+Set `NUXT_PUBLIC_API_BASE_URL` and `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` in the
+hosting provider's project settings before public traffic. See
+`docs/development/deployment.md` for the full production checklist.
+
 ## Internationalization
 
 Nuxt i18n is configured with `prefix_except_default` routing:

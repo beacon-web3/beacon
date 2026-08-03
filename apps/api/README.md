@@ -296,6 +296,21 @@ and Django CSRF requirements, but must not include provider secrets, private
 environment values, or operational stack details. The hand-maintained API notes
 remain in `docs/api/openapi.md` for product and integration context.
 
+## Health Check
+
+A minimal public health endpoint is available at `GET /api/health/`. It returns
+`200 OK` with `{"status": "ok"}` without authentication and is intended for
+provider health checks and deployment smoke tests. It reports process liveness
+only and never exposes secrets, database credentials, stack traces, or private
+operational details.
+
+## Production Deployment
+
+Before public traffic, configure the production environment variables in the
+hosting provider's dashboard. The complete checklist lives in
+`docs/development/deployment.md`; the health endpoint above is the deployment
+smoke test.
+
 ## Tests
 
 Run backend tests with the portable PostgreSQL runner from `apps/api/`:

@@ -25,9 +25,9 @@ Relevant specs and docs:
 
 Create a low-cost production-like deployment path with:
 
-- Nuxt frontend on Vercel free tier.
-- Django API on Render free tier.
-- PostgreSQL on Aiven free tier.
+- Nuxt frontend on Vercel Hobby.
+- Django API on Vercel Hobby through Vercel Services.
+- PostgreSQL on Neon free tier.
 - Explicit environment configuration for cross-origin session-cookie auth.
 - Health checks and smoke-test steps that prove the deployed stack is reachable.
 - Manual blockers surfaced before provider accounts, secrets, domains, OAuth, or
@@ -39,19 +39,24 @@ Use this stack for the first production-like MVP unless a manual blocker changes
 the decision:
 
 ```text
-Frontend: Vercel for Nuxt
-Backend API: Render free tier for Django and Django REST Framework
-Database: Aiven free-tier managed PostgreSQL
+Frontend: Vercel Hobby for Nuxt
+Backend API: Vercel Hobby for Django and Django REST Framework (Vercel Services,
+same project and domain as the frontend)
+Database: Neon free-tier managed PostgreSQL
 Solana: frontend wallet signing for user-approved transactions, with Django for
 app-owned API state and later indexed state
-Future worker/indexer: separate process or service, not the sleeping free Render
-web service
+Future worker/indexer: separate process or service, not a Vercel Function
 ```
 
 This recommendation optimizes for fast MVP deployment, low DevOps overhead,
 standard components, and a clean path to later self-hosting.
 
 ## Stack Rationale
+
+Decision update (2026-08-03): Task 1 selected Vercel Hobby for both Nuxt and
+Django (Vercel Services, one domain) and Neon free tier for PostgreSQL. The
+sections below retain the original analysis that led there; Render and Aiven
+remain fallbacks, not the chosen stack.
 
 ### Vercel For Nuxt
 
@@ -150,14 +155,15 @@ self-hosted, or provider-managed auth as the source of truth.
 
 - Keep the MVP deployment as a modular monolith: one Nuxt app, one Django API,
   one managed PostgreSQL database, and Solana programs/RPC outside the web host.
-- Prefer Render for the first Django host because fastest setup and low DevOps
-  burden matter most at MVP stage.
+- Prefer Vercel for the first Django host because it shares the frontend project
+  and domain through Vercel Services, removing separate cross-origin auth
+  configuration.
 - Prefer Cloud Run if the team accepts more setup in exchange for Docker-native
   deployment and faster scale-to-zero cold starts.
-- Prefer Aiven for the first managed PostgreSQL database because always-on
-  behavior is simpler for Django and future Web3 reconciliation work.
-- Prefer Neon instead if database branching and serverless preview workflows
-  become more important than always-on behavior.
+- Prefer Neon for the first managed PostgreSQL database because the free tier
+  requires no credit card and includes connection pooling.
+- Prefer Aiven instead if always-on behavior without scale-to-zero outweighs the
+  sign-up requirement.
 - Do not use Render free PostgreSQL for durable MVP data.
 - Do not place continuous Solana RPC WebSocket listeners or durable event
   indexing inside a sleeping free web service until the indexing boundary is
@@ -165,15 +171,13 @@ self-hosted, or provider-managed auth as the source of truth.
 
 ## Manual Blockers
 
-- [ ] Provider account access: developer must confirm access to Vercel and either
-  Render or Google Cloud.
-- [ ] Backend host confirmation: developer must confirm Render free tier or
-  intentionally override to Cloud Run before backend deployment files are
-  finalized.
-- [ ] Database provider confirmation: developer must confirm Aiven or
-  intentionally override to Neon before production `DATABASE_URL` is configured.
-- [ ] Billing or credit-card requirement: developer must complete any provider
-  sign-up requirement, especially if Cloud Run is selected.
+- [ ] Provider account access: developer must confirm access to Vercel and Neon.
+- [ ] Backend host confirmation: developer must confirm Vercel Hobby for Django
+  (Vercel Services) before backend deployment files are finalized.
+- [ ] Database provider confirmation: developer must confirm Neon free tier
+  before production `DATABASE_URL` is configured.
+- [ ] Account sign-up: no credit card is required on Vercel Hobby or Neon free;
+  the developer must still complete provider account sign-up and access.
 - [ ] Region selection: developer must choose frontend, backend, and database
   regions close enough to reduce latency for the intended MVP testers.
 - [ ] Secrets: developer must create or provide production values through provider
@@ -199,13 +203,12 @@ database before writing provider-specific deployment configuration.
 
 Acceptance criteria:
 
-- [ ] Frontend provider is confirmed as Vercel.
-- [ ] Backend provider is confirmed as Render, or the plan records an explicit
-  override to Cloud Run.
-- [ ] Database provider is confirmed as Aiven, or the plan records an explicit
-  override to Neon.
-- [ ] Any credit-card or billing sign-up requirement is documented as completed
-  or blocking.
+- [x] Frontend provider is confirmed as Vercel (Hobby).
+- [x] Backend provider is confirmed as Vercel Hobby for Django through Vercel
+  Services, sharing the frontend project and domain.
+- [x] Database provider is confirmed as Neon free tier.
+- [x] No credit card is required on Vercel Hobby or Neon free; account sign-up
+  and access remain blocking until the developer completes them.
 
 Verification:
 
@@ -223,6 +226,13 @@ Estimated scope: Small.
 
 Manual blocker: Provider account access and provider selection.
 
+Status note (2026-08-03): Task 1 selection updated after re-checking Vercel
+Services and pricing. The chosen stack is Vercel Hobby for both Nuxt and Django
+(one project, one domain, `/api/*` rewrites to the Django service) plus Neon
+free-tier PostgreSQL. No credit card is required on Vercel Hobby or Neon free.
+Provider choices are confirmed; account sign-up and access remain unconfirmed
+by the developer. This task stays open until that is done.
+
 ### Task 2: Build Production Environment Variable Checklist
 
 Description: Create a deployment checklist for all environment variables needed
@@ -230,18 +240,18 @@ by Vercel, the backend host, and the managed PostgreSQL provider.
 
 Acceptance criteria:
 
-- [ ] Backend checklist covers `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`,
+- [x] Backend checklist covers `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`,
   `ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`,
   `CSRF_TRUSTED_ORIGINS`, `FRONTEND_BASE_URL`, secure cookie settings, HSTS
   settings, email settings, reCAPTCHA settings, and Google OAuth settings.
-- [ ] Frontend checklist covers `NUXT_PUBLIC_API_BASE_URL` and
+- [x] Frontend checklist covers `NUXT_PUBLIC_API_BASE_URL` and
   `NUXT_PUBLIC_RECAPTCHA_SITE_KEY`.
-- [ ] Checklist explicitly says secrets must be set in provider dashboards or
+- [x] Checklist explicitly says secrets must be set in provider dashboards or
   secret managers, not committed.
 
 Verification:
 
-- [ ] Documentation review confirms every currently supported variable in
+- [x] Documentation review confirms every currently supported variable in
   `apps/api/.env.example` and `apps/web/README.md` is addressed.
 
 Dependencies: Task 1.
@@ -301,15 +311,15 @@ checks and smoke tests.
 
 Acceptance criteria:
 
-- [ ] Public endpoint returns `200 OK` without authentication.
-- [ ] Endpoint does not expose secrets, database credentials, stack traces, or
+- [x] Public endpoint returns `200 OK` without authentication.
+- [x] Endpoint does not expose secrets, database credentials, stack traces, or
   private operational details.
-- [ ] Endpoint is documented for deployment verification.
+- [x] Endpoint is documented for deployment verification.
 
 Verification:
 
-- [ ] Backend tests cover the health endpoint.
-- [ ] Local command passes: `cd apps/api && .venv/bin/pytest` or focused health
+- [x] Backend tests cover the health endpoint.
+- [x] Local command passes: `cd apps/api && .venv/bin/pytest` or focused health
   endpoint tests.
 
 Dependencies: Task 2.
@@ -329,8 +339,8 @@ host.
 
 Acceptance criteria:
 
-- [ ] Render path includes the required build/start commands and health check
-  path, or Cloud Run path includes Docker build/deploy instructions.
+- [ ] Vercel Services path includes the required build/start commands and health
+  check path (or the Cloud Run path is documented if overridden).
 - [ ] Static files, migrations, runtime command, and Python version expectations
   are documented.
 - [ ] Configuration avoids committed secrets.
@@ -482,9 +492,10 @@ Run this after Tasks 1-7 and before any public beta traffic.
 
 ## Open Questions
 
-- Should the backend host be Render or Cloud Run for the first production-like
-  MVP deployment?
-- Should the managed PostgreSQL provider be Neon or Aiven?
+- Should the backend host be Vercel Services or Cloud Run for the first
+  production-like MVP deployment? (Task 1 currently records Vercel Services.)
+- Should the managed PostgreSQL provider be Neon or Aiven? (Task 1 currently
+  records Neon free tier.)
 - What cold-start delay is acceptable for MVP testers?
 - Which provider should handle production email delivery?
 - Should production-like MVP testing use provider preview domains or custom
