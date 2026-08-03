@@ -81,9 +81,10 @@ docker compose run --rm api ruff check .
 
 The `.venv` workflow remains available for quick local development and editor integration.
 
-Use Python 3.14.6 for local virtual environments. The pinned local version is
-recorded in `.python-version`, and the backend Docker image uses the matching
-`python:3.14.6-slim` runtime.
+Use Python 3.14 for local virtual environments (3.14.6 locally). `.python-version`
+records the major.minor pin so Vercel's build can resolve an available patch
+version, and the backend Docker image uses the matching `python:3.14.6-slim`
+runtime.
 
 Run these commands from `apps/api/`.
 
@@ -295,6 +296,21 @@ The docs are intentionally public. They describe session-cookie authentication
 and Django CSRF requirements, but must not include provider secrets, private
 environment values, or operational stack details. The hand-maintained API notes
 remain in `docs/api/openapi.md` for product and integration context.
+
+## Health Check
+
+A minimal public health endpoint is available at `GET /api/health/`. It returns
+`200 OK` with `{"status": "ok"}` without authentication and is intended for
+provider health checks and deployment smoke tests. It reports process liveness
+only and never exposes secrets, database credentials, stack traces, or private
+operational details.
+
+## Production Deployment
+
+Before public traffic, configure the production environment variables in the
+hosting provider's dashboard. The complete checklist lives in
+`docs/development/deployment.md`; the health endpoint above is the deployment
+smoke test.
 
 ## Tests
 
