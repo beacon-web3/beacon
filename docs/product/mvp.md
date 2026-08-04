@@ -215,5 +215,9 @@ The MVP is successful if it demonstrates:
   and review-blocked reactivations?
 * Which MVP balances and authorities must be program-controlled before launch?
 * Which early-stage authorities can remain under disclosed multisig control?
-* Should Solana event monitoring run in Django, a separate worker/indexer,
-  scheduled jobs, or direct Nuxt client RPC reads during the production-like MVP?
+* ~~Should Solana event monitoring run in Django, a separate worker/indexer,
+  scheduled jobs, or direct Nuxt client RPC reads during the production-like
+  MVP?~~ Resolved (2026-08-04): hybrid pull — frontend direct RPC reads for
+  display, Django on-demand RPC verification at record time; no worker,
+  indexer, cron, or WebSocket listener in MVP. See
+  `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`.

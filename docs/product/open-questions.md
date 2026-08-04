@@ -92,8 +92,12 @@ implementation.
 - Which data belongs on-chain versus off-chain for the MVP?
 - How should the backend index Solana events and reconcile failed or delayed
   transactions?
-- Should Solana event monitoring for the production-like MVP run in Django, a
-  separate worker or indexer, scheduled jobs, or direct Nuxt client RPC reads?
+- ~~Should Solana event monitoring for the production-like MVP run in Django, a
+  separate worker or indexer, scheduled jobs, or direct Nuxt client RPC reads?~~
+  Resolved (2026-08-04): hybrid pull — frontend direct RPC reads for display,
+  Django on-demand RPC verification at record time; no worker, indexer, cron, or
+  WebSocket listener in MVP. See
+  `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`.
 - What API boundaries should exist between `apps/web`, `apps/api`,
   `apps/contracts`, and `packages/sdk`?
 - What observability is required for treasury, support, reward, and staking

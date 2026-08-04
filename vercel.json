@@ -4,6 +4,7 @@
     "backend": { "root": "apps/api/", "entrypoint": "beacon_api.wsgi:application" }
   },
   "rewrites": [
+    { "source": "/api/cap/(.*)", "destination": { "service": "frontend" } },
     { "source": "/api/(.*)", "destination": { "service": "backend" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]

@@ -40,13 +40,12 @@ the variables declared in `apps/api/.env.example` and `apps/api/beacon_api/setti
 | `SECURE_HSTS_PRELOAD` | `true` only when committing to HSTS preload | No |
 | `CAPTCHA_ENABLED` | `true` before public traffic | No |
 | `CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as frontend) | Yes |
-| `EMAIL_BACKEND` | SMTP backend, e.g. `django.core.mail.backends.smtp.EmailBackend` | No |
-| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` / `EMAIL_USE_TLS` / `EMAIL_USE_SSL` | Resend SMTP: host `smtp.resend.com`, port `465` (SSL) or `587` (TLS); user and password are both the Resend API key | Yes (user/password) |
-| `DEFAULT_FROM_EMAIL` | Verified sender, e.g. `no-reply@beacon.example` | No |
-| SMTP provider variables | Provider-specific (host, port, user, password), per provider docs | Yes |
-| `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth client ID | No (public by design) |
-| `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth client secret | Yes |
-| `GOOGLE_OAUTH_REDIRECT_URI` | API redirect URI registered in Google Console | No |
+| `EMAIL_BACKEND` | `django.core.mail.backends.smtp.EmailBackend` | No |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` / `EMAIL_USE_TLS` / `EMAIL_USE_SSL` | Google SMTP: host `smtp.gmail.com`, port `587`, `EMAIL_USE_TLS=true`, `EMAIL_USE_SSL=false`; user is the Gmail address, password is a 16-char Gmail app password | Yes (user/password) |
+| `DEFAULT_FROM_EMAIL` | Gmail address used as the sender | No |
+| `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth client ID (not required for MVP — Google OAuth dropped from MVP scope 2026-08-04) | No (public by design) |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth client secret (not required for MVP) | Yes |
+| `GOOGLE_OAUTH_REDIRECT_URI` | API redirect URI registered in Google Console (not required for MVP) | No |
 | `EMAIL_VERIFICATION_MAX_ATTEMPTS` | `5` (default) | No |
 | `AUTH_*_THROTTLE_RATE` | Keep defaults unless tuned | No |
 
@@ -90,5 +89,19 @@ proof-of-work captcha tokens.
    `{"status": "ok"}` without authentication.
 3. The frontend build succeeds with `NUXT_PUBLIC_API_BASE_URL` pointing at the
    deployed API.
-4. Signup, login, password reset, email verification, and Google social auth
-   all work end to end from the deployed frontend.
+4. Signup, login, password reset, and email verification all work end to end
+   from the deployed frontend (Google social auth is out of MVP scope).
+
+## Operations: Cold Start And Rollback
+
+- **Cold start**: Vercel serverless functions and Neon compute scale to zero
+  after idle. The first request after inactivity can take several seconds while
+  the function and database spin up; subsequent requests are fast. This is
+  expected free-tier behavior, not a defect. Verify it by leaving the site idle
+  for several minutes, then loading a page and watching first-response time in
+  the Vercel dashboard.
+- **Rollback**: Vercel deployments are immutable. To roll back, redeploy a
+  previous production deployment from the Vercel dashboard (or revert the
+  commit and redeploy). For the database, restore from a Neon backup or
+  `pg_dump` snapshot; for schema changes, reverse with Django migrations
+  (`python manage.py migrate <previous>`) after backing up the database.

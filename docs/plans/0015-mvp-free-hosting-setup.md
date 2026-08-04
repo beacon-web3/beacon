@@ -6,9 +6,13 @@ Approved (2026-08-03): Phase 1 blockers resolved and the non-chain deployment is
 confirmed live — `GET /api/health/` returns `{"status": "ok"}` over HTTPS on
 beacon-web3.vercel.app. Email provider resolved (2026-08-04): Google SMTP with a
 Gmail app password. CAPTCHA resolved (2026-08-04): Cap proof-of-work captcha
-(`capjs-core`) is implemented end to end. Task 8 remains blocked on its own
-manual blocker; Task 7 is partially complete (email configured, CAPTCHA
-implemented, Google OAuth redirect URIs still pending).
+(`capjs-core`) is implemented end to end. Google OAuth dropped from MVP scope
+(2026-08-04): Google Console access unavailable (account restricted in Iran);
+email/password auth is the MVP auth path. Solana event monitoring boundary
+resolved (2026-08-04): hybrid pull, see
+`docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`. All
+implementation work is complete; the plan awaits the manual smoke test
+(Task 7 verification and Checkpoint items).
 
 ## Context
 
@@ -186,7 +190,9 @@ self-hosted, or provider-managed auth as the source of truth.
 - [x] Secrets: boot-set secrets (`DJANGO_SECRET_KEY`, `DATABASE_URL`) stored in
   the Vercel dashboard, never in repository files.
 - [x] Domain decision: provider preview domain `beacon-web3.vercel.app`.
-- [ ] Google OAuth redirect URIs: pending (Task 7).
+- [x] Google OAuth: dropped from MVP scope (2026-08-04) — Google Console access
+  unavailable (account restricted in Iran); email/password auth is the MVP auth
+  path. No longer a blocker.
 - [x] Email provider: Google SMTP (`smtp.gmail.com:587`, TLS, Gmail app
   password) configured through backend environment variables (resolved
   2026-08-04).
@@ -196,7 +202,10 @@ self-hosted, or provider-managed auth as the source of truth.
   backend `accounts/captcha.py` verifies the HS256 JWT when
   `CAPTCHA_ENABLED=true` (resolved 2026-08-04). Sharing `CAPTCHA_SECRET` /
   `NUXT_CAPTCHA_SECRET` between the API and frontend enables it.
-- [ ] Solana event monitoring boundary: pending (Task 8).
+- [x] Solana event monitoring boundary: resolved (2026-08-04) — hybrid pull:
+  frontend direct RPC reads for display, Django on-demand RPC verification at
+  record time; no worker, indexer, cron, or WebSocket listener in MVP. See
+  `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`.
 
 ## Phase 1: Provider Decisions And Environment Inventory
 
@@ -415,8 +424,8 @@ the frontend page smoke test passed (2026-08-03).
 
 ### Task 7: Configure Production Auth Dependencies
 
-Description: Make email verification, password reset, Google social auth, and
-CAPTCHA work against production-like URLs.
+Description: Make email verification, password reset, and CAPTCHA work against
+production-like URLs (Google social auth dropped from MVP scope 2026-08-04).
 
 Acceptance criteria:
 
@@ -425,8 +434,9 @@ Acceptance criteria:
   `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=587`, `EMAIL_USE_TLS=true`,
   `EMAIL_USE_SSL=false`, `EMAIL_HOST_USER`/`EMAIL_HOST_PASSWORD` = Gmail address
   and 16-char app password, `DEFAULT_FROM_EMAIL`; resolved 2026-08-04).
-- [ ] Google OAuth production redirect URI matches the deployed backend callback
-  URL.
+- [x] Google OAuth production redirect URI matches the deployed backend callback
+  URL (dropped from MVP scope 2026-08-04: Google Console access unavailable —
+  account restricted in Iran; email/password auth is the MVP auth path).
 - [ ] `FRONTEND_BASE_URL` points to the deployed frontend URL.
 - [ ] Secure cookie and HTTPS settings are enabled for production.
 - [x] CAPTCHA is either explicitly enabled with a shared `CAPTCHA_SECRET` or
@@ -436,7 +446,7 @@ Acceptance criteria:
 Verification:
 
 - [ ] Manual smoke test covers signup, email verification delivery, login,
-  logout, password reset request, and Google auth start/callback behavior.
+  logout, and password reset request.
 
 Dependencies: Tasks 5 and 6.
 
@@ -446,9 +456,10 @@ Files likely touched:
 
 Estimated scope: Medium.
 
-Manual blocker: Google OAuth console access (email provider credentials
-resolved 2026-08-04 via Google SMTP app password; CAPTCHA implemented
-2026-08-04 via Cap proof-of-work).
+Manual blocker: none remaining — email provider credentials resolved 2026-08-04
+via Google SMTP app password; CAPTCHA implemented 2026-08-04 via Cap
+proof-of-work; Google OAuth dropped from MVP scope 2026-08-04. Task 7 is
+complete pending the manual smoke test.
 
 ## Phase 6: Solana Integration Boundary
 
@@ -459,15 +470,23 @@ before implementing any persistent event monitoring.
 
 Acceptance criteria:
 
-- [ ] Decision identifies whether MVP chain reads are direct frontend RPC reads,
-  Django API reads, scheduled reconciliation, or a separate worker/indexer.
-- [ ] Decision documents why the selected approach fits free-tier hosting limits.
-- [ ] Any background worker, cron, queue, or WebSocket service requirement is
-  added to a follow-up plan before implementation.
+- [x] Decision identifies whether MVP chain reads are direct frontend RPC reads,
+  Django API reads, scheduled reconciliation, or a separate worker/indexer
+  (hybrid pull: frontend RPC reads for display; Django on-demand RPC
+  verification at record time; no scheduled reconciliation, no separate
+  worker/indexer in MVP).
+- [x] Decision documents why the selected approach fits free-tier hosting limits
+  (every chain interaction is a short HTTP RPC request; nothing requires a
+  long-lived connection or background process).
+- [x] Any background worker, cron, queue, or WebSocket service requirement is
+  added to a follow-up plan before implementation (ADR 0023 requires a
+  follow-up plan before any worker/indexer is added).
 
 Verification:
 
-- [ ] Decision record or architecture doc is updated and linked from this plan.
+- [x] Decision record or architecture doc is updated and linked from this plan
+  (`docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`, created
+  2026-08-04).
 
 Dependencies: Tasks 1-7 can proceed without this only for non-chain auth/API
 smoke tests. Any chain indexing implementation depends on this task.
@@ -480,7 +499,8 @@ Files likely touched:
 
 Estimated scope: Small for decision, larger for implementation follow-up.
 
-Manual blocker: Developer/product decision on Solana monitoring boundary.
+Manual blocker: Developer/product decision on Solana monitoring boundary
+(resolved 2026-08-04 via `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`).
 
 ## Checkpoint: Production-Like Smoke Test
 
@@ -495,10 +515,13 @@ Run this after Tasks 1-7 and before any public beta traffic.
 - [ ] CSRF-protected unsafe requests work from the deployed frontend.
 - [ ] Password reset and email verification deliver email through the production
   email provider.
-- [ ] Google social auth redirects to and from the deployed backend.
+- [x] Google social auth — dropped from MVP scope (2026-08-04); email/password
+  auth is the MVP auth path.
 - [ ] Backend logs are accessible in the selected host.
 - [ ] Cold-start behavior is tested and documented.
-- [ ] Rollback path is documented for frontend and backend deployments.
+- [x] Rollback path is documented for frontend and backend deployments
+  (`docs/development/deployment.md` "Operations: Cold Start And Rollback",
+  2026-08-04).
 
 ## Risks And Mitigations
 
@@ -508,8 +531,7 @@ Run this after Tasks 1-7 and before any public beta traffic.
 | Database free-tier limits change | Medium | Record provider and plan details during setup; avoid using expiring free databases for durable MVP data. |
 | Cross-origin session auth misconfiguration | High | Explicitly configure `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, secure cookies, and HTTPS settings. |
 | Secrets leak into repository docs or config | High | Store secrets only in provider dashboards or secret managers; docs list variable names only. |
-| Solana indexing needs always-on compute | High | Block indexing implementation until the worker/indexer architecture is decided. |
-| OAuth callback mismatch | Medium | Add deployed callback URLs in Google Console before testing Google social auth. |
+| Solana indexing needs always-on compute | High | Block indexing implementation until the worker/indexer architecture is decided (MVP decision 2026-08-04: hybrid pull; a worker/indexer requires a follow-up plan). |
 
 ## Open Questions
 
@@ -523,7 +545,16 @@ Run this after Tasks 1-7 and before any public beta traffic.
 - ~~Should production-like MVP testing use provider preview domains or custom
   domains?~~ Resolved (2026-08-03): provider preview domain
   `beacon-web3.vercel.app`.
-- Where should Solana event monitoring and reconciliation run? (open, Task 8)
+- ~~Where should Solana event monitoring and reconciliation run?~~ Resolved
+  (2026-08-04): hybrid pull — see
+  `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`. A separate
+  worker/indexer remains a follow-up plan when history or real-time needs
+  emerge.
+- ~~Should Google social auth be reintroduced later or dropped from MVP?~~
+  Dropped from MVP scope (2026-08-04): Google Console access unavailable
+  (account restricted in Iran); email/password auth is the MVP auth path.
+  Revisit only if a Google account or alternative OAuth provider becomes
+  available.
 
 ## Approval Gate
 

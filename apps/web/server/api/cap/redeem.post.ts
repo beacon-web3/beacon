@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { useRuntimeConfig } from 'nitropack/runtime'
-import { validateChallenge } from 'capjs-core'
+import { validateChallenge, type ValidateChallengeBody } from 'capjs-core'
 
 function base64url(input: string): string {
   return btoa(input).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
@@ -18,7 +18,7 @@ async function signJwt(payload: Record<string, unknown>, secret: string, expires
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const secret = config.captchaSecret as string
-  const body = await readBody(event)
+  const body = await readBody(event) as ValidateChallengeBody
 
   const result = await validateChallenge(secret, body, {
     signToken: async ({ scope, expires, iat }) => signJwt({ scope }, secret, expires - (iat ?? 0))

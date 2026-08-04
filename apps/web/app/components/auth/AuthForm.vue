@@ -24,6 +24,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const showPassword = shallowRef(false)
 const showPasswordConfirmation = shallowRef(false)
+const captchaEnabled = useRuntimeConfig().public.captchaEnabled
 
 const {
   form,
@@ -194,7 +195,10 @@ const {
       {{ t('auth.passwordResetHelp') }}
     </p>
 
-    <p class="text-xs leading-5 text-ink-faint">
+    <p
+      v-if="!captchaEnabled"
+      class="text-xs leading-5 text-ink-faint"
+    >
       {{ t('auth.captchaNotice') }}
     </p>
 
@@ -240,38 +244,6 @@ const {
         color="neutral"
         size="sm"
         block
-      />
-    </div>
-
-    <div
-      v-if="isSignup || isLogin"
-      class="space-y-3"
-    >
-      <div class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-ink-faint">
-        <span class="h-px flex-1 bg-rule" />
-        <span>{{ t('auth.socialDivider') }}</span>
-        <span class="h-px flex-1 bg-rule" />
-      </div>
-
-      <UAlert
-        v-if="socialAuthError"
-        role="alert"
-        color="error"
-        variant="soft"
-        :title="socialAuthError"
-      />
-
-      <UButton
-        type="button"
-        :label="isSignup ? t('auth.googleSignup') : t('auth.googleLogin')"
-        :loading="socialAuthSubmitting"
-        :disabled="isSubmitting || socialAuthSubmitting"
-        icon="i-simple-icons-google"
-        variant="outline"
-        color="neutral"
-        size="xl"
-        block
-        @click="emit('googleAuthStart')"
       />
     </div>
   </UForm>
