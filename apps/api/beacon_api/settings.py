@@ -22,9 +22,8 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:3000", "http://127.0.0.1:3000"]),
-    RECAPTCHA_ENABLED=(bool, False),
-    RECAPTCHA_SECRET_KEY=(str, ""),
-    RECAPTCHA_VERIFY_URL=(str, "https://www.google.com/recaptcha/api/siteverify"),
+    CAPTCHA_ENABLED=(bool, False),
+    CAPTCHA_SECRET=(str, ""),
     FRONTEND_BASE_URL=(str, "http://localhost:3000"),
     EMAIL_VERIFICATION_MAX_ATTEMPTS=(int, 5),
     AUTH_SIGNUP_THROTTLE_RATE=(str, "5/min"),
@@ -65,9 +64,8 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
-RECAPTCHA_ENABLED = env("RECAPTCHA_ENABLED")
-RECAPTCHA_SECRET_KEY = env("RECAPTCHA_SECRET_KEY")
-RECAPTCHA_VERIFY_URL = env("RECAPTCHA_VERIFY_URL")
+CAPTCHA_ENABLED = env("CAPTCHA_ENABLED")
+CAPTCHA_SECRET = env("CAPTCHA_SECRET")
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL").rstrip("/")
 EMAIL_VERIFICATION_MAX_ATTEMPTS = env("EMAIL_VERIFICATION_MAX_ATTEMPTS")
 AUTH_THROTTLE_RATES = {
@@ -240,6 +238,12 @@ EMAIL_BACKEND = env(
         else "django.core.mail.backends.smtp.EmailBackend"
     ),
 )
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=False, cast=bool)
+EMAIL_USE_SSL = env("EMAIL_USE_SSL", default=False, cast=bool)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

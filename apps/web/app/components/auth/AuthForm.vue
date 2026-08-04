@@ -195,7 +195,7 @@ const {
     </p>
 
     <p class="text-xs leading-5 text-ink-faint">
-      {{ t('auth.recaptchaNotice') }}
+      {{ t('auth.captchaNotice') }}
     </p>
 
     <UAlert

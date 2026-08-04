@@ -219,18 +219,24 @@ The root pre-commit hook runs Ruff only when staged Python files exist under `ap
 
 ## Auth Configuration
 
-The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
-email verification OTPs, password reset emails, Google social auth through
-`django-allauth`, and cache-backed auth throttles.
+The auth API uses Django session cookies, CSRF protection, optional Cap
+proof-of-work captcha, email verification OTPs, password reset emails, Google
+social auth through `django-allauth`, and cache-backed auth throttles.
 
 Important environment variables:
 
 * `FRONTEND_BASE_URL` controls password-reset confirmation links.
 * `EMAIL_BACKEND` defaults to Django's console email backend when
   `DJANGO_DEBUG=true`, so local signup verification codes and password reset
-  links print to the API process output. In Docker, watch them with
+  links   print to the API process output. In Docker, watch them with
   `docker compose logs -f api`. Production should configure a real email
-  backend/provider.
+  backend/provider. For a free no-domain option, use Gmail SMTP with an app
+  password: `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`,
+  `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=587`, `EMAIL_USE_TLS=true`,
+  `EMAIL_USE_SSL=false`, `EMAIL_HOST_USER=<gmail address>`,
+  `EMAIL_HOST_PASSWORD=<16-char app password>`, and
+  `DEFAULT_FROM_EMAIL=<gmail address>`. Generate the app password at
+  `https://myaccount.google.com/apppasswords` (requires 2-Step Verification).
 * `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, and
   `GOOGLE_OAUTH_REDIRECT_URI` configure Google social auth. If the Google client
   ID or secret is missing, the social auth start endpoint returns `503 Service
@@ -261,10 +267,10 @@ synchronously through Django's configured email backend, so backend email errors
 can fail those requests even though their response bodies remain generic when the
 email backend succeeds.
 
-Before production or public traffic, set `RECAPTCHA_ENABLED=true` with a valid
-`RECAPTCHA_SECRET_KEY` and configure the Nuxt frontend with
-`NUXT_PUBLIC_RECAPTCHA_SITE_KEY` so browser auth submissions send reCAPTCHA v2
-Invisible tokens.
+Before production or public traffic, set `CAPTCHA_ENABLED=true` with a shared
+`CAPTCHA_SECRET` and configure the Nuxt frontend with the same value as
+`NUXT_CAPTCHA_SECRET` so the browser's Cap proof-of-work solutions are signed
+into JWT captcha tokens the backend can verify.
 
 Browser clients using session cookies must send Django's CSRF token on
 authenticated unsafe requests. Successful login and email verification

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { csrfToken, prepareAuthPage, recaptchaToken, validPassword } from './helpers'
+import { captchaToken, csrfToken, prepareAuthPage, validPassword } from './helpers'
 
 test.beforeEach(async ({ context, page }) => {
   await prepareAuthPage(context, page)
@@ -29,7 +29,7 @@ test('password reset submits generic request', async ({ page }) => {
     expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'user@example.com',
-      recaptcha_token: recaptchaToken
+      captcha_token: captchaToken
     })
 
     await route.fulfill({

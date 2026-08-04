@@ -30,7 +30,7 @@ const DEFAULT_SAFE_VALIDATION_KEYS = [
   'otp',
   'uid',
   'token',
-  'recaptcha_token'
+  'captcha_token'
 ] as const
 
 export function useApiErrorMessage() {

@@ -12,7 +12,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.captcha import verify_recaptcha_token
+from accounts.captcha import verify_captcha_token
 
 Account = get_user_model()
 
@@ -55,7 +55,7 @@ class ValidationErrorSerializer(serializers.Serializer):
         required=False,
         read_only=True,
     )
-    recaptcha_token = serializers.ListField(
+    captcha_token = serializers.ListField(
         child=serializers.CharField(),
         required=False,
         read_only=True,
@@ -91,24 +91,22 @@ class GoogleSocialStartResponseSerializer(serializers.Serializer):
     authorization_url = serializers.URLField(read_only=True)
 
 
-class RecaptchaSerializer(serializers.Serializer):
-    recaptcha_token = serializers.CharField(required=False, allow_blank=True)
+class CaptchaSerializer(serializers.Serializer):
+    captcha_token = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        token = attrs.get("recaptcha_token", "")
-        request = self.context.get("request")
-        remote_ip = request.META.get("REMOTE_ADDR") if request else None
+        token = attrs.get("captcha_token", "")
 
-        if not verify_recaptcha_token(token, remote_ip):
+        if not verify_captcha_token(token):
             raise serializers.ValidationError(
-                {"recaptcha_token": _("Captcha verification failed.")}
+                {"captcha_token": _("Captcha verification failed.")}
             )
 
         return attrs
 
 
-class SignupSerializer(RecaptchaSerializer):
+class SignupSerializer(CaptchaSerializer):
     email = serializers.EmailField()
     username = serializers.CharField(max_length=150)
     display_name = serializers.CharField(max_length=150)
@@ -175,7 +173,7 @@ class SignupSerializer(RecaptchaSerializer):
             ) from exc
 
 
-class LoginSerializer(RecaptchaSerializer):
+class LoginSerializer(CaptchaSerializer):
     identifier = serializers.CharField()
     password = serializers.CharField(write_only=True, trim_whitespace=False)
     account: Account
@@ -206,14 +204,14 @@ class LoginSerializer(RecaptchaSerializer):
         return self.account
 
 
-class PasswordResetRequestSerializer(RecaptchaSerializer):
+class PasswordResetRequestSerializer(CaptchaSerializer):
     email = serializers.EmailField()
 
     def validate_email(self, value: str) -> str:
         return value.strip().lower()
 
 
-class EmailVerificationRequestSerializer(RecaptchaSerializer):
+class EmailVerificationRequestSerializer(CaptchaSerializer):
     email = serializers.EmailField()
 
     def validate_email(self, value: str) -> str:

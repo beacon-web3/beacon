@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { csrfToken, prepareAuthPage, recaptchaToken } from './helpers'
+import { captchaToken, csrfToken, prepareAuthPage } from './helpers'
 
 test.beforeEach(async ({ context, page }) => {
   await prepareAuthPage(context, page)
@@ -41,7 +41,7 @@ test('email verification submits a six digit OTP to the auth api', async ({ page
   )
 })
 
-test('email verification resend submits email and recaptcha token', async ({ page }) => {
+test('email verification resend submits email and captcha token', async ({ page }) => {
   await page.route('**/api/auth/email-verification/request/', async (route) => {
     const request = route.request()
 
@@ -49,7 +49,7 @@ test('email verification resend submits email and recaptcha token', async ({ pag
     expect(request.headers()['x-csrftoken']).toBe(csrfToken)
     expect(request.postDataJSON()).toEqual({
       email: 'user@example.com',
-      recaptcha_token: recaptchaToken
+      captcha_token: captchaToken
     })
 
     await route.fulfill({

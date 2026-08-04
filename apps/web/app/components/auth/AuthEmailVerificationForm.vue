@@ -21,7 +21,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const { apiFetch } = useApiFetch()
 const { getApiErrorMessage } = useApiErrorMessage()
-const { executeRecaptcha } = useRecaptchaToken()
+const { executeCaptcha } = useCapToken()
 
 const form = reactive<VerificationFormState>({
   email: props.initialEmail,
@@ -89,13 +89,13 @@ async function resendCode() {
 
   isResending.value = true
   try {
-    const recaptchaToken = await executeRecaptcha()
+    const captchaToken = await executeCaptcha()
 
     await apiFetch('/api/auth/email-verification/request/', {
       method: 'POST',
       body: {
         email: form.email,
-        recaptcha_token: recaptchaToken
+        captcha_token: captchaToken
       }
     })
 

@@ -141,7 +141,7 @@ class SignupView(APIView):
         description=(
             "Public endpoint. Creates an unverified Beacon account and schedules "
             "an email verification code after the account transaction commits. "
-            "When captcha is enabled, include a reCAPTCHA v2 Invisible token."
+            "When captcha is enabled, include a Cap CAPTCHA token."
         ),
         request=SignupSerializer,
         responses={
@@ -174,7 +174,7 @@ class LoginView(APIView):
         description=(
             "Public endpoint. On success, Django starts a session and issues a "
             "CSRF cookie for browser clients. When captcha is enabled, include a "
-            "reCAPTCHA v2 Invisible token."
+            "Cap CAPTCHA token."
         ),
         request=LoginSerializer,
         responses={
@@ -266,7 +266,7 @@ class EmailVerificationRequestView(APIView):
         description=(
             "Public endpoint. Returns a generic response to avoid revealing "
             "whether an account exists. When captcha is enabled, include a "
-            "reCAPTCHA v2 Invisible token."
+            "Cap CAPTCHA token."
         ),
         request=EmailVerificationRequestSerializer,
         responses={
@@ -331,7 +331,7 @@ class PasswordResetRequestView(APIView):
         description=(
             "Public endpoint. Returns a generic response to avoid revealing "
             "whether an account exists. When captcha is enabled, include a "
-            "reCAPTCHA v2 Invisible token."
+            "Cap CAPTCHA token."
         ),
         request=PasswordResetRequestSerializer,
         responses={

@@ -152,7 +152,7 @@
     "newPasswordLabel": "Nouveau mot de passe",
     "newPasswordPlaceholder": "Nouveau mot de passe",
     "passwordResetHelp": "Les réponses de réinitialisation restent génériques pour ne pas révéler l'existence d'un compte.",
-    "recaptchaNotice": "Protégé par reCAPTCHA v2 Invisible lorsqu'il est activé.",
+    "captchaNotice": "Protégé par CAPTCHA lorsqu'il est activé.",
     "socialDivider": "ou",
     "googleSignup": "S'inscrire avec Google",
     "googleLogin": "Continuer avec Google",

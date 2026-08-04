@@ -80,7 +80,7 @@ Key outcomes:
 - Django API is deployed to Render free tier or Cloud Run free tier.
 - PostgreSQL runs on a dedicated managed provider such as Neon or Aiven.
 - Production environment variables, CORS, CSRF, secure cookies, OAuth redirects,
-  email, reCAPTCHA, and health checks are configured.
+  email, captcha, and health checks are configured.
 - Cold-start behavior, database retention assumptions, and Solana indexing
   blockers are documented before broader beta launch.
 

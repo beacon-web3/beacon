@@ -10,7 +10,7 @@ type EmailAuthFormState = {
   displayName: string
   password: string
   passwordConfirmation: string
-  recaptchaToken: string
+  captchaToken: string
 }
 
 type EmailAuthFormData = Partial<EmailAuthFormState>
@@ -45,7 +45,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
   const { t } = useI18n()
   const { apiFetch } = useApiFetch()
   const { getApiErrorData, getApiErrorMessage } = useApiErrorMessage()
-  const { executeRecaptcha } = useRecaptchaToken()
+  const { executeCaptcha } = useCapToken()
   const accountStore = useAccountStore()
 
   const form = reactive<EmailAuthFormState>({
@@ -55,7 +55,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     displayName: '',
     password: '',
     passwordConfirmation: '',
-    recaptchaToken: ''
+    captchaToken: ''
   })
 
   const isSubmitting = shallowRef(false)
@@ -140,7 +140,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         email: emailString.value,
         password: signupPasswordString.value,
         passwordConfirmation: requiredString.value,
-        recaptchaToken: z.string().optional()
+        captchaToken: z.string().optional()
       }).refine(data => data.password === data.passwordConfirmation, {
         path: ['passwordConfirmation'],
         message: t('auth.passwordConfirmationMismatch')
@@ -151,7 +151,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       return z.object({
         identifier: requiredString.value,
         password: requiredString.value,
-        recaptchaToken: z.string().optional()
+        captchaToken: z.string().optional()
       })
     }
 
@@ -163,7 +163,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
     return z.object({
       email: emailString.value,
-      recaptchaToken: z.string().optional()
+      captchaToken: z.string().optional()
     })
   })
 
@@ -175,7 +175,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
         display_name: form.displayName,
         password: form.password,
         password_confirmation: form.passwordConfirmation,
-        recaptcha_token: form.recaptchaToken
+        captcha_token: form.captchaToken
       }
     }
 
@@ -183,7 +183,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       return {
         identifier: form.identifier,
         password: form.password,
-        recaptcha_token: form.recaptchaToken
+        captcha_token: form.captchaToken
       }
     }
 
@@ -197,7 +197,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
     return {
       email: form.email,
-      recaptcha_token: form.recaptchaToken
+      captcha_token: form.captchaToken
     }
   }
 
@@ -208,7 +208,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
     form.displayName = ''
     form.password = ''
     form.passwordConfirmation = ''
-    form.recaptchaToken = ''
+    form.captchaToken = ''
   }
 
   function getVerificationRequiredEmail(error: unknown) {
@@ -226,7 +226,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
     try {
       if (!isPasswordResetConfirm.value) {
-        form.recaptchaToken = await executeRecaptcha()
+        form.captchaToken = await executeCaptcha()
       }
 
       const response = await apiFetch<AuthResponse>(options.endpoint, {
