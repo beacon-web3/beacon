@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
-    captchaSecret: process.env.CAPTCHA_SECRET || '',
+    captchaSecret: '',
     public: {
       apiBaseUrl: 'http://127.0.0.1:8000'
     }

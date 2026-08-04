@@ -262,9 +262,9 @@ can fail those requests even though their response bodies remain generic when th
 email backend succeeds.
 
 Before production or public traffic, set `CAPTCHA_ENABLED=true` with a shared
-`CAPTCHA_SECRET` and configure the Nuxt frontend with the same `CAPTCHA_SECRET`
-so the browser's Cap proof-of-work solutions are signed into JWT captcha tokens
-the backend can verify.
+`CAPTCHA_SECRET` and configure the Nuxt frontend with the same value as
+`NUXT_CAPTCHA_SECRET` so the browser's Cap proof-of-work solutions are signed
+into JWT captcha tokens the backend can verify.
 
 Browser clients using session cookies must send Django's CSRF token on
 authenticated unsafe requests. Successful login and email verification

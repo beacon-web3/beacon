@@ -75,11 +75,11 @@ Set these in the Vercel project settings:
 | Variable | Value (production) | Secret? |
 |---|---|---|
 | `NUXT_PUBLIC_API_BASE_URL` | Same Vercel domain, e.g. `https://beacon.vercel.app` (`/api/*` rewrites to Django) | No |
-| `CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as backend) | Yes |
+| `NUXT_CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as backend) | Yes |
 
 `NUXT_PUBLIC_*` variables are embedded in the browser bundle, so they must not
 contain secrets. `NUXT_PUBLIC_API_BASE_URL` drives the shared `useApiFetch()`
-transport in `apps/web/`; the Nuxt server reads `CAPTCHA_SECRET` to sign Cap
+transport in `apps/web/`; the Nuxt server reads `NUXT_CAPTCHA_SECRET` to sign Cap
 proof-of-work captcha tokens.
 
 ## Verification
