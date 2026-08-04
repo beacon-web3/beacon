@@ -4,8 +4,11 @@
 
 Approved (2026-08-03): Phase 1 blockers resolved and the non-chain deployment is
 confirmed live — `GET /api/health/` returns `{"status": "ok"}` over HTTPS on
-beacon-web3.vercel.app. Tasks 7 and 8 remain blocked on their own manual
-blockers.
+beacon-web3.vercel.app. Email provider resolved (2026-08-04): Google SMTP with a
+Gmail app password. CAPTCHA resolved (2026-08-04): Cap proof-of-work captcha
+(`capjs-core`) is implemented end to end. Task 8 remains blocked on its own
+manual blocker; Task 7 is partially complete (email configured, CAPTCHA
+implemented, Google OAuth redirect URIs still pending).
 
 ## Context
 
@@ -184,10 +187,15 @@ self-hosted, or provider-managed auth as the source of truth.
   the Vercel dashboard, never in repository files.
 - [x] Domain decision: provider preview domain `beacon-web3.vercel.app`.
 - [ ] Google OAuth redirect URIs: pending (Task 7).
-- [ ] Email provider: pending (Task 7).
-- [x] CAPTCHA secret: intentionally disabled for MVP internal testing
-  (`CAPTCHA_ENABLED=false`); shared `CAPTCHA_SECRET` required before public
-  beta.
+- [x] Email provider: Google SMTP (`smtp.gmail.com:587`, TLS, Gmail app
+  password) configured through backend environment variables (resolved
+  2026-08-04).
+- [x] CAPTCHA: Cap proof-of-work captcha (`capjs-core`) implemented end to end
+  — Nuxt Nitro routes `apps/web/server/api/cap/challenge.post.ts` and
+  `redeem.post.ts` issue/redeem challenges signed with `NUXT_CAPTCHA_SECRET`,
+  backend `accounts/captcha.py` verifies the HS256 JWT when
+  `CAPTCHA_ENABLED=true` (resolved 2026-08-04). Sharing `CAPTCHA_SECRET` /
+  `NUXT_CAPTCHA_SECRET` between the API and frontend enables it.
 - [ ] Solana event monitoring boundary: pending (Task 8).
 
 ## Phase 1: Provider Decisions And Environment Inventory
@@ -412,14 +420,18 @@ CAPTCHA work against production-like URLs.
 
 Acceptance criteria:
 
-- [ ] Production email provider is configured through backend environment
-  variables.
+- [x] Production email provider is configured through backend environment
+  variables (Google SMTP: `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`,
+  `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=587`, `EMAIL_USE_TLS=true`,
+  `EMAIL_USE_SSL=false`, `EMAIL_HOST_USER`/`EMAIL_HOST_PASSWORD` = Gmail address
+  and 16-char app password, `DEFAULT_FROM_EMAIL`; resolved 2026-08-04).
 - [ ] Google OAuth production redirect URI matches the deployed backend callback
   URL.
 - [ ] `FRONTEND_BASE_URL` points to the deployed frontend URL.
 - [ ] Secure cookie and HTTPS settings are enabled for production.
-- [ ] CAPTCHA is either explicitly enabled with a shared `CAPTCHA_SECRET` or
-  intentionally disabled for limited internal testing.
+- [x] CAPTCHA is either explicitly enabled with a shared `CAPTCHA_SECRET` or
+  intentionally disabled for limited internal testing (Cap proof-of-work
+  captcha implemented and covered by tests, resolved 2026-08-04).
 
 Verification:
 
@@ -434,8 +446,9 @@ Files likely touched:
 
 Estimated scope: Medium.
 
-Manual blocker: Email provider credentials, Google OAuth console access, and
-the shared `CAPTCHA_SECRET`.
+Manual blocker: Google OAuth console access (email provider credentials
+resolved 2026-08-04 via Google SMTP app password; CAPTCHA implemented
+2026-08-04 via Cap proof-of-work).
 
 ## Phase 6: Solana Integration Boundary
 
@@ -505,7 +518,8 @@ Run this after Tasks 1-7 and before any public beta traffic.
 - ~~Should the managed PostgreSQL provider be Neon or Aiven?~~ Resolved
   (2026-08-03): Neon free tier.
 - What cold-start delay is acceptable for MVP testers?
-- Which provider should handle production email delivery? (open, Task 7)
+- ~~Which provider should handle production email delivery?~~ Resolved
+  (2026-08-04): Google SMTP with a Gmail app password.
 - ~~Should production-like MVP testing use provider preview domains or custom
   domains?~~ Resolved (2026-08-03): provider preview domain
   `beacon-web3.vercel.app`.

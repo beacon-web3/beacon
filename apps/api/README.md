@@ -228,9 +228,15 @@ Important environment variables:
 * `FRONTEND_BASE_URL` controls password-reset confirmation links.
 * `EMAIL_BACKEND` defaults to Django's console email backend when
   `DJANGO_DEBUG=true`, so local signup verification codes and password reset
-  links print to the API process output. In Docker, watch them with
+  links   print to the API process output. In Docker, watch them with
   `docker compose logs -f api`. Production should configure a real email
-  backend/provider.
+  backend/provider. For a free no-domain option, use Gmail SMTP with an app
+  password: `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`,
+  `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=587`, `EMAIL_USE_TLS=true`,
+  `EMAIL_USE_SSL=false`, `EMAIL_HOST_USER=<gmail address>`,
+  `EMAIL_HOST_PASSWORD=<16-char app password>`, and
+  `DEFAULT_FROM_EMAIL=<gmail address>`. Generate the app password at
+  `https://myaccount.google.com/apppasswords` (requires 2-Step Verification).
 * `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, and
   `GOOGLE_OAUTH_REDIRECT_URI` configure Google social auth. If the Google client
   ID or secret is missing, the social auth start endpoint returns `503 Service
