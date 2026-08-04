@@ -58,7 +58,7 @@ Templates live in `docs/plans/templates/`.
 
 | ID   | Plan | Status    |
 |------| --- |-----------|
-| 0015 | [MVP free hosting setup](0015-mvp-free-hosting-setup.md) | Draft |
+| 0015 | [MVP free hosting setup](0015-mvp-free-hosting-setup.md) | In Progress |
 | 0018 | [Recommendation lifecycle API](0018-recommendation-lifecycle-api.md) | Draft |
 
 ## Completed Plans

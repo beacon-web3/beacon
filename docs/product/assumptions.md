@@ -48,7 +48,7 @@ Status values:
 | MVP frontend hosting | Vercel free tier for the Nuxt frontend | Proposed | Suitable for production-like MVP testing; not a production reliability guarantee. |
 | MVP backend hosting | Render free tier for Django, with Cloud Run as an alternative if Docker deployment and faster cold starts are preferred | Proposed | Needs provider account setup, environment configuration, and cold-start acceptance. |
 | MVP database hosting | Neon or Aiven free-tier managed PostgreSQL, selected before deployment | Proposed | Avoid disposable app-platform free databases for durable MVP data. |
-| Solana event monitoring host | Undecided | Draft | Manual blocker before implementing background workers, RPC WebSocket listeners, or durable indexing. |
+| Solana event monitoring host | Hybrid pull for MVP: frontend direct RPC reads for display; Django on-demand RPC verification at record time; no worker, indexer, cron, or WebSocket listener | Accepted | See `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`. A worker/indexer is added only via follow-up plan when history or real-time needs emerge. |
 
 ## Maintenance Rules
 

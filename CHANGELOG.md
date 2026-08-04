@@ -53,6 +53,19 @@ Changelog. Use date-based entries until formal versioning starts.
   lifecycle planning docs with fixed `0.01 SOL` MVP support contributions.
 - Aligned product, tokenomics, risk, assumptions, and open question docs with
   accepted step-based milestone reward timing.
+- Resolved the MVP Solana event monitoring boundary: hybrid pull — frontend
+  direct RPC reads for display, Django on-demand RPC verification at record
+  time; no worker, indexer, cron, or WebSocket listener in the MVP hosting
+  shape (see `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`).
+- Accepted `docs/decisions/0010-mvp-free-hosting-stack.md` with the final
+  stack: Vercel Hobby for both Nuxt and Django through Vercel Services (one
+  domain) plus Neon free-tier PostgreSQL.
+- Dropped Google OAuth from MVP scope (Google Console access unavailable);
+  email/password is the MVP auth path.
+- Updated the deployment checklist to Google SMTP and documented cold-start
+  and rollback procedures in `docs/development/deployment.md`.
+- Plan `0015-mvp-free-hosting-setup.md`: all implementation work complete;
+  awaiting the manual production smoke test before archive.
 
 ### Added
 

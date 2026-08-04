@@ -29,6 +29,7 @@ const { t } = useI18n()
   <div class="beacon-container py-16 sm:py-24">
     <section class="grid min-h-[calc(100vh-13rem)] gap-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(22rem,0.58fr)] lg:items-center">
       <AuthContextPanel
+        class="hidden lg:block"
         :title="title"
         :description="description"
       />

@@ -2,7 +2,11 @@
 
 ## Status
 
-Proposed
+Accepted (2026-08-04): the hosting choice was finalized during implementation as
+Vercel Hobby for both Nuxt and Django through Vercel Services (one project, one
+domain, `/api/*` rewrites to the Django service) with Neon free-tier PostgreSQL.
+See `docs/plans/0015-mvp-free-hosting-setup.md` and
+`docs/development/deployment.md`.
 
 ## Date
 
@@ -58,7 +62,8 @@ resource limits.
 
 This decision does not decide where Solana event monitoring lives. Continuous
 indexing, long-running jobs, or RPC WebSocket listeners remain a manual blocker
-until the architecture decision is made.
+until the architecture decision is made (resolved for MVP 2026-08-04: hybrid
+pull — see `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`).
 
 ## Alternatives Considered
 
@@ -90,12 +95,14 @@ until the architecture decision is made.
 - Cold starts must be documented as expected behavior for free backend hosting.
 - Production environment variables must explicitly configure `ALLOWED_HOSTS`,
   CORS origins, CSRF trusted origins, secure cookies, frontend base URL, database
-  URL, email settings, reCAPTCHA settings, and Google OAuth redirect settings.
+  URL, email settings, and CAPTCHA settings (Google OAuth dropped from MVP scope
+  2026-08-04).
 - Backend health checks and smoke tests should be added before relying on the
   free production-like environment.
 - Any task requiring persistent Solana indexing, background workers, cron jobs,
   or WebSocket listeners must stop at a manual blocker until a worker/indexer
-  hosting decision is made.
+  hosting decision is made (MVP boundary resolved in 0023; a worker/indexer
+  still requires a follow-up plan).
 - Free tiers are suitable for MVP validation, not a promise of production
   reliability.
 

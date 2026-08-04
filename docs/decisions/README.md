@@ -38,7 +38,7 @@ Each record should include:
 | 0007 | [Password session auth foundation](0007-password-session-auth-foundation.md) | Accepted |
 | 0008 | [Trust-minimized protocol custody](0008-trust-minimized-protocol-custody.md) | Proposed |
 | 0009 | [Google social auth strategy](0009-google-social-auth-strategy.md) | Accepted |
-| 0010 | [MVP free hosting stack](0010-mvp-free-hosting-stack.md) | Proposed |
+| 0010 | [MVP free hosting stack](0010-mvp-free-hosting-stack.md) | Accepted |
 | 0011 | [Hybrid recommendation lifecycle](0011-hybrid-recommendation-lifecycle.md) | Accepted |
 | 0012 | [Canonical work and series identity](0012-canonical-work-series-identity.md) | Accepted |
 | 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
@@ -51,6 +51,7 @@ Each record should include:
 | 0020 | [Review agent design](0020-review-agent-design.md) | Accepted |
 | 0021 | [Lead developer agent design](0021-lead-developer-design.md) | Accepted |
 | 0022 | [Planner agent design](0022-planner-agent-design.md) | Accepted |
+| 0023 | [MVP Solana event monitoring boundary](0023-mvp-solana-event-monitoring-boundary.md) | Accepted |
 
 ## Maintenance Rules
 
