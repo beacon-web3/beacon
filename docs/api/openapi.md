@@ -24,8 +24,8 @@ operational stack details.
 ## Auth
 
 Auth endpoints use Django session cookies for browser authentication. Mutating
-auth endpoints verify reCAPTCHA v2 Invisible tokens when captcha is enabled on
-the backend. Password reset emails build confirmation links from
+auth endpoints verify Cap proof-of-work captcha tokens when captcha is enabled
+on the backend. Password reset emails build confirmation links from
 `FRONTEND_BASE_URL`.
 
 Google social auth also uses Django session cookies. Google OAuth/OIDC token
@@ -93,7 +93,7 @@ Request body:
   "display_name": "Reader One",
   "password": "correct horse battery staple",
   "password_confirmation": "correct horse battery staple",
-  "recaptcha_token": "recaptcha-v2-invisible-token"
+  "captcha_token": "cap-jwt-token"
 }
 ```
 
@@ -119,7 +119,7 @@ Request body:
 {
   "identifier": "user@example.com",
   "password": "correct horse battery staple",
-  "recaptcha_token": "recaptcha-v2-invisible-token"
+  "captcha_token": "cap-jwt-token"
 }
 ```
 
@@ -143,7 +143,7 @@ Request body:
 ```json
 {
   "email": "user@example.com",
-  "recaptcha_token": "recaptcha-v2-invisible-token"
+  "captcha_token": "cap-jwt-token"
 }
 ```
 
@@ -274,7 +274,7 @@ Request body:
 ```json
 {
   "email": "user@example.com",
-  "recaptcha_token": "recaptcha-v2-invisible-token"
+  "captcha_token": "cap-jwt-token"
 }
 ```
 

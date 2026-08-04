@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { csrfToken, prepareAuthPage, recaptchaToken, validPassword } from './helpers'
+import { captchaToken, csrfToken, prepareAuthPage, validPassword } from './helpers'
 
 test.beforeEach(async ({ context, page }) => {
   await prepareAuthPage(context, page)
@@ -19,7 +19,7 @@ test('signup submits account fields to the auth api', async ({ page }) => {
       display_name: 'Reader One',
       password: validPassword,
       password_confirmation: validPassword,
-      recaptcha_token: recaptchaToken
+      captcha_token: captchaToken
     })
 
     await route.fulfill({
@@ -129,52 +129,6 @@ test('signup shows safe api validation details', async ({ page }) => {
   await expect(page.getByRole('alert')).toContainText(
     'An account with this email already exists.'
   )
-})
-
-test('signup removes hidden recaptcha containers when cleanup reset fails', async ({ page }) => {
-  let signupRequested = false
-
-  await page.route('**/api/auth/signup/', async (route) => {
-    signupRequested = true
-    await route.fulfill({ status: 500 })
-  })
-
-  await page.goto('/signup')
-  await page.waitForLoadState('networkidle')
-  await page.evaluate(() => {
-    const recaptchaWindow = window as unknown as {
-      grecaptcha: {
-        execute: () => never
-        ready: (readyCallback: () => void) => void
-        render: () => number
-        reset: () => never
-      }
-    }
-
-    recaptchaWindow.grecaptcha = {
-      ready: (readyCallback: () => void) => readyCallback(),
-      render: () => 1,
-      execute: () => {
-        throw new Error('execute failed')
-      },
-      reset: () => {
-        throw new Error('reset failed')
-      }
-    }
-  })
-
-  await page.getByLabel('Display name').fill('Reader One')
-  await page.getByLabel('Username').fill('readerone')
-  await page.getByLabel('Email address').fill('new@example.com')
-  await page.getByLabel('Password', { exact: true }).fill(validPassword)
-  await page.getByLabel('Confirm password').fill(validPassword)
-  await page.getByRole('button', { name: 'Create account' }).click()
-
-  await expect(page.getByRole('alert')).toContainText(
-    'Network error. Check your connection and try again.'
-  )
-  await expect.poll(async () => page.locator('body > div[hidden]').count()).toBe(0)
-  expect(signupRequested).toBe(false)
 })
 
 test('signup blocks weak passwords before calling the auth api', async ({ page }) => {

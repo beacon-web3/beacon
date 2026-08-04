@@ -36,7 +36,7 @@ The current E2E tests verify that the home page loads in Chromium, the landing
 page fits narrow mobile screens without horizontal overflow, the French route
 loads with LTR direction, and signup/login/email-verification/password-reset
 forms submit to the password auth API contract. Auth E2E coverage also checks
-shared backend API transport CSRF header attachment, reCAPTCHA token inclusion,
+shared backend API transport CSRF header attachment, CAPTCHA token inclusion,
 active-locale `Accept-Language` attachment, password reset confirmation request
 shape, and weak-password blocking.
 Playwright starts the Nuxt dev server automatically through

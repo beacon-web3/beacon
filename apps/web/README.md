@@ -71,15 +71,15 @@ Use `useApiFetch()` for Beacon backend HTTP resources. Keep Solana RPC calls,
 wallet signing flows, and package SDK calls outside this transport unless they
 explicitly proxy through the Django API.
 
-Set `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` when backend reCAPTCHA is enabled. When the
-site key is empty, auth forms submit an empty token so local development can run
-with backend `RECAPTCHA_ENABLED=false`.
+Set `CAPTCHA_SECRET` in the Vercel project settings (server-only runtime config)
+to enable Cap proof-of-work captcha. When the secret is empty, auth forms submit
+an empty token so local development can run with `CAPTCHA_ENABLED=false`.
 
 ## Production Deployment
 
-Set `NUXT_PUBLIC_API_BASE_URL` and `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` in the
-hosting provider's project settings before public traffic. See
-`docs/development/deployment.md` for the full production checklist.
+Set `NUXT_PUBLIC_API_BASE_URL` and `CAPTCHA_SECRET` in the Vercel project
+settings before public traffic. See `docs/development/deployment.md` for the
+full production checklist.
 
 ## Internationalization
 

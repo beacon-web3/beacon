@@ -38,10 +38,10 @@ the variables declared in `apps/api/.env.example` and `apps/api/beacon_api/setti
 | `SECURE_HSTS_SECONDS` | `31536000` (1 year) once HTTPS is verified | No |
 | `SECURE_HSTS_INCLUDE_SUBDOMAINS` | `true` | No |
 | `SECURE_HSTS_PRELOAD` | `true` only when committing to HSTS preload | No |
-| `RECAPTCHA_ENABLED` | `true` before public traffic | No |
-| `RECAPTCHA_SECRET_KEY` | Google reCAPTCHA secret key | Yes |
-| `RECAPTCHA_VERIFY_URL` | `https://www.google.com/recaptcha/api/siteverify` (default) | No |
+| `CAPTCHA_ENABLED` | `true` before public traffic | No |
+| `CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as frontend) | Yes |
 | `EMAIL_BACKEND` | SMTP backend, e.g. `django.core.mail.backends.smtp.EmailBackend` | No |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` / `EMAIL_USE_TLS` / `EMAIL_USE_SSL` | Resend SMTP: host `smtp.resend.com`, port `465` (SSL) or `587` (TLS); user and password are both the Resend API key | Yes (user/password) |
 | `DEFAULT_FROM_EMAIL` | Verified sender, e.g. `no-reply@beacon.example` | No |
 | SMTP provider variables | Provider-specific (host, port, user, password), per provider docs | Yes |
 | `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth client ID | No (public by design) |
@@ -75,12 +75,12 @@ Set these in the Vercel project settings:
 | Variable | Value (production) | Secret? |
 |---|---|---|
 | `NUXT_PUBLIC_API_BASE_URL` | Same Vercel domain, e.g. `https://beacon.vercel.app` (`/api/*` rewrites to Django) | No |
-| `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` | Google reCAPTCHA site key | No |
+| `CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as backend) | Yes |
 
 `NUXT_PUBLIC_*` variables are embedded in the browser bundle, so they must not
 contain secrets. `NUXT_PUBLIC_API_BASE_URL` drives the shared `useApiFetch()`
-transport in `apps/web/`; `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` is used by the auth
-forms.
+transport in `apps/web/`; the Nuxt server reads `CAPTCHA_SECRET` to sign Cap
+proof-of-work captcha tokens.
 
 ## Verification
 

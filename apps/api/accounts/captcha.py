@@ -1,42 +1,25 @@
-import json
 import logging
-from urllib import parse, request
 
+import jwt
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
-def verify_recaptcha_token(token: str, remote_ip: str | None = None) -> bool:
-    if not settings.RECAPTCHA_ENABLED:
+def verify_captcha_token(token: str, remote_ip: str | None = None) -> bool:
+    if not settings.CAPTCHA_ENABLED:
         return True
 
-    if not token or not settings.RECAPTCHA_SECRET_KEY:
+    if not token or not settings.CAPTCHA_SECRET:
         return False
-
-    payload = {
-        "secret": settings.RECAPTCHA_SECRET_KEY,
-        "response": token,
-    }
-    if remote_ip:
-        payload["remoteip"] = remote_ip
-
-    data = parse.urlencode(payload).encode()
-    recaptcha_request = request.Request(
-        settings.RECAPTCHA_VERIFY_URL,
-        data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        method="POST",
-    )
 
     try:
-        with request.urlopen(recaptcha_request, timeout=5) as response:
-            result = json.loads(response.read().decode())
-    except OSError:
-        logger.exception("reCAPTCHA verification request failed")
+        jwt.decode(token, settings.CAPTCHA_SECRET, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        logger.warning("CAPTCHA token expired")
         return False
-    except ValueError:
-        logger.exception("reCAPTCHA verification response could not be parsed")
+    except jwt.InvalidTokenError:
+        logger.warning("CAPTCHA token invalid")
         return False
 
-    return result.get("success") is True
+    return True

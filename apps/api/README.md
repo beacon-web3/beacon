@@ -219,9 +219,9 @@ The root pre-commit hook runs Ruff only when staged Python files exist under `ap
 
 ## Auth Configuration
 
-The auth API uses Django session cookies, CSRF protection, optional reCAPTCHA,
-email verification OTPs, password reset emails, Google social auth through
-`django-allauth`, and cache-backed auth throttles.
+The auth API uses Django session cookies, CSRF protection, optional Cap
+proof-of-work captcha, email verification OTPs, password reset emails, Google
+social auth through `django-allauth`, and cache-backed auth throttles.
 
 Important environment variables:
 
@@ -261,10 +261,10 @@ synchronously through Django's configured email backend, so backend email errors
 can fail those requests even though their response bodies remain generic when the
 email backend succeeds.
 
-Before production or public traffic, set `RECAPTCHA_ENABLED=true` with a valid
-`RECAPTCHA_SECRET_KEY` and configure the Nuxt frontend with
-`NUXT_PUBLIC_RECAPTCHA_SITE_KEY` so browser auth submissions send reCAPTCHA v2
-Invisible tokens.
+Before production or public traffic, set `CAPTCHA_ENABLED=true` with a shared
+`CAPTCHA_SECRET` and configure the Nuxt frontend with the same `CAPTCHA_SECRET`
+so the browser's Cap proof-of-work solutions are signed into JWT captcha tokens
+the backend can verify.
 
 Browser clients using session cookies must send Django's CSRF token on
 authenticated unsafe requests. Successful login and email verification

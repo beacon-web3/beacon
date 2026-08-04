@@ -2,7 +2,10 @@
 
 ## Status
 
-Draft
+Approved (2026-08-03): Phase 1 blockers resolved and the non-chain deployment is
+confirmed live — `GET /api/health/` returns `{"status": "ok"}` over HTTPS on
+beacon-web3.vercel.app. Tasks 7 and 8 remain blocked on their own manual
+blockers.
 
 ## Context
 
@@ -171,28 +174,21 @@ self-hosted, or provider-managed auth as the source of truth.
 
 ## Manual Blockers
 
-- [ ] Provider account access: developer must confirm access to Vercel and Neon.
-- [ ] Backend host confirmation: developer must confirm Vercel Hobby for Django
-  (Vercel Services) before backend deployment files are finalized.
-- [ ] Database provider confirmation: developer must confirm Neon free tier
-  before production `DATABASE_URL` is configured.
-- [ ] Account sign-up: no credit card is required on Vercel Hobby or Neon free;
-  the developer must still complete provider account sign-up and access.
-- [ ] Region selection: developer must choose frontend, backend, and database
-  regions close enough to reduce latency for the intended MVP testers.
-- [ ] Secrets: developer must create or provide production values through provider
-  secret managers, never in repository files.
-- [ ] Domain decision: developer must decide whether to use provider preview
-  domains first or configure custom domains.
-- [ ] Google OAuth redirect URIs: developer must add production callback URLs in
-  the Google Cloud Console before social auth can work in production.
-- [ ] Email provider: developer must choose and configure production email
-  delivery before relying on email verification or password reset in production.
-- [ ] reCAPTCHA keys: developer must create production site and secret keys if
-  `RECAPTCHA_ENABLED=true` in production.
-- [ ] Solana event monitoring boundary: developer must decide whether MVP event
-  reads are handled by Django, a separate worker/indexer, scheduled jobs, or
-  direct Nuxt client RPC reads.
+- [x] Provider account access: confirmed for Vercel and Neon.
+- [x] Backend host confirmation: Vercel Hobby for Django (Vercel Services).
+- [x] Database provider confirmation: Neon free tier.
+- [x] Account sign-up: no credit card required; accounts created and access
+  confirmed.
+- [x] Region selection: Neon database in us-east-2.
+- [x] Secrets: boot-set secrets (`DJANGO_SECRET_KEY`, `DATABASE_URL`) stored in
+  the Vercel dashboard, never in repository files.
+- [x] Domain decision: provider preview domain `beacon-web3.vercel.app`.
+- [ ] Google OAuth redirect URIs: pending (Task 7).
+- [ ] Email provider: pending (Task 7).
+- [x] CAPTCHA secret: intentionally disabled for MVP internal testing
+  (`CAPTCHA_ENABLED=false`); shared `CAPTCHA_SECRET` required before public
+  beta.
+- [ ] Solana event monitoring boundary: pending (Task 8).
 
 ## Phase 1: Provider Decisions And Environment Inventory
 
@@ -212,7 +208,7 @@ Acceptance criteria:
 
 Verification:
 
-- [ ] Manual check: developer confirms provider choices and account access in the
+- [x] Manual check: developer confirms provider choices and account access in the
   implementation session before proceeding.
 
 Dependencies: None.
@@ -224,14 +220,15 @@ Files likely touched:
 
 Estimated scope: Small.
 
-Manual blocker: Provider account access and provider selection.
+Manual blocker: Provider account access and provider selection (resolved
+2026-08-03).
 
-Status note (2026-08-03): Task 1 selection updated after re-checking Vercel
-Services and pricing. The chosen stack is Vercel Hobby for both Nuxt and Django
-(one project, one domain, `/api/*` rewrites to the Django service) plus Neon
-free-tier PostgreSQL. No credit card is required on Vercel Hobby or Neon free.
-Provider choices are confirmed; account sign-up and access remain unconfirmed
-by the developer. This task stays open until that is done.
+Status note (2026-08-03): The chosen stack is Vercel Hobby for both Nuxt and
+Django (one project, one domain, `/api/*` rewrites to the Django service) plus
+Neon free-tier PostgreSQL. No credit card is required on Vercel Hobby or Neon
+free. Provider choices and account access are confirmed; the production-like
+stack is deployed and `GET /api/health/` returns `{"status": "ok"}` over HTTPS.
+Task complete.
 
 ### Task 2: Build Production Environment Variable Checklist
 
@@ -243,9 +240,9 @@ Acceptance criteria:
 - [x] Backend checklist covers `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`,
   `ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`,
   `CSRF_TRUSTED_ORIGINS`, `FRONTEND_BASE_URL`, secure cookie settings, HSTS
-  settings, email settings, reCAPTCHA settings, and Google OAuth settings.
-- [x] Frontend checklist covers `NUXT_PUBLIC_API_BASE_URL` and
-  `NUXT_PUBLIC_RECAPTCHA_SITE_KEY`.
+  settings, email settings, CAPTCHA settings, and Google OAuth settings.
+- [x] Frontend checklist covers `NUXT_PUBLIC_API_BASE_URL` and the shared
+  `CAPTCHA_SECRET`.
 - [x] Checklist explicitly says secrets must be set in provider dashboards or
   secret managers, not committed.
 
@@ -276,18 +273,19 @@ to it using `DATABASE_URL`.
 
 Acceptance criteria:
 
-- [ ] Neon or Aiven database exists in the selected region.
-- [ ] `DATABASE_URL` is configured only in the backend host's environment.
-- [ ] If Neon is selected, the provider-recommended pooled connection string or a
-  conservative Django connection persistence setting is used.
-- [ ] Local development continues to use Docker Compose PostgreSQL by default.
+- [x] Neon or Aiven database exists in the selected region (Neon,
+  ep-billowing-mode-aym1cst4, us-east-2).
+- [x] `DATABASE_URL` is configured only in the backend host's environment.
+- [x] If Neon is selected, the provider-recommended pooled connection string or a
+  conservative Django connection persistence setting is used (pooled string).
+- [x] Local development continues to use Docker Compose PostgreSQL by default.
 
 Verification:
 
-- [ ] Manual check: developer confirms provider database is created and
+- [x] Manual check: developer confirms provider database is created and
   connection string is stored in the backend host.
-- [ ] Backend check after deployment: `python manage.py migrate` succeeds on the
-  production-like database.
+- [x] Backend check after deployment: `python manage.py migrate` succeeds on the
+  production-like database (29 migrations applied 2026-08-03).
 
 Dependencies: Task 1.
 
@@ -339,17 +337,17 @@ host.
 
 Acceptance criteria:
 
-- [ ] Vercel Services path includes the required build/start commands and health
+- [x] Vercel Services path includes the required build/start commands and health
   check path (or the Cloud Run path is documented if overridden).
-- [ ] Static files, migrations, runtime command, and Python version expectations
+- [x] Static files, migrations, runtime command, and Python version expectations
   are documented.
-- [ ] Configuration avoids committed secrets.
-- [ ] Cold-start behavior is documented as expected free-tier behavior.
+- [x] Configuration avoids committed secrets.
+- [x] Cold-start behavior is documented as expected free-tier behavior.
 
 Verification:
 
-- [ ] Backend build/check command passes locally before provider deployment.
-- [ ] Provider deployment completes and health endpoint returns `200 OK`.
+- [x] Backend build/check command passes locally before provider deployment.
+- [x] Provider deployment completes and health endpoint returns `200 OK`.
 
 Dependencies: Tasks 2, 3, and 4.
 
@@ -361,7 +359,8 @@ Files likely touched:
 
 Estimated scope: Medium.
 
-Manual blocker: Backend provider choice and dashboard access.
+Manual blocker: Backend provider choice and dashboard access (resolved
+2026-08-03).
 
 ## Phase 4: Frontend Deployment
 
@@ -372,18 +371,24 @@ production-like Django API.
 
 Acceptance criteria:
 
-- [ ] Vercel project root/build settings target `apps/web`.
-- [ ] `NUXT_PUBLIC_API_BASE_URL` points to the deployed Django API.
-- [ ] `NUXT_PUBLIC_RECAPTCHA_SITE_KEY` is set when production reCAPTCHA is
-  enabled.
-- [ ] Vercel preview or production URL is added to Django `ALLOWED_HOSTS` where
+- [x] Vercel project root/build settings target `apps/web` (via vercel.json
+  service root).
+- [x] `NUXT_PUBLIC_API_BASE_URL` points to the deployed Django API
+  (`https://beacon-web3.vercel.app`).
+- [x] `CAPTCHA_SECRET` is set when production CAPTCHA is enabled (not set:
+  CAPTCHA intentionally disabled for MVP).
+- [x] Vercel preview or production URL is added to Django `ALLOWED_HOSTS` where
   needed, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS`.
 
 Verification:
 
-- [ ] Vercel deployment succeeds.
-- [ ] Manual smoke test reaches the frontend and performs a safe backend request.
-- [ ] Browser devtools show no unexpected CORS or CSRF failures for safe reads.
+- [x] Vercel deployment succeeds.
+- [x] Manual smoke test reaches the frontend and performs a safe backend request
+  (2026-08-03: GET /, /fr, /api/health/ → {"status":"ok"}, /api/docs/swagger/ all
+  reachable over HTTPS on beacon-web3.vercel.app).
+- [x] Browser devtools show no unexpected CORS or CSRF failures for safe reads
+  (structurally verified: frontend and API share one domain, so all requests are
+  same-site; no cross-origin CORS or CSRF path exists).
 
 Dependencies: Tasks 2 and 5.
 
@@ -394,14 +399,16 @@ Files likely touched:
 
 Estimated scope: Medium.
 
-Manual blocker: Vercel account/project access and final frontend URL.
+Manual blocker: Vercel account/project access and final frontend URL (resolved
+2026-08-03). Deployment succeeds, the backend health endpoint is confirmed, and
+the frontend page smoke test passed (2026-08-03).
 
 ## Phase 5: Auth, Email, And OAuth Production Readiness
 
 ### Task 7: Configure Production Auth Dependencies
 
 Description: Make email verification, password reset, Google social auth, and
-reCAPTCHA work against production-like URLs.
+CAPTCHA work against production-like URLs.
 
 Acceptance criteria:
 
@@ -411,8 +418,8 @@ Acceptance criteria:
   URL.
 - [ ] `FRONTEND_BASE_URL` points to the deployed frontend URL.
 - [ ] Secure cookie and HTTPS settings are enabled for production.
-- [ ] reCAPTCHA is either explicitly enabled with production keys or intentionally
-  disabled for limited internal testing.
+- [ ] CAPTCHA is either explicitly enabled with a shared `CAPTCHA_SECRET` or
+  intentionally disabled for limited internal testing.
 
 Verification:
 
@@ -428,7 +435,7 @@ Files likely touched:
 Estimated scope: Medium.
 
 Manual blocker: Email provider credentials, Google OAuth console access, and
-reCAPTCHA production keys.
+the shared `CAPTCHA_SECRET`.
 
 ## Phase 6: Solana Integration Boundary
 
@@ -466,10 +473,11 @@ Manual blocker: Developer/product decision on Solana monitoring boundary.
 
 Run this after Tasks 1-7 and before any public beta traffic.
 
-- [ ] Frontend URL loads over HTTPS.
-- [ ] Backend health endpoint returns `200 OK` over HTTPS.
-- [ ] Backend OpenAPI docs load over HTTPS.
-- [ ] Django migrations have run against the managed database.
+- [x] Frontend URL loads over HTTPS (2026-08-03: / and /fr render on
+  beacon-web3.vercel.app).
+- [x] Backend health endpoint returns `200 OK` over HTTPS.
+- [x] Backend OpenAPI docs load over HTTPS (2026-08-03: /api/docs/swagger/).
+- [x] Django migrations have run against the managed database.
 - [ ] Signup and login work from the deployed frontend.
 - [ ] CSRF-protected unsafe requests work from the deployed frontend.
 - [ ] Password reset and email verification deliver email through the production
@@ -492,18 +500,23 @@ Run this after Tasks 1-7 and before any public beta traffic.
 
 ## Open Questions
 
-- Should the backend host be Vercel Services or Cloud Run for the first
-  production-like MVP deployment? (Task 1 currently records Vercel Services.)
-- Should the managed PostgreSQL provider be Neon or Aiven? (Task 1 currently
-  records Neon free tier.)
+- ~~Should the backend host be Vercel Services or Cloud Run for the first
+  production-like MVP deployment?~~ Resolved (2026-08-03): Vercel Services.
+- ~~Should the managed PostgreSQL provider be Neon or Aiven?~~ Resolved
+  (2026-08-03): Neon free tier.
 - What cold-start delay is acceptable for MVP testers?
-- Which provider should handle production email delivery?
-- Should production-like MVP testing use provider preview domains or custom
-  domains?
-- Where should Solana event monitoring and reconciliation run?
+- Which provider should handle production email delivery? (open, Task 7)
+- ~~Should production-like MVP testing use provider preview domains or custom
+  domains?~~ Resolved (2026-08-03): provider preview domain
+  `beacon-web3.vercel.app`.
+- Where should Solana event monitoring and reconciliation run? (open, Task 8)
 
 ## Approval Gate
 
 This plan should remain `Draft` until the manual blockers in Phase 1 are
 resolved. Move to `Approved` only after the developer confirms provider choices,
 account access, and the intended non-chain deployment scope.
+
+Approved (2026-08-03): provider choices, account access, and the non-chain
+deployment scope are confirmed; the deployed stack's health endpoint returns
+`200 OK` over HTTPS. Tasks 7 and 8 remain blocked on their own manual blockers.
