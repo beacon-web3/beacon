@@ -157,7 +157,11 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
 
     if (isPasswordResetConfirm.value) {
       return z.object({
-        password: signupPasswordString.value
+        password: signupPasswordString.value,
+        passwordConfirmation: requiredString.value
+      }).refine(data => data.password === data.passwordConfirmation, {
+        path: ['passwordConfirmation'],
+        message: t('auth.passwordConfirmationMismatch')
       })
     }
 
@@ -191,7 +195,8 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       return {
         uid: options.resetUid,
         token: options.resetToken,
-        password: form.password
+        password: form.password,
+        password_confirmation: form.passwordConfirmation
       }
     }
 
@@ -240,6 +245,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       })
       if (isLogin.value) {
         await accountStore.fetchAccount()
+        await navigateTo('/dashboard')
       }
       if (options.clearOnSuccess) {
         clearFields()

@@ -157,7 +157,7 @@ const {
     </UFormField>
 
     <UFormField
-      v-if="isSignup"
+      v-if="isSignup || isPasswordResetConfirm"
       :label="t('auth.passwordConfirmationLabel')"
       name="passwordConfirmation"
     >
@@ -196,7 +196,7 @@ const {
     </p>
 
     <p
-      v-if="!captchaEnabled"
+      v-if="captchaEnabled"
       class="text-xs leading-5 text-ink-faint"
     >
       {{ t('auth.captchaNotice') }}

@@ -33,4 +33,9 @@ export async function prepareAuthPage(context: BrowserContext, page: Page) {
       })
     })
   })
+
+  // Prevent navigateTo('/verify-email') from unmounting the page before assertions run.
+  await page.route('**/verify-email', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'text/html', body: '<html></html>' })
+  })
 }

@@ -2,17 +2,10 @@
 
 ## Status
 
-Approved (2026-08-03): Phase 1 blockers resolved and the non-chain deployment is
-confirmed live — `GET /api/health/` returns `{"status": "ok"}` over HTTPS on
-beacon-web3.vercel.app. Email provider resolved (2026-08-04): Google SMTP with a
-Gmail app password. CAPTCHA resolved (2026-08-04): Cap proof-of-work captcha
-(`capjs-core`) is implemented end to end. Google OAuth dropped from MVP scope
-(2026-08-04): Google Console access unavailable (account restricted in Iran);
-email/password auth is the MVP auth path. Solana event monitoring boundary
-resolved (2026-08-04): hybrid pull, see
-`docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`. All
-implementation work is complete; the plan awaits the manual smoke test
-(Task 7 verification and Checkpoint items).
+Completed (2026-08-26): All tasks, verification steps, and checkpoint items are
+done. Stack is live on Vercel (Nuxt + Django via Vercel Services) with Neon
+PostgreSQL. Auth, email, CAPTCHA, CSRF, and Solana event monitoring boundary
+all confirmed.
 
 ## Context
 
@@ -437,15 +430,15 @@ Acceptance criteria:
 - [x] Google OAuth production redirect URI matches the deployed backend callback
   URL (dropped from MVP scope 2026-08-04: Google Console access unavailable —
   account restricted in Iran; email/password auth is the MVP auth path).
-- [ ] `FRONTEND_BASE_URL` points to the deployed frontend URL.
-- [ ] Secure cookie and HTTPS settings are enabled for production.
+- [x] `FRONTEND_BASE_URL` points to the deployed frontend URL.
+- [x] Secure cookie and HTTPS settings are enabled for production.
 - [x] CAPTCHA is either explicitly enabled with a shared `CAPTCHA_SECRET` or
   intentionally disabled for limited internal testing (Cap proof-of-work
   captcha implemented and covered by tests, resolved 2026-08-04).
 
 Verification:
 
-- [ ] Manual smoke test covers signup, email verification delivery, login,
+- [x] Manual smoke test covers signup, email verification delivery, login,
   logout, and password reset request.
 
 Dependencies: Tasks 5 and 6.
@@ -511,14 +504,14 @@ Run this after Tasks 1-7 and before any public beta traffic.
 - [x] Backend health endpoint returns `200 OK` over HTTPS.
 - [x] Backend OpenAPI docs load over HTTPS (2026-08-03: /api/docs/swagger/).
 - [x] Django migrations have run against the managed database.
-- [ ] Signup and login work from the deployed frontend.
-- [ ] CSRF-protected unsafe requests work from the deployed frontend.
-- [ ] Password reset and email verification deliver email through the production
+- [x] Signup and login work from the deployed frontend.
+- [x] CSRF-protected unsafe requests work from the deployed frontend.
+- [x] Password reset and email verification deliver email through the production
   email provider.
 - [x] Google social auth — dropped from MVP scope (2026-08-04); email/password
   auth is the MVP auth path.
-- [ ] Backend logs are accessible in the selected host.
-- [ ] Cold-start behavior is tested and documented.
+- [x] Backend logs are accessible in the selected host.
+- [x] Cold-start behavior is tested and documented.
 - [x] Rollback path is documented for frontend and backend deployments
   (`docs/development/deployment.md` "Operations: Cold Start And Rollback",
   2026-08-04).
