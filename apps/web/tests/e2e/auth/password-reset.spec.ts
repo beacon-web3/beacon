@@ -60,7 +60,8 @@ test('password reset confirm submits uid token and password to the auth api', as
     expect(request.postDataJSON()).toEqual({
       uid: 'uid-123',
       token: 'token-456',
-      password: validPassword
+      password: validPassword,
+      password_confirmation: validPassword
     })
 
     await route.fulfill({
@@ -73,6 +74,7 @@ test('password reset confirm submits uid token and password to the auth api', as
   await page.goto('/reset-password/confirm?uid=uid-123&token=token-456')
   await page.waitForLoadState('networkidle')
   await page.getByLabel('New password').fill(validPassword)
+  await page.getByLabel('Confirm password').fill(validPassword)
   await page.getByRole('button', { name: 'Reset password' }).click()
 
   await expect(page.getByRole('status')).toContainText(
@@ -92,6 +94,7 @@ test('password reset confirm shows invalid token details', async ({ page }) => {
   await page.goto('/reset-password/confirm?uid=uid-123&token=token-456')
   await page.waitForLoadState('networkidle')
   await page.getByLabel('New password').fill(validPassword)
+  await page.getByLabel('Confirm password').fill(validPassword)
   await page.getByRole('button', { name: 'Reset password' }).click()
 
   await expect(page.getByRole('alert')).toContainText('Invalid password reset token.')
