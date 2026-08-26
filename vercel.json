@@ -1,7 +1,7 @@
 {
   "services": {
     "frontend": { "root": "apps/web/" },
-    "backend": { "root": "apps/api/", "entrypoint": "beacon_api.wsgi:application" }
+    "backend": { "root": "apps/api/", "entrypoint": "beacon_api.wsgi:application", "buildCommand": "python manage.py collectstatic --noinput" }
   },
   "rewrites": [
     { "source": "/api/cap/(.*)", "destination": { "service": "frontend" } },
