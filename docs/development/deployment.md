@@ -74,6 +74,7 @@ Set these in the Vercel project settings:
 | Variable | Value (production) | Secret? |
 |---|---|---|
 | `NUXT_PUBLIC_API_BASE_URL` | Same Vercel domain, e.g. `https://beacon.vercel.app` (`/api/*` rewrites to Django) | No |
+| `NUXT_PUBLIC_CAPTCHA_ENABLED` | `true` to match backend `CAPTCHA_ENABLED` — controls the "Protected by CAPTCHA" notice in the auth form | No |
 | `NUXT_CAPTCHA_SECRET` | Shared secret for Cap proof-of-work captcha JWT signing (same value as backend) | Yes |
 
 `NUXT_PUBLIC_*` variables are embedded in the browser bundle, so they must not

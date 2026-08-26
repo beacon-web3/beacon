@@ -240,6 +240,7 @@ export function useEmailAuthForm(options: UseEmailAuthFormOptions) {
       })
       if (isLogin.value) {
         await accountStore.fetchAccount()
+        await navigateTo('/dashboard')
       }
       if (options.clearOnSuccess) {
         clearFields()

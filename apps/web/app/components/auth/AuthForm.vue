@@ -196,7 +196,7 @@ const {
     </p>
 
     <p
-      v-if="!captchaEnabled"
+      v-if="captchaEnabled"
       class="text-xs leading-5 text-ink-faint"
     >
       {{ t('auth.captchaNotice') }}

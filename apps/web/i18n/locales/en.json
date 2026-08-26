@@ -152,7 +152,7 @@
     "newPasswordLabel": "New password",
     "newPasswordPlaceholder": "New password",
     "passwordResetHelp": "Password reset responses are intentionally generic so account existence is not exposed.",
-    "captchaNotice": "Protected by CAPTCHA when enabled.",
+    "captchaNotice": "Protected by CAPTCHA.",
     "socialDivider": "or",
     "googleSignup": "Sign up with Google",
     "googleLogin": "Continue with Google",
