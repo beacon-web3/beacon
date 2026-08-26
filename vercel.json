@@ -1,11 +1,16 @@
 {
   "services": {
     "frontend": { "root": "apps/web/" },
-    "backend": { "root": "apps/api/", "entrypoint": "beacon_api.wsgi:application" }
+    "backend": {
+      "root": "apps/api/",
+      "entrypoint": "beacon_api.wsgi:application",
+      "staticFiles": "staticfiles"
+    }
   },
   "rewrites": [
     { "source": "/api/cap/(.*)", "destination": { "service": "frontend" } },
     { "source": "/api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/admin/(.*)", "destination": { "service": "backend" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
 }
