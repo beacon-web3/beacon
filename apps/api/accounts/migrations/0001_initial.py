@@ -1,23 +1,8 @@
-import django.contrib.auth.hashers
 import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.db.models.functions.text
 import django.utils.timezone
 from django.db import migrations, models
-
-
-def create_super_user(apps, schema_editor):
-    Account = apps.get_model("accounts", "Account")
-    if not Account.objects.filter(email="mohsenpk1370@gmail.com").exists():
-        Account.objects.create(
-            email="mohsenpk1370@gmail.com",
-            username="mohsenpk",
-            display_name="Mohsen",
-            password=django.contrib.auth.hashers.make_password("pass"),
-            is_staff=True,
-            is_superuser=True,
-            is_active=True,
-        )
 
 
 class Migration(migrations.Migration):
@@ -193,5 +178,4 @@ class Migration(migrations.Migration):
                 ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
-        migrations.RunPython(create_super_user, migrations.RunPython.noop),
     ]
