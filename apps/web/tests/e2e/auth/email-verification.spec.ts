@@ -6,7 +6,21 @@ test.beforeEach(async ({ context, page }) => {
   await prepareAuthPage(context, page)
 })
 
-test('email verification submits a six digit OTP to the auth api', async ({ page }) => {
+const accountPayload = {
+  account: {
+    id: 1,
+    email: 'user@example.com',
+    username: 'readerone',
+    display_name: 'Reader One',
+    wallet_address: null,
+    reputation_score: 0,
+    account_credit: '0'
+  }
+}
+
+test('email verification submits OTP, fetches account, and redirects home', async ({ page }) => {
+  let confirmRequested = false
+
   await page.route('**/api/auth/email-verification/confirm/', async (route) => {
     const request = route.request()
 
@@ -17,17 +31,20 @@ test('email verification submits a six digit OTP to the auth api', async ({ page
       otp: '123456'
     })
 
+    confirmRequested = true
+
     await route.fulfill({
       contentType: 'application/json',
       status: 200,
-      body: JSON.stringify({
-        account: {
-          id: 1,
-          email: 'user@example.com',
-          username: 'readerone',
-          display_name: 'Reader One'
-        }
-      })
+      body: JSON.stringify(accountPayload)
+    })
+  })
+
+  await page.route('**/api/auth/me/', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      status: 200,
+      body: JSON.stringify(accountPayload)
     })
   })
 
@@ -36,9 +53,8 @@ test('email verification submits a six digit OTP to the auth api', async ({ page
   await page.getByLabel('Verification code').fill('123456')
   await page.getByRole('button', { name: 'Verify email' }).click()
 
-  await expect(page.getByRole('status')).toContainText(
-    'Email verified for user@example.com.'
-  )
+  await expect(page).toHaveURL(/\/$/)
+  expect(confirmRequested).toBe(true)
 })
 
 test('email verification resend submits email and captcha token', async ({ page }) => {
