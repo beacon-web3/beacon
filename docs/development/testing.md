@@ -93,7 +93,7 @@ already running at the configured `DATABASE_URL`:
 
 ```bash
 source .venv/bin/activate
-python -m pip install -r requirements-dev.txt
+uv sync
 .venv/bin/pytest
 ```
 

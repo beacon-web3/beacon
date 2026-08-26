@@ -6,29 +6,7 @@ This workspace uses Django, Django REST Framework, and PostgreSQL for the Beacon
 
 ## What Is Installed
 
-The current Python dependencies are tracked in `requirements.txt`:
-
-* Django 5.2.15
-* Django REST Framework 3.17.1
-* django-allauth 65.13.1
-* django-cors-headers 4.9.0
-* django-environ 0.14.0
-* drf-spectacular 0.29.0
-* psycopg 3.3.4 with the binary libpq wheel extra
-* requests 2.32.5, retained as the OAuth2 HTTP transport used by
-  `django-allauth`
-* PyJWT 2.10.1
-* cryptography 46.0.3
-* asgiref 3.11.1
-* sqlparse 0.5.5
-* typing_extensions 4.15.0
-
-Development-only Python tools are tracked in `requirements-dev.txt`:
-
-* Ruff 0.15.20
-* pytest 9.1.1
-* pytest-django 4.12.0
-* factory_boy 3.3.3
+Python dependencies are managed with `uv` and tracked in `pyproject.toml` + `uv.lock`.
 
 ## Docker Setup
 
@@ -107,13 +85,7 @@ When activated, your terminal prompt usually shows `(.venv)`.
 ### 3. Install Dependencies
 
 ```bash
-python -m pip install -r requirements.txt
-```
-
-For development, install the development tools too:
-
-```bash
-python -m pip install -r requirements-dev.txt
+uv sync
 ```
 
 ### 4. Configure Environment Variables
@@ -180,8 +152,7 @@ Expected version:
 * Python virtual environment: `apps/api/.venv/`
 * Backend Dockerfile: `apps/api/Dockerfile`
 * Docker Compose services: `api` and `postgres`
-* Dependency list: `apps/api/requirements.txt`
-* Development dependency list: `apps/api/requirements-dev.txt`
+* Dependency list: `apps/api/pyproject.toml` + `apps/api/uv.lock`
 * Django installed: yes
 * Django REST Framework installed: yes
 * PostgreSQL driver installed: yes

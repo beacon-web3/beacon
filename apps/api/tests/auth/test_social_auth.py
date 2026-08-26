@@ -323,7 +323,7 @@ def test_google_callback_rejects_failed_allauth_exchange(api_client):
 
     assert response.status_code == status.HTTP_302_FOUND
     assert response.url == "http://localhost:3000/login?error=social_auth_failed"
-    assert Account.objects.count() == 0
+    assert Account.objects.count() == 1  # seeded superuser only
 
 
 @pytest.mark.django_db
@@ -375,7 +375,7 @@ def test_google_callback_rejects_malformed_identity_fields(api_client, extra_dat
 
     assert response.status_code == status.HTTP_302_FOUND
     assert response.url == "http://localhost:3000/login?error=social_auth_failed"
-    assert Account.objects.count() == 0
+    assert Account.objects.count() == 1  # seeded superuser only
     assert SocialAccount.objects.count() == 0
     assert api_client.get(reverse("me")).status_code == status.HTTP_403_FORBIDDEN
 
@@ -419,7 +419,7 @@ def test_google_callback_uses_existing_duplicate_social_identity(api_client):
         response = callback(api_client)
 
     assert response.status_code == status.HTTP_302_FOUND
-    assert Account.objects.count() == 1
+    assert Account.objects.count() == 2  # seeded superuser + created user
     assert SocialAccount.objects.count() == 1
     assert api_client.get(reverse("me")).status_code == status.HTTP_200_OK
 
@@ -516,7 +516,7 @@ def test_google_callback_fails_closed_after_username_uniqueness_race(api_client)
 
     assert response.status_code == status.HTTP_302_FOUND
     assert response.url == "http://localhost:3000/login?error=social_auth_failed"
-    assert Account.objects.count() == 0
+    assert Account.objects.count() == 1  # seeded superuser only
 
 
 @pytest.mark.django_db

@@ -10,12 +10,27 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Fixed
 
+- Fixed Vercel `collectstatic` `KeyError: 'staticfiles'` by adding `whitenoise`
+  to `pyproject.toml` so it is included in the `uv.lock` resolved set, which
+  Vercel's Python runtime installs from.
+- Added an admin superuser seed migration for production deploys so Django admin
+  is accessible without manual `createsuperuser` on a fresh Vercel database.
+- Adjusted social auth test assertions to account for the seeded superuser row
+  in the test database.
+
 - Review agent now includes untracked (new) files in the default uncommitted
   scope. Previously, only tracked modified files were reviewed, which meant new
   implementations, configs, and documentation files were silently skipped.
 
 ### Changed
 
+- Migrated the backend dependency management from `pip` + `requirements.txt` to
+  `uv` + `pyproject.toml` + `uv.lock`. Deleted `requirements.txt` and
+  `requirements-dev.txt`. Updated the Dockerfile to use the `uv` multi-stage
+  pattern and the README with new install instructions. Vercel resolves
+  dependencies from the lockfile directly.
+- Explicitly set `"default"` storage backend in `STORAGES` alongside the
+  whitenoise staticfiles backend.
 - Lead Developer agent: replaced `--taskIndex` (0-based) with `--task` (accepts
   both 1-based task numbers and standalone descriptions) and added `--phase`
   flag to implement all tasks in a given phase. `--plan` now accepts bare plan

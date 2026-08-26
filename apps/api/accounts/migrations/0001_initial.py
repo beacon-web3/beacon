@@ -8,17 +8,16 @@ from django.db import migrations, models
 
 def create_super_user(apps, schema_editor):
     Account = apps.get_model("accounts", "Account")
-    Account.objects.update_or_create(
-        email="mohsenpk1370@gmail.com",
-        defaults={
-            "username": "mohsenpk",
-            "display_name": "Mohsen",
-            "password": django.contrib.auth.hashers.make_password("pass"),
-            "is_staff": True,
-            "is_superuser": True,
-            "is_active": True,
-        },
-    )
+    if not Account.objects.filter(email="mohsenpk1370@gmail.com").exists():
+        Account.objects.create(
+            email="mohsenpk1370@gmail.com",
+            username="mohsenpk",
+            display_name="Mohsen",
+            password=django.contrib.auth.hashers.make_password("pass"),
+            is_staff=True,
+            is_superuser=True,
+            is_active=True,
+        )
 
 
 class Migration(migrations.Migration):
