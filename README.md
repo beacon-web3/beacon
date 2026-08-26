@@ -135,6 +135,16 @@ Testing is split by workspace. Frontend E2E tests use Playwright in `apps/web/`;
 
 Local backend development can run through Docker Compose in `apps/api/`, including the Django API and PostgreSQL database. See `docs/development/database.md` for setup commands.
 
+### Quick Start
+
+To start the full local environment (backend + frontend) in one command:
+
+```bash
+make dev
+```
+
+This copies the backend `.env` if missing, starts PostgreSQL and the Django API via Docker, runs migrations, then launches the Nuxt dev server at `http://localhost:3000`. The API will be available at `http://localhost:8000`. See `docs/development/local-docker-setup.md` for the full step-by-step walkthrough.
+
 ## Core Principle
 
 In a world of infinite content, attention becomes the scarce resource.

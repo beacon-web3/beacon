@@ -22,6 +22,7 @@ const localePath = useLocalePath()
 const { apiFetch } = useApiFetch()
 const { getApiErrorMessage } = useApiErrorMessage()
 const { executeCaptcha } = useCapToken()
+const accountStore = useAccountStore()
 
 const form = reactive<VerificationFormState>({
   email: props.initialEmail,
@@ -70,6 +71,9 @@ async function submit(_event: FormSubmitEvent<VerificationFormState>) {
       email: response.account?.email ?? form.email
     })
     form.otp = []
+
+    await accountStore.fetchAccount()
+    await navigateTo(localePath('/'))
   } catch (error) {
     errorText.value = getApiErrorMessage(error, { fallbackMessageKey: 'auth.verificationError' })
   } finally {
