@@ -26,9 +26,8 @@ Changelog. Use date-based entries until formal versioning starts.
 
 - Migrated the backend dependency management from `pip` + `requirements.txt` to
   `uv` + `pyproject.toml` + `uv.lock`. Deleted `requirements.txt` and
-  `requirements-dev.txt`. Updated the Dockerfile to use the `uv` multi-stage
-  pattern and the README with new install instructions. Vercel resolves
-  dependencies from the lockfile directly.
+  `requirements-dev.txt`. Updated the Dockerfile, CI workflow, and README to
+  use `uv`. Vercel resolves dependencies from the lockfile directly.
 - Explicitly set `"default"` storage backend in `STORAGES` alongside the
   whitenoise staticfiles backend.
 - Lead Developer agent: replaced `--taskIndex` (0-based) with `--task` (accepts
