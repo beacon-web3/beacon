@@ -38,5 +38,5 @@ as OKF-conformant markdown documents.
 ## Other
 
 * [Decisions](decisions/) - Business, product, and technical decision records.
-* [Plans](docs/plans/) - Implementation plans.
+* [Plans](../plans/) - Implementation plans.
 * [Development](development/) - Development documentation.

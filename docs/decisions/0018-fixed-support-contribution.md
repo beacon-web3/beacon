@@ -76,4 +76,4 @@ top-ups, withdrawals, or locked SOL.
 - `docs/product/open-questions.md`
 - `docs/tokenomics/rewards.md`
 - `docs/architecture/system-design.md`
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`

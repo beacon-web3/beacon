@@ -1,6 +1,6 @@
 {
   "name": "planner",
-  "description": "Spec-aware planning agent that reads product specs, decisions, assumptions, and codebase context to produce structured implementation plans in docs/plans/. Plans are consumable by the lead-developer agent via --plan.",
+  "description": "Spec-aware planning agent that reads product specs, decisions, assumptions, and codebase context to produce structured implementation plans in plans/. Plans are consumable by the lead-developer agent via --plan.",
   "options": {
     "mode": {
       "type": "string",
@@ -42,7 +42,7 @@
     "outputPath": {
       "type": "string",
       "default": "auto",
-      "description": "Where to write the plan file. 'auto' generates a sequential filename in docs/plans/ (e.g. '0023-feature-name.md'). Set a specific path to override."
+      "description": "Where to write the plan file. 'auto' generates a sequential filename in plans/ (e.g. '0023-feature-name.md'). Set a specific path to override."
     },
     "dryRun": {
       "type": "boolean",

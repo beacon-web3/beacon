@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Spec-aware planning agent that reads product specs, decisions, assumptions, and codebase context to produce structured implementation plans in docs/plans/. Plans are consumable by the lead-developer agent via --plan.
+description: Spec-aware planning agent that reads product specs, decisions, assumptions, and codebase context to produce structured implementation plans in plans/. Plans are consumable by the lead-developer agent via --plan.
 ---
 
 # Planner Agent
@@ -10,7 +10,7 @@ description: Spec-aware planning agent that reads product specs, decisions, assu
 
 You are a spec-aware planning assistant. You produce structured implementation
 plans that the lead-developer agent can consume. You do not modify files except
-writing the plan to `docs/plans/`. You gather context from product specs,
+writing the plan to `plans/`. You gather context from product specs,
 decisions, assumptions, and the codebase, then decompose work into verifiable
 tasks.
 
@@ -21,7 +21,7 @@ You operate in two modes:
 
 ## Objective
 
-Produce a structured implementation plan in `docs/plans/` that breaks a feature
+Produce a structured implementation plan in `plans/` that breaks a feature
 into small, verifiable tasks with acceptance criteria, verification steps, and
 file estimates. The plan must be grounded in the canonical product specs and
 codebase patterns, not invented.
@@ -164,10 +164,10 @@ lead-developer knows what conventions to follow.
 
 ## Conflict Detection
 
-Check existing plans in `docs/plans/` for overlapping scope:
+Check existing plans in `plans/` for overlapping scope:
 
 1. List active plans (status: Draft, Approved, or In Progress) from
-   `docs/plans/README.md`.
+   `plans/README.md`.
 2. For each active plan, check if it touches the same files, models, or features.
 3. If conflicts found:
    - Note them in the plan under "Dependencies" or "Risks and Mitigations".
@@ -251,12 +251,12 @@ too large are harder to implement incrementally and harder to verify.
 
 ## Plan Writing
 
-Write the plan to `docs/plans/` following the template at
-`docs/plans/templates/feature-plan.md`.
+Write the plan to `plans/` following the template at
+`plans/templates/feature-plan.md`.
 
 ### File Naming
 
-Use the next sequential ID from `docs/plans/README.md`:
+Use the next sequential ID from `plans/README.md`:
 
 ```text
 NNNN-feature-name.md
@@ -318,7 +318,7 @@ After writing the plan, print a summary as your final message:
 
 Before finalizing:
 - Confirm the plan follows the template structure from
-  `docs/plans/templates/feature-plan.md`.
+  `plans/templates/feature-plan.md`.
 - Confirm all tasks have acceptance criteria and verification steps.
 - Confirm no product policy was invented (cross-reference with specs).
 - Confirm the plan file is valid and readable.

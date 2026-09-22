@@ -15,8 +15,8 @@ Relevant specs and docs:
 - `docs/api/openapi.md`
 - `docs/architecture/system-design.md`
 - `docs/decisions/0007-password-session-auth-foundation.md`
-- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/completed/0006-email-verification-otp.md`
+- `plans/completed/0005-password-auth-and-profile-foundation.md`
+- `plans/completed/0006-email-verification-otp.md`
 
 ## Decisions
 

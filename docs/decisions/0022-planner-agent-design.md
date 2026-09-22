@@ -31,9 +31,9 @@ Add a spec-aware Planner Agent with the following design:
   feature touches frontend, backend, web3, or other domains.
 - **Full codebase awareness**: Explores existing patterns (models, views,
   components, contracts) to ensure plans follow conventions and identify reuse.
-- **Conflict detection**: Checks existing plans in `docs/plans/` for overlapping
+- **Conflict detection**: Checks existing plans in `plans/` for overlapping
   scope and flags dependencies or conflicts.
-- **Output**: Structured plan file in `docs/plans/` following the existing
+- **Output**: Structured plan file in `plans/` following the existing
   template, consumable by lead-developer via `--plan`.
 - **Dual documentation**: Agent instructions
   (`.opencode/agents/planner.md`) are the source of truth for agent behavior.

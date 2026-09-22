@@ -10,7 +10,7 @@
     },
     "plan": {
       "type": "string",
-      "description": "Plan file in docs/plans/. Accepts a full filename (e.g. '0016-recommendation-lifecycle-data-model.md') or a plan number (e.g. '0016'). When provided, the agent reads tasks from the plan and implements them sequentially."
+      "description": "Plan file in plans/. Accepts a full filename (e.g. '0016-recommendation-lifecycle-data-model.md') or a plan number (e.g. '0016'). When provided, the agent reads tasks from the plan and implements them sequentially."
     },
     "task": {
       "type": "string",

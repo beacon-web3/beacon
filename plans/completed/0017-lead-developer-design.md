@@ -166,13 +166,13 @@ Estimated scope: Small.
 ### Task 6: Update index files
 
 Description: Update `docs/decisions/README.md` index with the new ADR, update
-`docs/plans/README.md` active plans table, and add a changelog entry to
+`plans/README.md` active plans table, and add a changelog entry to
 `CHANGELOG.md`.
 
 Acceptance criteria:
 
 - [x] `docs/decisions/README.md` has row for 0021.
-- [x] `docs/plans/README.md` has row for 0017 with Completed status.
+- [x] `plans/README.md` has row for 0017 with Completed status.
 - [x] `CHANGELOG.md` has an entry under Unreleased > Added.
 
 Verification:
@@ -182,7 +182,7 @@ Verification:
 Files likely touched:
 
 - `docs/decisions/README.md`
-- `docs/plans/README.md`
+- `plans/README.md`
 - `CHANGELOG.md`
 
 Dependencies: Tasks 4, 5.

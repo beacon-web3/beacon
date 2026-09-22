@@ -22,7 +22,7 @@ Add a plan-driven Lead Developer Agent with the following design:
 - **Two-mode architecture**: Auto mode routes between direct implementation
   (inline, for small single-domain tasks) and orchestrate mode (specialist
   sub-agents, for multi-domain features) based on task count and domain spread.
-- **Plan-driven input**: Reads tasks from `docs/plans/` plan files or from
+- **Plan-driven input**: Reads tasks from `plans/` plan files or from
   standalone task descriptions. Updates plan task statuses as work progresses.
 - **Domain-based routing**: Tasks are classified by path prefix into Frontend,
   Backend, Web3, Shared, Documentation, and Config domains.

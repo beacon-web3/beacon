@@ -90,7 +90,7 @@ plan before implementation.
 
 - `docs/architecture/system-design.md`
 - `docs/decisions/0010-mvp-free-hosting-stack.md`
-- `docs/plans/0015-mvp-free-hosting-setup.md`
+- `plans/0015-mvp-free-hosting-setup.md`
 - `docs/product/mvp.md`
 - `docs/product/open-questions.md`
 - `docs/product/assumptions.md`

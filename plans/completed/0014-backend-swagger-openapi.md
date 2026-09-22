@@ -22,9 +22,9 @@ Relevant specs and docs:
 - `docs/architecture/system-design.md`
 - `docs/development/testing.md`
 - `apps/api/README.md`
-- `docs/plans/completed/0005-password-auth-and-profile-foundation.md`
-- `docs/plans/completed/0007-backend-auth-hardening.md`
-- `docs/plans/completed/0013-google-social-auth.md`
+- `plans/completed/0005-password-auth-and-profile-foundation.md`
+- `plans/completed/0007-backend-auth-hardening.md`
+- `plans/completed/0013-google-social-auth.md`
 
 ## User Decisions
 
@@ -130,11 +130,11 @@ The final public documentation routes should be:
   - Dependencies: Final route names.
 
 - [x] Update project tracking documentation.
-  - Acceptance: `docs/plans/README.md` lists this plan, and `CHANGELOG.md`
+  - Acceptance: `plans/README.md` lists this plan, and `CHANGELOG.md`
     records the completed Swagger/OpenAPI documentation work once implemented.
   - Verify: Documentation review confirms status and changelog entry match the
     actual implementation state.
-  - Files likely touched: `docs/plans/README.md`, `CHANGELOG.md`.
+  - Files likely touched: `plans/README.md`, `CHANGELOG.md`.
   - Dependencies: Implementation status.
 
 ## Acceptance Criteria

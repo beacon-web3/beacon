@@ -29,7 +29,7 @@ product behavior. Start with the OKF bundle index for a full navigation map:
 - `docs/tokenomics/staking.md` - Draft staking model for treasury and locked SOL.
 - `docs/architecture/system-design.md` - System boundaries and architecture direction.
 - `docs/decisions/` - Business, product, and technical decision records.
-- `docs/plans/` - Implementation plans that break approved work into tasks.
+- `plans/` - Implementation plans that break approved work into tasks.
 - `CHANGELOG.md` - Meaningful project changes by date or release.
 
 If implementation and documentation disagree, stop and surface the conflict
@@ -67,7 +67,7 @@ tokenomics, architecture, or API document before implementing. If requirements
 are missing or ambiguous, ask a short clarifying question instead of inventing
 product policy.
 
-For multi-step features or changes, create or update a plan in `docs/plans/`
+For multi-step features or changes, create or update a plan in `plans/`
 before implementation. Plans should link to relevant specs and decision records,
 break work into small tasks, include acceptance criteria, list verification
 steps, and identify blocked open questions. Do not implement tasks that depend
@@ -89,7 +89,7 @@ on unresolved product policy unless the user explicitly resolves the question.
   status.
 - If a changelog entry or decision record would be misleading without a related
   spec update, update the relevant spec in the same change.
-- Keep `docs/plans/` current when implementing planned work: update task status,
+- Keep `plans/` current when implementing planned work: update task status,
   record scope changes, and mark completed plans only after verification.
 
 Use the `using-agent-skills` skill when starting a session or when it is
@@ -147,7 +147,7 @@ standalone task.
 ### Planner
 
 Spec-aware planning agent. Reads product specs, decisions, assumptions, and
-codebase context to produce structured implementation plans in `docs/plans/`.
+codebase context to produce structured implementation plans in `plans/`.
 Plans are consumable by the lead-developer agent via `--plan`.
 
 - **Quick plan**: Light context gathering for simple, single-domain features.

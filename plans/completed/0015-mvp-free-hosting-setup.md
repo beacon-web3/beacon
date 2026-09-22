@@ -225,7 +225,7 @@ Dependencies: None.
 
 Files likely touched:
 
-- `docs/plans/0015-mvp-free-hosting-setup.md`
+- `plans/0015-mvp-free-hosting-setup.md`
 - Optional provider-specific deployment docs.
 
 Estimated scope: Small.
@@ -488,7 +488,7 @@ Files likely touched:
 
 - `docs/architecture/system-design.md`
 - `docs/decisions/`
-- Optional follow-up plan under `docs/plans/`.
+- Optional follow-up plan under `plans/`.
 
 Estimated scope: Small for decision, larger for implementation follow-up.
 

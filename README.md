@@ -170,7 +170,7 @@ Key documents:
 * `docs/tokenomics/rewards.md` - Draft reward and badge mechanics.
 * `docs/tokenomics/staking.md` - Draft staking model for treasury and locked SOL.
 * `docs/decisions/` - Business, product, and technical decision records.
-* `docs/plans/` - Implementation plans that break larger work into verifiable tasks.
+* `plans/` - Implementation plans that break larger work into verifiable tasks.
 * `CHANGELOG.md` - Meaningful project changes by date or release.
 
 These documents are intentionally marked as drafts where the economics require simulation, legal review, security review, or community approval.
