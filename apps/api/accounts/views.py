@@ -47,6 +47,10 @@ from accounts.throttles import (
     PasswordResetRateThrottle,
     SignupRateThrottle,
 )
+from recommendations.throttles import (
+    RecommendationFollowThrottle,
+    RecommendationReadThrottle,
+)
 
 Account = get_user_model()
 logger = logging.getLogger(__name__)
@@ -383,3 +387,37 @@ class PasswordResetConfirmView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": _("Password has been reset.")})
+
+
+class CuratorFollowView(APIView):
+    """Placeholder — POST follow / DELETE unfollow implemented in Phase 2."""
+
+    throttle_classes = [RecommendationFollowThrottle]
+
+
+class FollowersView(APIView):
+    """Placeholder — GET followers (public) implemented in Phase 2."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [RecommendationReadThrottle]
+
+
+class FollowingView(APIView):
+    """Placeholder — GET following (public) implemented in Phase 2."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [RecommendationReadThrottle]
+
+
+class ReputationView(APIView):
+    """Placeholder — GET reputation events (public) implemented in Phase 2."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [RecommendationReadThrottle]
+
+
+class ProfileView(APIView):
+    """Placeholder — GET public profile (public) implemented in Phase 2."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [RecommendationReadThrottle]

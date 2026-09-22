@@ -1,0 +1,85 @@
+from django.urls import path
+
+from recommendations.views import (
+    BookmarkView,
+    DuplicateReportListView,
+    DuplicateReportView,
+    ReactivateView,
+    RecommendationBadgeListView,
+    RecommendationDetailView,
+    RecommendationListView,
+    RecommendView,
+    StakeHistoryView,
+    StakeView,
+    SupportConfirmView,
+    SupportListView,
+    SupportView,
+)
+
+urlpatterns = [
+    path(
+        "recommendations/",
+        RecommendationListView.as_view(),
+        name="recommendation-list",
+    ),
+    path(
+        "recommendations/<int:id>/",
+        RecommendationDetailView.as_view(),
+        name="recommendation-detail",
+    ),
+    path(
+        "recommendations/<int:id>/recommend/",
+        RecommendView.as_view(),
+        name="recommendation-recommend",
+    ),
+    path(
+        "recommendations/<int:id>/reactivate/",
+        ReactivateView.as_view(),
+        name="recommendation-reactivate",
+    ),
+    path(
+        "recommendations/<int:id>/support/",
+        SupportView.as_view(),
+        name="recommendation-support",
+    ),
+    path(
+        "recommendations/<int:id>/support/confirm/",
+        SupportConfirmView.as_view(),
+        name="recommendation-support-confirm",
+    ),
+    path(
+        "recommendations/<int:id>/supports/",
+        SupportListView.as_view(),
+        name="recommendation-supports",
+    ),
+    path(
+        "recommendations/<int:id>/stake/",
+        StakeView.as_view(),
+        name="recommendation-stake",
+    ),
+    path(
+        "recommendations/<int:id>/stake/history/",
+        StakeHistoryView.as_view(),
+        name="recommendation-stake-history",
+    ),
+    path(
+        "recommendations/<int:id>/bookmark/",
+        BookmarkView.as_view(),
+        name="recommendation-bookmark",
+    ),
+    path(
+        "recommendations/<int:id>/badges/",
+        RecommendationBadgeListView.as_view(),
+        name="recommendation-badges",
+    ),
+    path(
+        "recommendations/<int:id>/report-duplicate/",
+        DuplicateReportView.as_view(),
+        name="recommendation-report-duplicate",
+    ),
+    path(
+        "recommendations/<int:id>/duplicate-reports/",
+        DuplicateReportListView.as_view(),
+        name="recommendation-duplicate-reports",
+    ),
+]

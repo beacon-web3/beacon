@@ -14,6 +14,13 @@ from recommendations.models import (
     Support,
 )
 
+BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+
+def _base58_signature(n: int) -> str:
+    """Return an 88-character base58 string (Solana signature shape)."""
+    return "".join(BASE58[(n // (58**i)) % 58] for i in range(88))
+
 
 class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -78,6 +85,8 @@ class SupportFactory(factory.django.DjangoModelFactory):
     supporter_number = factory.Sequence(lambda n: n + 1)
     amount_lamports = 10_000_000
     recommendation_cycle_number = 0
+    # Support.clean() requires an on-chain signature.
+    on_chain_support_transaction = factory.Sequence(_base58_signature)
 
 
 class BookmarkFactory(factory.django.DjangoModelFactory):

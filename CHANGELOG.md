@@ -8,6 +8,13 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Added
+
+- Recommendation lifecycle API Phase 1 foundation: URL routing for
+  `/api/recommendations/` and `/api/accounts/`, serializer layer, per-endpoint
+  throttle scopes (env-configurable), and idempotency infrastructure
+  (`Idempotency-Key` support with hashed key storage, replay, and TTL).
+
 ### Documentation
 
 - Moved `docs/plans/` to the repository root as `plans/` and updated all
