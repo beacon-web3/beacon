@@ -81,4 +81,4 @@ required for reactivation.
 - `docs/product/assumptions.md`
 - `docs/product/open-questions.md`
 - `docs/architecture/system-design.md`
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`

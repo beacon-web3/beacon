@@ -15,7 +15,7 @@ the temporary note from this file.
 - Product policy questions and assumptions: `docs/product/open-questions.md`
   and `docs/product/assumptions.md`.
 - Roadmap and implementation tracking: `docs/product/roadmap.md` and
-  `docs/plans/`.
+  `plans/`.
 - Architecture direction: `docs/architecture/system-design.md`.
 - API behavior: `docs/api/openapi.md`.
 - Testing workflow: `docs/development/testing.md`.

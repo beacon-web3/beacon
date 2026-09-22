@@ -84,4 +84,4 @@ conditions if no recommender SOL remains locked on the active cycle.
 - `docs/tokenomics/rewards.md`
 - `docs/tokenomics/staking.md`
 - `docs/architecture/system-design.md`
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`

@@ -114,8 +114,8 @@ rules for future feature breakdowns.
 
 Acceptance criteria:
 
-- [x] `docs/plans/README.md` explains when and how to create plans.
-- [x] `docs/plans/templates/feature-plan.md` provides a reusable template.
+- [x] `plans/README.md` explains when and how to create plans.
+- [x] `plans/templates/feature-plan.md` provides a reusable template.
 - [x] This plan records the documentation-foundation work.
 - [x] `AGENTS.md`, `README.md`, and `CHANGELOG.md` reference plan tracking.
 

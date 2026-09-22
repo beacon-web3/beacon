@@ -5,7 +5,7 @@
 Accepted (2026-08-04): the hosting choice was finalized during implementation as
 Vercel Hobby for both Nuxt and Django through Vercel Services (one project, one
 domain, `/api/*` rewrites to the Django service) with Neon free-tier PostgreSQL.
-See `docs/plans/0015-mvp-free-hosting-setup.md` and
+See `plans/0015-mvp-free-hosting-setup.md` and
 `docs/development/deployment.md`.
 
 ## Date
@@ -112,4 +112,4 @@ pull — see `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`).
 - `docs/development/database.md`
 - `docs/product/open-questions.md`
 - `docs/product/assumptions.md`
-- `docs/plans/0015-mvp-free-hosting-setup.md`
+- `plans/0015-mvp-free-hosting-setup.md`

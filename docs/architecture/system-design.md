@@ -139,7 +139,7 @@ handled by Django, a separate worker/indexer, scheduled jobs, or direct Nuxt
 client reads from RPC nodes. Do not invent this boundary during deployment work.
 
 See `docs/decisions/0010-mvp-free-hosting-stack.md` and
-`docs/plans/0015-mvp-free-hosting-setup.md`.
+`plans/0015-mvp-free-hosting-setup.md`.
 
 ## Data Model Concepts
 

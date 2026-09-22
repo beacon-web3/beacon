@@ -2,7 +2,7 @@
 
 This page is the production checklist for environment variables across the
 Beacon backend and frontend. It pairs with plan
-`docs/plans/0015-mvp-free-hosting-setup.md` (MVP free hosting setup).
+`plans/0015-mvp-free-hosting-setup.md` (MVP free hosting setup).
 
 The MVP target stack is:
 

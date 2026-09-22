@@ -39,7 +39,7 @@ Use sequential filenames:
 0003-wallet-connection.md
 ```
 
-Templates live in `docs/plans/templates/`.
+Templates live in `plans/templates/`.
 
 ## Maintenance Rules
 
@@ -50,7 +50,7 @@ Templates live in `docs/plans/templates/`.
 - Update a plan when scope changes during implementation.
 - Update `CHANGELOG.md` when a completed plan produces meaningful project
   changes.
-- Move completed plan files into `docs/plans/completed/` and keep active,
+- Move completed plan files into `plans/completed/` and keep active,
   draft, in-progress, superseded, or canceled plans at the top level unless the
   archive structure changes.
 
@@ -62,7 +62,7 @@ Templates live in `docs/plans/templates/`.
 
 ## Completed Plans
 
-Completed plans are archived in `docs/plans/completed/` to keep active planning
+Completed plans are archived in `plans/completed/` to keep active planning
 easy to scan while preserving implementation history.
 
 | ID   | Plan | Status    |

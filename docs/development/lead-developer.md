@@ -5,7 +5,7 @@
 > `.opencode/agents/lead-developer.md`.
 
 Plan-driven implementation agent that builds Beacon features across domains. It
-reads tasks from plans in `docs/plans/` or from standalone task descriptions,
+reads tasks from plans in `plans/` or from standalone task descriptions,
 implements them with domain-specific validation, and produces an implementation
 report.
 
@@ -34,7 +34,7 @@ sub-agents.
 The `--plan` flag accepts either a full filename or a bare plan number:
 
 - `--plan 0018-recommendation-lifecycle-api.md` — resolves directly.
-- `--plan 0018` — searches `docs/plans/` then `docs/plans/completed/` for a
+- `--plan 0018` — searches `plans/` then `plans/completed/` for a
   file starting with `0018`. Errors if no match or multiple matches.
 
 ### Task and Phase Selection
@@ -157,7 +157,7 @@ be running. Pre-flight lint and migration checks do **not** require Docker.
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `mode` | `auto` \| `direct` \| `orchestrate` | `auto` | Build mode |
-| `plan` | `string` | — | Plan file in `docs/plans/` (filename or number) |
+| `plan` | `string` | — | Plan file in `plans/` (filename or number) |
 | `task` | `string` | — | Standalone task description, or 1-based task number with `--plan` |
 | `phase` | `number` | — | 1-based phase number to run all tasks in that phase |
 | `paths` | `string[]` | `[]` | Restrict to specific files/dirs |

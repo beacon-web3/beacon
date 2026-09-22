@@ -373,7 +373,7 @@ Dependencies: Spec Approval checkpoint.
 
 Files likely touched:
 
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`
 - Optional schema note under `docs/architecture/` if the design becomes too large
   for the plan.
 
@@ -837,7 +837,7 @@ Dependencies: Spec Approval checkpoint.
 
 Files likely touched:
 
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`
 - Optional schema note under `docs/architecture/` if the design becomes too large
   for the plan.
 
@@ -929,7 +929,7 @@ Dependencies: Task 5.
 
 Files likely touched:
 
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`
 - Later implementation files under `apps/api/`.
 
 Estimated scope: Small.
@@ -1155,13 +1155,13 @@ Acceptance criteria:
 
 Verification:
 
-- [x] Follow-up plan is linked from `docs/plans/README.md` if created.
+- [x] Follow-up plan is linked from `plans/README.md` if created.
 
 Dependencies: Tasks 1-11.
 
 Files likely touched:
 
-- New plan under `docs/plans/`.
+- New plan under `plans/`.
 - `docs/api/openapi.md` planning section if needed.
 
 Estimated scope: Small.

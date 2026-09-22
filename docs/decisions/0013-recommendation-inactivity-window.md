@@ -105,4 +105,4 @@ MVP activation and reactivation minimum stake.
 - `docs/product/open-questions.md`
 - `docs/tokenomics/rewards.md`
 - `docs/architecture/system-design.md`
-- `docs/plans/0016-recommendation-lifecycle-data-model.md`
+- `plans/0016-recommendation-lifecycle-data-model.md`

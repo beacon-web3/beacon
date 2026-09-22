@@ -5,7 +5,7 @@
 > see `.opencode/agents/planner.md`.
 
 Spec-aware planning agent that reads product specs, decisions, assumptions, and
-codebase context to produce structured implementation plans in `docs/plans/`.
+codebase context to produce structured implementation plans in `plans/`.
 Plans are consumable by the lead-developer agent via `--plan`.
 
 ## Quick Start
@@ -16,7 +16,7 @@ planner --scope "governance"                                         # plan for 
 planner --specs "docs/product/user-stories.md" "docs/tokenomics/rewards.md"  # plan from specific specs
 planner --description "..." --dryRun                                 # preview plan without writing
 planner --description "..." --mode direct                            # force full plan
-planner --description "..." --outputPath docs/plans/0023-bookmarks.md  # custom output path
+planner --description "..." --outputPath plans/0023-bookmarks.md  # custom output path
 ```
 
 ## How It Works
@@ -78,7 +78,7 @@ opportunities.
 
 ## Conflict Detection
 
-The agent checks existing plans in `docs/plans/` for overlapping scope and
+The agent checks existing plans in `plans/` for overlapping scope and
 flags conflicts or dependencies in the output plan.
 
 ## Options
@@ -137,7 +137,7 @@ Plans produced by the planner agent are directly consumable by the
 lead-developer agent:
 
 ```
-lead-developer --plan docs/plans/0023-bookmarks.md
+lead-developer --plan plans/0023-bookmarks.md
 ```
 
 The lead-developer reads the plan, validates it, and implements tasks

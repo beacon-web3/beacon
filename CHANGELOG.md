@@ -8,6 +8,12 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Documentation
+
+- Moved `docs/plans/` to the repository root as `plans/` and updated all
+  internal, decision-record, agent-config, and README links to reference the
+  new location.
+
 ### Fixed
 
 - Fixed Vercel `collectstatic` `KeyError: 'staticfiles'` by adding `whitenoise`
@@ -34,8 +40,8 @@ Changelog. Use date-based entries until formal versioning starts.
   both 1-based task numbers and standalone descriptions) and added `--phase`
   flag to implement all tasks in a given phase. `--plan` now accepts bare plan
   numbers (e.g. `--plan 0018`) in addition to full filenames.
-- Lead Developer agent: added plan resolution by number — searches `docs/plans/`
-  then `docs/plans/completed/` for matching files.
+- Lead Developer agent: added plan resolution by number — searches `plans/`
+  then `plans/completed/` for matching files.
 - Lead Developer agent: added plan parsing that supports both phase-grouped
   format (`### Phase N: Name` / `#### Task N: Name`) and legacy flat format.
 - Plan template restructured with explicit phase groupings (`### Phase N: Name`
@@ -101,7 +107,7 @@ Changelog. Use date-based entries until formal versioning starts.
   `docs/development/lead-developer.md`.
 - Added the Planner Agent: a spec-aware planning agent that reads product specs,
   decisions, assumptions, and codebase context to produce structured
-  implementation plans in `docs/plans/`. Supports auto-routing between quick
+  implementation plans in `plans/`. Supports auto-routing between quick
   plan (light context gathering) and full plan (thorough codebase exploration),
   three core skills (spec-driven-development, planning-and-task-breakdown,
   context-engineering), dynamic domain skill loading, conflict detection against
