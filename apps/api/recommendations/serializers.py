@@ -195,7 +195,9 @@ class DuplicateReportCreateSerializer(serializers.Serializer):
     suspected_duplicate_of = serializers.PrimaryKeyRelatedField(
         queryset=BookRecommendation.objects.all(), required=False, allow_null=True
     )
-    reason = serializers.CharField(required=False, allow_blank=True, default="")
+    reason = serializers.CharField(
+        required=False, allow_blank=True, default="", max_length=1000
+    )
 
     def validate(self, attrs):
         recommendation = self.context.get("recommendation")
@@ -395,7 +397,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ["display_name", "reputation_score", "badge_count"]
         read_only_fields = fields
 
-    def get_badge_count(self, obj):
+    def get_badge_count(self, obj) -> int:
         return obj.badges.count()
 
 

@@ -3,15 +3,18 @@ from django.core.cache import cache
 from django.test import override_settings
 from rest_framework.test import APIClient
 
+from recommendations.serializers import (
+    MIN_ACTIVATION_STAKE_LAMPORTS as MIN_ACTIVATION_STAKE,
+)
 from tests.recommendations.factories import (
     AccountFactory,
     BookRecommendationFactory,
+    RecommenderParticipantFactory,
 )
 
 pytestmark = pytest.mark.django_db
 
 VALID_SIGNATURE = "1" * 88
-MIN_ACTIVATION_STAKE = 200_000_000
 
 
 @pytest.fixture(autouse=True)
@@ -97,6 +100,45 @@ class TestBookmarkThrottle(ThrottleTestMixin):
         client = APIClient()
         client.force_authenticate(user=user)
         return client.post(f"/api/recommendations/{rec.id}/bookmark/")
+
+
+class TestStakeThrottle(ThrottleTestMixin):
+    scope = "recommendation_stake"
+
+    def _call(self, user):
+        rec = BookRecommendationFactory()
+        RecommenderParticipantFactory(account=user, recommendation=rec, is_active=True)
+        client = APIClient()
+        client.force_authenticate(user=user)
+        payload = {"amount_lamports": MIN_ACTIVATION_STAKE}
+        return client.post(
+            f"/api/recommendations/{rec.id}/stake/", payload, format="json"
+        )
+
+
+class TestStakeReclaimThrottle(ThrottleTestMixin):
+    """The stake throttle class also guards DELETE (reclaim)."""
+
+    scope = "recommendation_stake"
+
+    def _call(self, user):
+        rec = BookRecommendationFactory()
+        RecommenderParticipantFactory(account=user, recommendation=rec, is_active=True)
+        client = APIClient()
+        client.force_authenticate(user=user)
+        return client.delete(f"/api/recommendations/{rec.id}/stake/")
+
+
+class TestDuplicateThrottle(ThrottleTestMixin):
+    scope = "recommendation_duplicate"
+
+    def _call(self, user):
+        rec = BookRecommendationFactory()
+        client = APIClient()
+        client.force_authenticate(user=user)
+        return client.post(
+            f"/api/recommendations/{rec.id}/report-duplicate/", {}, format="json"
+        )
 
 
 class TestFollowThrottle(ThrottleTestMixin):

@@ -32,6 +32,18 @@ Changelog. Use date-based entries until formal versioning starts.
   ACTIVE when an active `RecommenderParticipant` exists, otherwise stays
   INACTIVE). Added `GET /api/recommendations/{id}/supports/` to list supporters
   publicly, ordered by `supporter_number`.
+- Recommendation lifecycle API Phase 5 duplicate report and stake endpoints:
+  `POST /api/recommendations/{id}/report-duplicate/` files a PENDING
+  `DuplicateReport` (optional `suspected_duplicate_of` and `reason`, 409 on
+  repeat filing, 400 on self-reference) with
+  `GET /api/recommendations/{id}/duplicate-reports/` for admin paginated review;
+  `POST /api/recommendations/{id}/stake/` top-ups an existing participant's
+  locked stake (50,000,000 lamport minimum, never changes lifecycle state) and
+  `DELETE /api/recommendations/{id}/stake/` reclaims an active position in full
+  under `select_for_update()`, both returning Solana transaction hints; and
+  `GET /api/recommendations/{id}/stake/history/` lists participant history
+  publicly ordered by `reactivation_number`. Extended throttle coverage to the
+  stake and duplicate-report endpoints.
 
 ### Documentation
 

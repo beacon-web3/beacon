@@ -11,7 +11,7 @@ from drf_spectacular.utils import (
     extend_schema,
     extend_schema_view,
 )
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,6 +20,7 @@ from recommendations.models import (
     SUPPORT_AMOUNT_LAMPORTS,
     Bookmark,
     BookRecommendation,
+    DuplicateReport,
     RecommenderParticipant,
     Support,
 )
@@ -29,6 +30,8 @@ from recommendations.serializers import (
     BookmarkReadSerializer,
     BookmarkSerializer,
     CreateRecommendationSerializer,
+    DuplicateReportCreateSerializer,
+    DuplicateReportReadSerializer,
     ReactivateSerializer,
     RecommendationDetailSerializer,
     RecommendationEnvelopeSerializer,
@@ -36,6 +39,7 @@ from recommendations.serializers import (
     RecommendationSummarySerializer,
     RecommenderParticipantSerializer,
     RecommendSerializer,
+    StakeAddSerializer,
     SupportConfirmSerializer,
     SupportCreateSerializer,
     SupportEnvelopeSerializer,
@@ -53,10 +57,6 @@ from recommendations.throttles import (
     RecommendationSupportThrottle,
     RecommendationUpdateThrottle,
 )
-
-# Placeholder views for later Plan 0018 phases (Phase 5 stake/duplicate-report
-# endpoints). Permission and throttle classes reflect the plan's rate/permission
-# matrix so public reads stay public.
 
 Account = get_user_model()
 
@@ -278,6 +278,7 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         return queryset
 
     @extend_schema(
+        operation_id="recommendations_list",
         summary="List recommendations",
         description=(
             "Public endpoint. Returns paginated canonical recommendation "
@@ -377,6 +378,7 @@ class RecommendationDetailView(RecommendationUpdateView):
         return [RecommendationReadThrottle()]
 
     @extend_schema(
+        operation_id="recommendations_retrieve",
         summary="Retrieve a recommendation",
         description=(
             "Public endpoint. Authenticated requests receive the full detail "
@@ -773,17 +775,211 @@ class SupportListView(APIView):
         )
 
 
-class StakeView(APIView):
-    """Placeholder — POST add stake / DELETE reclaim, implemented in Phase 5."""
+class StakeBaseView(APIView):
+    """POST top-up / DELETE reclaim for the caller's recommender stake.
 
+    Both operations lock the parent recommendation row with
+    ``select_for_update()`` and only mutate the caller's
+    ``RecommenderParticipant`` locked balance. Lifecycle state (``is_active``
+    for top-ups, ``BookRecommendation.status``, ``current_recommender``,
+    ``recommendation_cycle_number``) is never changed here — positions are
+    opened exclusively through recommend/reactivate (Plan 0018).
+    """
+
+    def _locked_recommendation(self, id):
+        return get_object_or_404(BookRecommendation.objects.select_for_update(), id=id)
+
+    @extend_schema(
+        summary="Reclaim recommender stake",
+        description=(
+            "Authenticated only. Reclaims all locked SOL from the caller's "
+            "active recommender position: sets locked_amount_lamports to 0, "
+            "records reclaimed_at, and deactivates the position. Does not "
+            "change recommendation lifecycle state. Returns Solana hints."
+        ),
+        responses={
+            200: RecommendationEnvelopeSerializer,
+            400: OpenApiResponse(description="No active stake to reclaim."),
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation not found."),
+        },
+    )
+    def delete(self, request, id):
+        with transaction.atomic():
+            recommendation = self._locked_recommendation(id)
+            participant = (
+                recommendation.recommender_participants.filter(
+                    account=request.user, is_active=True
+                )
+                .order_by("-reactivation_number", "-created_at")
+                .first()
+            )
+            if participant is None:
+                return Response(
+                    {
+                        "detail": _(
+                            "You do not have an active stake on this recommendation."
+                        )
+                    },
+                    status=400,
+                )
+            reclaimed_amount = participant.locked_amount_lamports
+            now = timezone.now()
+            participant.locked_amount_lamports = 0
+            participant.reclaimed_at = now
+            participant.last_stake_change_at = now
+            participant.is_active = False
+            participant.save(
+                update_fields=[
+                    "locked_amount_lamports",
+                    "reclaimed_at",
+                    "last_stake_change_at",
+                    "is_active",
+                    "updated_at",
+                ]
+            )
+            # current_recommender means "account currently staked on the
+            # active cycle; null when inactive" (decision 0011). The reclaimed
+            # participant is now inactive, so stop advertising it as current.
+            if recommendation.current_recommender_id == participant.account_id:
+                recommendation.current_recommender = None
+                recommendation.save(update_fields=["current_recommender", "updated_at"])
+        return Response(
+            RecommendationEnvelopeSerializer(
+                instance={
+                    "recommendation": recommendation,
+                    "recommender_participant": RecommenderParticipantSerializer(
+                        participant
+                    ).data,
+                    "solana_hints": activation_hints(
+                        recommendation, reclaimed_amount, request.user
+                    ),
+                }
+            ).data
+        )
+
+    def post(self, request, id):
+        with transaction.atomic():
+            recommendation = self._locked_recommendation(id)
+            participant = (
+                recommendation.recommender_participants.filter(account=request.user)
+                .order_by("-reactivation_number", "-created_at")
+                .first()
+            )
+            if participant is None:
+                return Response(
+                    {
+                        "detail": _(
+                            "You need an existing stake position on this "
+                            "recommendation. Use recommend or reactivate to "
+                            "open one."
+                        )
+                    },
+                    status=400,
+                )
+            serializer = StakeAddSerializer(
+                data=request.data,
+                context={
+                    "existing_locked_lamports": participant.locked_amount_lamports
+                },
+            )
+            serializer.is_valid(raise_exception=True)
+            amount_lamports = serializer.validated_data["amount_lamports"]
+            participant.locked_amount_lamports += amount_lamports
+            participant.last_stake_change_at = timezone.now()
+            participant.save(
+                update_fields=[
+                    "locked_amount_lamports",
+                    "last_stake_change_at",
+                    "updated_at",
+                ]
+            )
+        return Response(
+            RecommendationEnvelopeSerializer(
+                instance={
+                    "recommendation": recommendation,
+                    "recommender_participant": RecommenderParticipantSerializer(
+                        participant
+                    ).data,
+                    "solana_hints": activation_hints(
+                        recommendation, amount_lamports, request.user
+                    ),
+                }
+            ).data
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Add recommender stake",
+        description=(
+            "Authenticated only. Top-up only: requires an existing "
+            "RecommenderParticipant for the caller (400 otherwise). Adds at "
+            "least 50,000,000 lamports while keeping the total at 0 or at "
+            "least 0.2 SOL, and never changes lifecycle state. Idempotent "
+            "when an Idempotency-Key header is supplied. Returns Solana hints."
+        ),
+        request=StakeAddSerializer,
+        responses={
+            200: RecommendationEnvelopeSerializer,
+            400: OpenApiResponse(
+                description="No existing position, below minimum, or dust balance."
+            ),
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation not found."),
+            409: OpenApiResponse(description="Idempotency key already in use."),
+        },
+    ),
+)
+class StakeView(IdempotencyKeyMixin, StakeBaseView):
+    """POST /api/recommendations/{id}/stake/ — top up stake; DELETE reclaims.
+
+    The explicit ``@extend_schema_view(post=...)`` is required: the
+    ``IdempotencyKeyMixin`` sits first in the MRO and shadows
+    ``StakeBaseView.post`` from drf-spectacular. DELETE is not idempotency-
+    keyed per the plan's endpoint catalog.
+    """
+
+    permission_classes = [IsAuthenticated]
     throttle_classes = [RecommendationStakeThrottle]
 
 
 class StakeHistoryView(APIView):
-    """Placeholder — GET stake history, implemented in Phase 5."""
+    """GET /api/recommendations/{id}/stake/history/ — participant history."""
 
     permission_classes = [AllowAny]
     throttle_classes = [RecommendationReadThrottle]
+    pagination_class = RecommendationPagination
+
+    @extend_schema(
+        summary="List recommender stake history",
+        description=(
+            "Public endpoint. Returns paginated RecommenderParticipant "
+            "history for the recommendation ordered by reactivation number."
+        ),
+        parameters=[
+            OpenApiParameter(name="page", type=int, description="Page number."),
+            OpenApiParameter(
+                name="page_size", type=int, description="Page size (max 100)."
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                description="Paginated list of recommender participants."
+            ),
+            404: OpenApiResponse(description="Recommendation not found."),
+        },
+    )
+    def get(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        queryset = recommendation.recommender_participants.order_by(
+            "reactivation_number"
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(
+            RecommenderParticipantSerializer(page, many=True).data
+        )
 
 
 class BookmarkToggleView(APIView):
@@ -961,11 +1157,162 @@ class AccountBadgeListView(APIView):
         return paginator.get_paginated_response(BadgeSerializer(page, many=True).data)
 
 
-class DuplicateReportView(APIView):
-    """Placeholder — POST create duplicate report, implemented in Phase 5."""
+class DuplicateReportBaseView(APIView):
+    """POST file a PENDING duplicate report against a recommendation."""
 
+    def post(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        serializer = DuplicateReportCreateSerializer(
+            data=request.data, context={"recommendation": recommendation}
+        )
+        serializer.is_valid(raise_exception=True)
+        if DuplicateReport.objects.filter(
+            reporter=request.user, recommendation=recommendation
+        ).exists():
+            return Response(
+                {
+                    "detail": _(
+                        "You have already filed a report for this recommendation."
+                    )
+                },
+                status=409,
+            )
+        suspected = serializer.validated_data.get("suspected_duplicate_of")
+        # Only a non-null suspect can collide with the pair unique constraint
+        # (PostgreSQL treats NULLs as distinct), so the pair pre-check is
+        # skipped when no suspect was given.
+        if (
+            suspected is not None
+            and DuplicateReport.objects.filter(
+                reporter=request.user, suspected_duplicate_of=suspected
+            ).exists()
+        ):
+            return Response(
+                {
+                    "detail": _(
+                        "You have already filed a report against that "
+                        "suspected duplicate."
+                    )
+                },
+                status=409,
+            )
+        try:
+            report = DuplicateReport.objects.create(
+                reporter=request.user,
+                recommendation=recommendation,
+                suspected_duplicate_of=suspected,
+                reason=serializer.validated_data.get("reason", ""),
+            )
+        except IntegrityError:
+            # The exists() pre-checks are the common case; the DB unique
+            # constraints are the safety net for concurrent requests (without
+            # a shared Idempotency-Key). Only map conflicts on the two
+            # reporter uniqueness constraints to 409; any other constraint
+            # failure is a real DB fault and must surface as a 500.
+            already_reported = DuplicateReport.objects.filter(
+                reporter=request.user, recommendation=recommendation
+            ).exists()
+            pair_conflict = (
+                suspected is not None
+                and DuplicateReport.objects.filter(
+                    reporter=request.user, suspected_duplicate_of=suspected
+                ).exists()
+            )
+            if already_reported:
+                return Response(
+                    {
+                        "detail": _(
+                            "You have already filed a report for this recommendation."
+                        )
+                    },
+                    status=409,
+                )
+            if pair_conflict:
+                return Response(
+                    {
+                        "detail": _(
+                            "You have already filed a report against that "
+                            "suspected duplicate."
+                        )
+                    },
+                    status=409,
+                )
+            raise
+        return Response(
+            {"duplicate_report": DuplicateReportReadSerializer(report).data},
+            status=201,
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="File a duplicate report",
+        description=(
+            "Authenticated only. Files a PENDING duplicate report against the "
+            "recommendation; both suspected_duplicate_of and reason are "
+            "optional, and self-reference is rejected with 400. Returns 409 "
+            "when the caller already filed a report. Idempotent when an "
+            "Idempotency-Key header is supplied."
+        ),
+        request=DuplicateReportCreateSerializer,
+        responses={
+            201: OpenApiResponse(description="Created duplicate report."),
+            400: OpenApiResponse(
+                description="Self-reference or unknown suspected duplicate."
+            ),
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation not found."),
+            409: OpenApiResponse(description="Report already filed."),
+        },
+    ),
+)
+class DuplicateReportView(IdempotencyKeyMixin, DuplicateReportBaseView):
+    """POST /api/recommendations/{id}/report-duplicate/ — file a report.
+
+    The explicit ``@extend_schema_view(post=...)`` is required: the
+    ``IdempotencyKeyMixin`` sits first in the MRO and shadows
+    ``DuplicateReportBaseView.post`` from drf-spectacular.
+    """
+
+    permission_classes = [IsAuthenticated]
     throttle_classes = [RecommendationDuplicateThrottle]
 
 
 class DuplicateReportListView(APIView):
-    """Placeholder — GET duplicate reports (admin-only), implemented in Phase 5."""
+    """GET /api/recommendations/{id}/duplicate-reports/ — admin only."""
+
+    permission_classes = [IsAdminUser]
+    throttle_classes = [RecommendationReadThrottle]
+    pagination_class = RecommendationPagination
+
+    @extend_schema(
+        summary="List duplicate reports",
+        description=(
+            "Admin only. Returns paginated duplicate reports filed against "
+            "the recommendation, newest first. Status transitions are "
+            "handled through Django admin for MVP (Open Question 1)."
+        ),
+        parameters=[
+            OpenApiParameter(name="page", type=int, description="Page number."),
+            OpenApiParameter(
+                name="page_size", type=int, description="Page size (max 100)."
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Paginated list of reports."),
+            403: OpenApiResponse(description="Admin only."),
+            404: OpenApiResponse(description="Recommendation not found."),
+        },
+    )
+    def get(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        queryset = recommendation.duplicate_reports.select_related(
+            "reporter",
+            "recommendation__category",
+            "suspected_duplicate_of__category",
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(
+            DuplicateReportReadSerializer(page, many=True).data
+        )

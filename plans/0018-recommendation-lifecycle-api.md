@@ -866,7 +866,7 @@ Estimated scope: Small.
 - [x] Solana hints are included in all mutating responses.
 - [x] Concurrency tests pass for supporter_number and status transitions.
 
-### Phase 4: Auxiliary Endpoints
+### Phase 4: Auxiliary Endpoints (completed)
 
 #### Task 10: Bookmark endpoints
 
@@ -1001,7 +1001,7 @@ Estimated scope: Small.
 - [x] Permission checks pass: auth-required for mutations, public for reads.
 - [x] Pagination works on all list endpoints.
 
-### Phase 5: Duplicate Reports and Admin
+### Phase 5: Duplicate Reports and Admin (completed)
 
 #### Task 14: Duplicate report endpoints
 
@@ -1010,22 +1010,22 @@ Implement `POST /recommendations/{id}/report-duplicate/` (authenticated) and
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/report-duplicate/` creates a
+- [x] `POST /recommendations/{id}/report-duplicate/` creates a
   `DuplicateReport` with status PENDING.
-- [ ] Request body accepts optional `suspected_duplicate_of` (integer
+- [x] Request body accepts optional `suspected_duplicate_of` (integer
   recommendation id) and
   optional `reason` (string).
-- [ ] Returns 409 if user has already filed a report for this recommendation.
-- [ ] Returns 400 if `suspected_duplicate_of` references the same
+- [x] Returns 409 if user has already filed a report for this recommendation.
+- [x] Returns 400 if `suspected_duplicate_of` references the same
   recommendation (self-reference).
-- [ ] `GET /recommendations/{id}/duplicate-reports/` returns paginated list.
-- [ ] `GET /recommendations/{id}/duplicate-reports/` returns 403 for
+- [x] `GET /recommendations/{id}/duplicate-reports/` returns paginated list.
+- [x] `GET /recommendations/{id}/duplicate-reports/` returns 403 for
   non-admin users.
-- [ ] Each view has `@extend_schema` documentation.
+- [x] Each view has `@extend_schema` documentation.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_duplicate_reports.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_duplicate_reports.py -v`
 
 Files likely touched:
 
@@ -1045,24 +1045,27 @@ Implement `POST /recommendations/{id}/stake/` (add stake),
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/stake/` is top-up only: requires an existing
+- [x] `POST /recommendations/{id}/stake/` is top-up only: requires an existing
   `RecommenderParticipant` for the caller (400 if none) and never changes
   `is_active`, `BookRecommendation.status`, `current_recommender`, or
   `recommendation_cycle_number`.
-- [ ] Validates minimum top-up: 50,000,000 lamports above the existing
+- [x] Validates minimum top-up: 50,000,000 lamports above the existing
   qualifying balance (activation minimums are enforced by recommend/reactivate).
-- [ ] Rejects withdrawal that would leave balance between 1 and 199,999,999.
-- [ ] `DELETE /recommendations/{id}/stake/` sets `locked_amount_lamports` to 0,
+- [x] Rejects withdrawal that would leave balance between 1 and 199,999,999.
+- [x] `DELETE /recommendations/{id}/stake/` sets `locked_amount_lamports` to 0,
   sets `reclaimed_at`, sets `is_active` to False.
-- [ ] `DELETE /recommendations/{id}/stake/` returns 400 if no active stake.
-- [ ] `GET /recommendations/{id}/stake/history/` returns paginated
+- [x] `DELETE /recommendations/{id}/stake/` clears `current_recommender` when
+  the reclaimed participant was the current recommender (decision 0011: the
+  field is null when the account is no longer staked on an active cycle).
+- [x] `DELETE /recommendations/{id}/stake/` returns 400 if no active stake.
+- [x] `GET /recommendations/{id}/stake/history/` returns paginated
   `RecommenderParticipant` history ordered by `reactivation_number`.
-- [ ] Both mutating endpoints return `solana_hints` in the response.
-- [ ] Uses `select_for_update()` on parent `BookRecommendation`.
+- [x] Both mutating endpoints return `solana_hints` in the response.
+- [x] Uses `select_for_update()` on parent `BookRecommendation`.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_stake.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_stake.py -v`
 
 Files likely touched:
 
@@ -1100,13 +1103,15 @@ Estimated scope: Medium.
 
 ### Checkpoint: Complete
 
-- [ ] All 25 endpoints implement the behaviors defined in the endpoint catalog.
-- [ ] All mutating endpoints have throttle classes applied.
-- [ ] Permission checks match the permissions matrix.
-- [ ] Solana transaction hints are included in all mutating responses.
-- [ ] `manage.py test` passes for all recommendation endpoint tests.
-- [ ] OpenAPI schema generates correctly for all new endpoints.
-- [ ] No regressions in existing auth endpoint tests.
+- [x] All 25 endpoints implement the behaviors defined in the endpoint catalog.
+- [x] All mutating endpoints have throttle classes applied.
+- [x] Permission checks match the permissions matrix.
+- [x] Solana transaction hints are included in all stake/recommend/reactivate
+  mutating responses (report-duplicate is a DB-only mutation and correctly
+  returns none).
+- [x] `manage.py test` passes for all recommendation endpoint tests.
+- [x] OpenAPI schema generates correctly for all new endpoints.
+- [x] No regressions in existing auth endpoint tests.
 
 ### Phase 6: Cover Art and Profile Images (reserve fields)
 
