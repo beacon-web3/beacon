@@ -4,6 +4,10 @@ from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Lower
 
+# Single source for the fixed support amount (0.01 SOL in lamports) per the
+# product spec; used by the model default, CHECK constraint, API layer, and tests.
+SUPPORT_AMOUNT_LAMPORTS = 10_000_000
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -291,7 +295,7 @@ class Support(models.Model):
     supporter_number = models.PositiveIntegerField()
     # Fixed at 10M lamports (0.01 SOL) per the product spec. The CHECK constraint
     # enforces the exact minimum; the API layer also validates on creation.
-    amount_lamports = models.BigIntegerField(default=10_000_000)
+    amount_lamports = models.BigIntegerField(default=SUPPORT_AMOUNT_LAMPORTS)
     recommendation_cycle_number = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     on_chain_support_transaction = models.CharField(
@@ -313,7 +317,7 @@ class Support(models.Model):
                 name="support_one_per_supporter_per_recommendation",
             ),
             models.CheckConstraint(
-                condition=Q(amount_lamports__gte=10_000_000),
+                condition=Q(amount_lamports__gte=SUPPORT_AMOUNT_LAMPORTS),
                 name="support_amount_min_10m_lamports",
             ),
         ]

@@ -388,7 +388,7 @@ signature and creates the `Support` record.
 
 ```json
 {
-  "transaction_signature": "base58 signature, 88 chars",
+  "transaction_signature": "base58 signature, 87-88 chars",
   "on_chain_support_account": "base58 account, 64 chars (optional)"
 }
 ```
@@ -485,7 +485,8 @@ Acceptance criteria:
 - [x] `SupportCreateSerializer` input has no user-provided amount (fixed at
   10,000,000 lamports).
 - [x] `SupportConfirmSerializer` validates `transaction_signature` (required,
-  88-char base58) and optional `on_chain_support_account`.
+  valid base58 Ed25519 signature, 87-88 chars) and optional
+  `on_chain_support_account`.
 - [x] `DuplicateReportCreateSerializer` input accepts optional `suspected_duplicate_of`
   (integer recommendation id) and optional `reason` (string).
 - [x] `CreateRecommendationSerializer` writes `title_normalized` /
@@ -610,7 +611,7 @@ Estimated scope: Small.
 - [x] `python manage.py check` passes.
 - [x] `manage.py test` passes for serializer and URL tests.
 
-### Phase 2: Recommendation CRUD
+### Phase 2: Recommendation CRUD (completed)
 
 #### Task 4: Recommendation list and detail endpoints
 
@@ -699,7 +700,7 @@ Estimated scope: Medium.
 - [x] Search with < 3 characters returns empty results.
 - [x] OpenAPI schema generates correctly for recommendation endpoints.
 
-### Phase 3: Activation and Support
+### Phase 3: Activation and Support (completed)
 
 #### Task 6: Recommend (activate) endpoint
 
@@ -711,21 +712,21 @@ with `is_active=True`, sets `current_recommender`, increments
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/recommend/` creates a `RecommenderParticipant`.
-- [ ] `BookRecommendation.status` changes from INACTIVE to ACTIVE.
-- [ ] `BookRecommendation.current_recommender` is set to the requesting user.
-- [ ] `BookRecommendation.recommendation_cycle_number` increments.
-- [ ] `BookRecommendation.activated_at` is set.
-- [ ] Returns 400 if recommendation is already ACTIVE.
-- [ ] Returns 400 if user already has an active participant on this recommendation.
-- [ ] Uses `select_for_update()` on `BookRecommendation` for concurrency safety.
-- [ ] Response includes `solana_hints` with program ID, PDA seeds, amount.
-- [ ] Operation runs inside `transaction.atomic()`.
+- [x] `POST /recommendations/{id}/recommend/` creates a `RecommenderParticipant`.
+- [x] `BookRecommendation.status` changes from INACTIVE to ACTIVE.
+- [x] `BookRecommendation.current_recommender` is set to the requesting user.
+- [x] `BookRecommendation.recommendation_cycle_number` increments.
+- [x] `BookRecommendation.activated_at` is set.
+- [x] Returns 400 if recommendation is already ACTIVE.
+- [x] Returns 400 if user already has an active participant on this recommendation.
+- [x] Uses `select_for_update()` on `BookRecommendation` for concurrency safety.
+- [x] Response includes `solana_hints` with program ID, PDA seeds, amount.
+- [x] Operation runs inside `transaction.atomic()`.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_recommend.py -v`
-- [ ] Concurrency test: two simultaneous requests, only one succeeds.
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_recommend.py -v`
+- [x] Concurrency test: two simultaneous requests, only one succeeds.
 
 Files likely touched:
 
@@ -746,19 +747,19 @@ an inactive recommendation that has a previous cycle. Creates a new
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/reactivate/` creates a new
+- [x] `POST /recommendations/{id}/reactivate/` creates a new
   `RecommenderParticipant` with incremented `reactivation_number`.
-- [ ] `BookRecommendation.status` changes to ACTIVE.
-- [ ] `BookRecommendation.deactivated_at` is cleared.
-- [ ] Returns 400 if recommendation is already ACTIVE.
-- [ ] Returns 400 if `recommendation_cycle_number == 0` (use recommend instead).
-- [ ] Uses `select_for_update()` on `BookRecommendation`.
-- [ ] Response includes `solana_hints`.
-- [ ] Runs inside `transaction.atomic()`.
+- [x] `BookRecommendation.status` changes to ACTIVE.
+- [x] `BookRecommendation.deactivated_at` is cleared.
+- [x] Returns 400 if recommendation is already ACTIVE.
+- [x] Returns 400 if `recommendation_cycle_number == 0` (use recommend instead).
+- [x] Uses `select_for_update()` on `BookRecommendation`.
+- [x] Response includes `solana_hints`.
+- [x] Runs inside `transaction.atomic()`.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_reactivate.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_reactivate.py -v`
 
 Dependencies: Task 6.
 
@@ -794,31 +795,31 @@ Confirm (inside `transaction.atomic()` with `select_for_update()` on the
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/support/` returns a quote and hints without
+- [x] `POST /recommendations/{id}/support/` returns a quote and hints without
   persisting anything (`support_count` unchanged, no `Support` rows).
-- [ ] `POST /recommendations/{id}/support/` returns 409 if the user is already
+- [x] `POST /recommendations/{id}/support/` returns 409 if the user is already
   a supporter.
-- [ ] `POST /recommendations/{id}/support/confirm/` creates a `Support` record
+- [x] `POST /recommendations/{id}/support/confirm/` creates a `Support` record
   with `amount_lamports=10_000_000`, the given `transaction_signature`, and
   the correct next `supporter_number`; `full_clean()` passes.
-- [ ] `POST /recommendations/{id}/support/confirm/` requires a valid
-  88-char base58 `transaction_signature` (400 otherwise).
-- [ ] `supporter_number` is sequenced atomically (no duplicates under
+- [x] `POST /recommendations/{id}/support/confirm/` requires a valid base58
+  Ed25519 `transaction_signature` (87-88 chars; 400 otherwise).
+- [x] `supporter_number` is sequenced atomically (no duplicates under
   concurrency).
-- [ ] `BookRecommendation.support_count` is incremented and `last_support_at`
+- [x] `BookRecommendation.support_count` is incremented and `last_support_at`
   is updated at confirm.
-- [ ] Support confirm during INACTIVE with active recommender transitions to
+- [x] Support confirm during INACTIVE with active recommender transitions to
   ACTIVE; without active recommender stays INACTIVE.
-- [ ] Replaying the same confirm request (same idempotency key) returns the
+- [x] Replaying the same confirm request (same idempotency key) returns the
   stored support response and does not create a second record.
-- [ ] Response includes `solana_hints` on prepare.
-- [ ] Runs inside `transaction.atomic()`.
+- [x] Response includes `solana_hints` on prepare.
+- [x] Runs inside `transaction.atomic()`.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_support.py -v`
-- [ ] Concurrency test: simultaneous confirms get different `supporter_number`.
-- [ ] Idempotency replay test for confirm.
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_support.py -v`
+- [x] Concurrency test: simultaneous confirms get different `supporter_number`.
+- [x] Idempotency replay test for confirm.
 
 Files likely touched:
 
@@ -836,16 +837,16 @@ for a recommendation, ordered by `supporter_number`.
 
 Acceptance criteria:
 
-- [ ] Returns paginated list of supports.
-- [ ] Supports are ordered by `supporter_number` ascending.
-- [ ] Each support includes `supporter_number`, `amount_lamports`,
+- [x] Returns paginated list of supports.
+- [x] Supports are ordered by `supporter_number` ascending.
+- [x] Each support includes `supporter_number`, `amount_lamports`,
   `recommendation_cycle_number`, `created_at`.
-- [ ] Supports are publicly readable.
-- [ ] Returns 404 for nonexistent recommendation.
+- [x] Supports are publicly readable.
+- [x] Returns 404 for nonexistent recommendation.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_support_list.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_support_list.py -v`
 
 Files likely touched:
 
@@ -858,11 +859,11 @@ Estimated scope: Small.
 
 ### Checkpoint: Activation and Support
 
-- [ ] Recommend, reactivate, and support endpoints work end-to-end.
-- [ ] Support during INACTIVE correctly transitions to ACTIVE when applicable.
-- [ ] `supporter_number` is unique per recommendation (no races).
-- [ ] Solana hints are included in all mutating responses.
-- [ ] Concurrency tests pass for supporter_number and status transitions.
+- [x] Recommend, reactivate, and support endpoints work end-to-end.
+- [x] Support during INACTIVE correctly transitions to ACTIVE when applicable.
+- [x] `supporter_number` is unique per recommendation (no races).
+- [x] Solana hints are included in all mutating responses.
+- [x] Concurrency tests pass for supporter_number and status transitions.
 
 ### Phase 4: Auxiliary Endpoints
 

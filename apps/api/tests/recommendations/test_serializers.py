@@ -359,8 +359,12 @@ class TestSupportConfirmSerializer:
         assert not serializer.is_valid()
 
     def test_rejects_wrong_length(self):
-        serializer = SupportConfirmSerializer(data={"transaction_signature": "1" * 87})
+        serializer = SupportConfirmSerializer(data={"transaction_signature": "1" * 86})
         assert not serializer.is_valid()
+
+    def test_accepts_87_char_signature(self):
+        serializer = SupportConfirmSerializer(data={"transaction_signature": "1" * 87})
+        assert serializer.is_valid(), serializer.errors
 
     def test_accepts_valid_signature(self):
         serializer = SupportConfirmSerializer(
@@ -558,7 +562,7 @@ class TestEnvelopes:
         assert data["results"][0]["title"] == rec.title
 
     def test_support_envelope_fields(self):
-        assert set(SupportEnvelopeSerializer().fields) == {"support"}
+        assert set(SupportEnvelopeSerializer().fields) == {"support", "solana_hints"}
 
     def test_detail_envelope_fields(self):
         assert set(DetailEnvelopeSerializer().fields) == {"detail"}

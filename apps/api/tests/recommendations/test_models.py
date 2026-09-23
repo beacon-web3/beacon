@@ -6,6 +6,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from recommendations.models import (
+    SUPPORT_AMOUNT_LAMPORTS,
     Badge,
     Bookmark,
     BookRecommendation,
@@ -435,7 +436,7 @@ class TestSupport:
             recommendation=rec,
             supporter_number=1,
         )
-        assert support.amount_lamports == 10_000_000
+        assert support.amount_lamports == SUPPORT_AMOUNT_LAMPORTS
 
     def test_supporter_protect_on_delete(self, account):
         rec = BookRecommendationFactory(creator=account)
@@ -786,7 +787,7 @@ class TestFactories:
 
     def test_support_default_amount(self, account):
         support = SupportFactory(supporter=account)
-        assert support.amount_lamports == 10_000_000
+        assert support.amount_lamports == SUPPORT_AMOUNT_LAMPORTS
 
     def test_support_amount_override(self, account):
         support = SupportFactory(supporter=account, amount_lamports=5_000_000_000)

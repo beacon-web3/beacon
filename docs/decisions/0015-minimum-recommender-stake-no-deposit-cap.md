@@ -30,9 +30,12 @@ recommendation by an eligible recommender. A recommender may lock more than `0.2
 SOL` initially or later add more locked SOL if they are the original discoverer
 or a prior reactivator for that page.
 
-This decision only resolves the minimum stake and deposit-cap rule. ADR 0016
-resolves that extra locked SOL must follow a diminishing-returns principle if it
-affects future upvote/support credit, reward splits, ranking, or visibility.
+This decision only resolves the minimum stake and deposit-cap rule. Keeping at
+least the `0.2 SOL` minimum locked by any recommender participant is what keeps a
+recommendation cycle active; full withdrawal of all recommender stake can start
+the inactivity window per ADR 0013. ADR 0024 resolves that future upvote/support
+credit and reward share are weighted linearly by each recommender's locked SOL
+share (superseding the earlier ADR 0016 diminishing-returns position).
 Product copy must avoid implying that extra locked SOL creates guaranteed yield,
 guaranteed rewards, or uncapped influence.
 
@@ -66,8 +69,9 @@ least `0.05 SOL`.
 
 - Pros: Keeps a clear spam-resistance floor while allowing stronger conviction
   signals and additional historical recommender stake.
-- Cons: Requires an exact diminishing-returns formula before extra stake can
-  safely affect rewards or ranking.
+- Cons: Requires linear stake-share weighting (ADR 0024) and anti-whale
+  parameters to be finalized before extra stake can safely affect rewards or
+  ranking.
 - Accepted for MVP deposit rules.
 
 ## Consequences
@@ -83,8 +87,8 @@ least `0.05 SOL`.
   withdrawals for inactivity eligibility.
 - Open questions should no longer ask whether `0.2 SOL` is fixed, dynamic, or
   governance-adjustable for MVP.
-- Exact diminishing-returns curve, reward splits, ranking influence, and
-  anti-whale parameters remain unresolved.
+- Exact reward split parameters, ranking influence, and anti-whale controls
+  remain unresolved; the weighting principle is linear share per ADR 0024.
 
 ## Related Specs
 
@@ -95,4 +99,5 @@ least `0.05 SOL`.
 - `docs/tokenomics/rewards.md`
 - `docs/tokenomics/staking.md`
 - `docs/architecture/system-design.md`
-- `plans/0016-recommendation-lifecycle-data-model.md`
+- `docs/decisions/0024-linear-reward-weighting-across-recommender-stake.md`
+- `plans/completed/0016-recommendation-lifecycle-data-model.md`

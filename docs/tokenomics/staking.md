@@ -51,8 +51,10 @@ withdraw user principal outside the documented lock and release rules.
 For the recommendation lifecycle, the original discoverer and prior reactivators
 may add locked SOL to increase future upvote/support credit share. That extra
 stake must not change historical credit or create a user-facing yield product. If
-extra locked SOL affects future credit, rewards, ranking, or visibility, it must
-use diminishing returns rather than linear weighting.
+extra locked SOL affects future credit, rewards, ranking, or visibility, it is
+weighted linearly in proportion to each recommender's locked SOL share of the
+total locked recommender SOL on the recommendation, per ADR 0024. Exact split
+parameters remain unresolved pending simulation.
 
 Recommender participant balances must be either `0 SOL` or at least `0.2 SOL`.
 Later top-ups above an existing qualifying locked balance must be at least
@@ -155,6 +157,6 @@ The product should show:
 * What staking risk disclosures are required before launch?
 * How can native staking be implemented while preserving program-controlled
   custody and timely recommender stake withdrawal?
-* What exact diminishing-returns curve, cap, or fixed staking window should apply
-  to extra historical recommender stake?
+* What exact reward-split parameters, caps, or fixed staking windows should apply
+  to extra historical recommender stake under the linear weighting in ADR 0024?
 * Which staking authority addresses must be visible in the treasury dashboard?

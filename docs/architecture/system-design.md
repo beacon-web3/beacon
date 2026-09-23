@@ -70,11 +70,12 @@ Responsibilities:
   deposit cap for eligible recommenders.
 * Recommender stake balance validation requiring `0 SOL` or at least `0.2 SOL`,
   plus `0.05 SOL` minimum top-ups above an existing qualifying balance.
-* Diminishing-returns weighting for any future extra-stake influence on credit,
-  rewards, ranking, or visibility.
+* Linear reward weighting across recommender stake for any future extra-stake
+  influence on credit, rewards, ranking, or visibility (see
+  `docs/decisions/0024-linear-reward-weighting-across-recommender-stake.md`).
 * Fixed `0.01 SOL` MVP support/upvote contribution accounting.
-* Inactivity-window evaluation based on zero locked recommender SOL plus 90 days
-  with no new support for recommendation cycles.
+* Inactivity-window evaluation based on no active recommender participant plus 90
+  days with no new support for recommendation cycles.
 * Reactivation blocker state for flagged, disputed, duplicate-reported, or unsafe
   canonical pages that require review before reactivation.
 * Duplicate detection and moderation workflows.

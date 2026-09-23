@@ -76,7 +76,7 @@ Acceptance criteria:
 
 * I can see whether a recommendation page is active or inactive.
 * I can see that a recommendation becomes eligible for inactive status only after
-  no recommender SOL remains locked and 90 days pass with no new support.
+  no active recommender participant remains and 90 days pass with no new support.
 * I can reactivate an inactive recommendation by locking at least the required
   `0.2 SOL` minimum stake.
 * Ordinary supporters who contribute `0.01 SOL` are not subject to recommender

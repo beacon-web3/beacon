@@ -2,11 +2,22 @@
 
 ## Status
 
-Accepted
+Superseded by `0024-linear-reward-weighting-across-recommender-stake.md`.
+
+This decision was accepted on 2026-07-09 and superseded on 2026-09-23. MVP
+reward weighting is now linear by locked SOL share across the active recommender
+and historical recommenders; see ADR 0024.
 
 ## Date
 
 2026-07-09
+
+> **SUPERSEDED — 2026-09-23.** The Decision, Alternatives Considered, and
+> Consequences below describe the superseded diminishing-returns policy and are
+> retained for history only. The binding MVP policy is linear reward weighting
+> across recommender stake per
+> `0024-linear-reward-weighting-across-recommender-stake.md`; see that ADR for
+> current policy.
 
 ## Context
 

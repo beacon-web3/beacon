@@ -14,9 +14,36 @@ Changelog. Use date-based entries until formal versioning starts.
   `/api/recommendations/` and `/api/accounts/`, serializer layer, per-endpoint
   throttle scopes (env-configurable), and idempotency infrastructure
   (`Idempotency-Key` support with hashed key storage, replay, and TTL).
+- Recommendation lifecycle API Phase 3 activation endpoints:
+  `POST /api/recommendations/{id}/recommend/` activates an inactive
+  recommendation for its first cycle — enforces the `0.2 SOL` minimum recommender
+  stake, rejects already-active recommendations and callers who already hold an
+  active participant, creates the `RecommenderParticipant`, and returns Solana
+  transaction hints inside an atomic, row-locked block; and
+  `POST /api/recommendations/{id}/reactivate/` reactivates later cycles with an
+  incremented reactivation number and the same stake minimum and hints.
+- Recommendation lifecycle API Phase 3 support flow: two-phase support with
+  `POST /api/recommendations/{id}/support/` (prepare) validating eligibility and
+  returning a quote plus Solana transaction hints with no database writes, and
+  `POST /api/recommendations/{id}/support/confirm/` creating the `Support`
+  record at the fixed `0.01 SOL` (10,000,000 lamports) amount with atomic
+  `supporter_number` sequencing under `select_for_update()`, idempotency-key
+  replay protection, and the support-during-INACTIVE state transition (back to
+  ACTIVE when an active `RecommenderParticipant` exists, otherwise stays
+  INACTIVE). Added `GET /api/recommendations/{id}/supports/` to list supporters
+  publicly, ordered by `supporter_number`.
 
 ### Documentation
 
+- Added ADR 0024 resolving that future upvote/support credit and reward share on
+  an active recommendation are weighted linearly by each recommender's locked SOL
+  share across the active recommender and historical recommenders. Supersedes ADR
+  0016 (diminishing returns). Updated decision records 0011/0013/0014/0015/0017,
+  tokenomics specs, MVP scope, assumptions, open questions, and plan references to
+  the linear weighting. Clarified that the `0.2 SOL` recommender minimum keeps a
+  recommendation cycle active while an active `RecommenderParticipant` holds it
+  and that the original discoverer and prior reactivators may reactivate a
+  deactivated recommendation while remaining in the historical recommender set.
 - Moved `docs/plans/` to the repository root as `plans/` and updated all
   internal, decision-record, agent-config, and README links to reference the
   new location.

@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from accounts.models import Account
 from recommendations.models import (
+    SUPPORT_AMOUNT_LAMPORTS,
     Badge,
     Bookmark,
     BookRecommendation,
@@ -83,7 +84,7 @@ class SupportFactory(factory.django.DjangoModelFactory):
     supporter = factory.SubFactory(AccountFactory)
     recommendation = factory.SubFactory(BookRecommendationFactory)
     supporter_number = factory.Sequence(lambda n: n + 1)
-    amount_lamports = 10_000_000
+    amount_lamports = SUPPORT_AMOUNT_LAMPORTS
     recommendation_cycle_number = 0
     # Support.clean() requires an on-chain signature.
     on_chain_support_transaction = factory.Sequence(_base58_signature)

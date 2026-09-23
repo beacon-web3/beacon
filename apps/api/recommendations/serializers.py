@@ -19,7 +19,7 @@ Account = get_user_model()
 MIN_ACTIVATION_STAKE_LAMPORTS = 200_000_000
 MIN_TOP_UP_LAMPORTS = 50_000_000
 
-BASE58_SIGNATURE_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{88}$"
+BASE58_SIGNATURE_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{87,88}$"
 BASE58_ACCOUNT_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{1,64}$"
 
 
@@ -165,7 +165,7 @@ class SupportConfirmSerializer(serializers.Serializer):
     transaction_signature = serializers.RegexField(
         regex=BASE58_SIGNATURE_REGEX,
         error_messages={
-            "invalid": _("Transaction signature must be 88 base58 characters.")
+            "invalid": _("Transaction signature must be 87 or 88 base58 characters.")
         },
     )
     on_chain_support_account = serializers.RegexField(
@@ -427,6 +427,7 @@ class SupportQuoteSerializer(serializers.Serializer):
 
 class SupportEnvelopeSerializer(serializers.Serializer):
     support = SupportReadSerializer()
+    solana_hints = SolanaHintsSerializer(required=False)
 
 
 class SupportPrepareEnvelopeSerializer(serializers.Serializer):
