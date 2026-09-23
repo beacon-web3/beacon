@@ -13,6 +13,14 @@ class RecommendationRateThrottle(SimpleRateThrottle):
     def get_rate(self):
         return getattr(settings, "RECOMMENDATION_THROTTLE_RATES", {}).get(self.scope)
 
+    def get_cache_key(self, request, view):
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated:
+            ident = user.pk
+        else:
+            ident = self.get_ident(request)
+        return self.cache_format % {"scope": self.scope, "ident": ident}
+
 
 class RecommendationCreateThrottle(RecommendationRateThrottle):
     """POST /api/recommendations/ — create."""

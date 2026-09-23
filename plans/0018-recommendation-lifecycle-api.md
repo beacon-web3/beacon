@@ -447,7 +447,7 @@ Validation errors follow DRF's default format:
 
 ## Phases
 
-### Phase 1: Foundation
+### Phase 1: Foundation (completed)
 
 #### Task 1: Recommendation serializers
 
@@ -621,29 +621,29 @@ users and summary serializer for anonymous.
 
 Acceptance criteria:
 
-- [ ] `GET /recommendations/` returns paginated list with summary fields.
-- [ ] All filter parameters work: `status`, `page_type`, `category`,
+- [x] `GET /recommendations/` returns paginated list with summary fields.
+- [x] All filter parameters work: `status`, `page_type`, `category`,
   `duplicate_risk_status`, `review_status`, `creator`, `is_canonical`,
   `search`, `ordering`.
-- [ ] `search` requires minimum 3 characters; shorter queries return empty
+- [x] `search` requires minimum 3 characters; shorter queries return empty
   results.
-- [ ] `page_size` defaults to 20, max 100.
-- [ ] `GET /recommendations/{id}/` returns detail fields for authenticated
+- [x] `page_size` defaults to 20, max 100.
+- [x] `GET /recommendations/{id}/` returns detail fields for authenticated
   users.
-- [ ] `GET /recommendations/{id}/` returns summary fields for anonymous users.
-- [ ] `GET /recommendations/{id}/` returns 404 for nonexistent IDs.
-- [ ] Every view has `@extend_schema` documentation.
-- [ ] `GET /recommendations/` applies the public read throttle (60/min);
+- [x] `GET /recommendations/{id}/` returns summary fields for anonymous users.
+- [x] `GET /recommendations/{id}/` returns 404 for nonexistent IDs.
+- [x] Every view has `@extend_schema` documentation.
+- [x] `GET /recommendations/` applies the public read throttle (60/min);
   `POST /recommendations/` (Phase 2 create handler) uses the create throttle
   (10/min) via `get_throttles()`, which switches on `request.method`.
-- [ ] N+1 note: list/detail querysets must use `select_related` /
+- [x] N+1 note: list/detail querysets must use `select_related` /
   `prefetch_related` for the nested summary/detail serializers (`category`,
   `creator`, `current_recommender`) to avoid per-row queries.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_recommendation_list.py -v`
-- [ ] Manual check: `curl` list and detail endpoints return expected shapes.
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_recommendation_list.py -v`
+- [x] Manual check: `curl` list and detail endpoints return expected shapes.
 
 Files likely touched:
 
@@ -665,21 +665,21 @@ before activation (status is INACTIVE and `recommendation_cycle_number == 0`).
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/` creates a recommendation with status INACTIVE.
-- [ ] `POST /recommendations/` requires authentication (403 for anonymous).
-- [ ] `POST /recommendations/` validates unique canonical constraint
+- [x] `POST /recommendations/` creates a recommendation with status INACTIVE.
+- [x] `POST /recommendations/` requires authentication (403 for anonymous).
+- [x] `POST /recommendations/` validates unique canonical constraint
   (title + author + page_type).
-- [ ] `PATCH /recommendations/{id}/` updates metadata fields only.
-- [ ] `PATCH /recommendations/{id}/` returns 403 for non-creators.
-- [ ] `PATCH /recommendations/{id}/` returns 400 if recommendation is already
+- [x] `PATCH /recommendations/{id}/` updates metadata fields only.
+- [x] `PATCH /recommendations/{id}/` returns 403 for non-creators.
+- [x] `PATCH /recommendations/{id}/` returns 400 if recommendation is already
   active (`recommendation_cycle_number > 0`).
-- [ ] `POST /recommendations/` is idempotent (client-generated idempotency key).
-- [ ] Every view has `@extend_schema` documentation.
+- [x] `POST /recommendations/` is idempotent (client-generated idempotency key).
+- [x] Every view has `@extend_schema` documentation.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_recommendation_create.py -v`
-- [ ] Manual check: create, update, and verify permissions.
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_recommendation_create.py -v`
+- [x] Manual check: create, update, and verify permissions.
 
 Files likely touched:
 
@@ -694,10 +694,10 @@ Estimated scope: Medium.
 
 ### Checkpoint: Recommendation CRUD
 
-- [ ] Create, read, update, list, filter, and paginate work end-to-end.
-- [ ] Permission checks pass: creator-only update, auth-only create.
-- [ ] Search with < 3 characters returns empty results.
-- [ ] OpenAPI schema generates correctly for recommendation endpoints.
+- [x] Create, read, update, list, filter, and paginate work end-to-end.
+- [x] Permission checks pass: creator-only update, auth-only create.
+- [x] Search with < 3 characters returns empty results.
+- [x] OpenAPI schema generates correctly for recommendation endpoints.
 
 ### Phase 3: Activation and Support
 
