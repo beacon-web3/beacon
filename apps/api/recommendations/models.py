@@ -316,6 +316,10 @@ class Support(models.Model):
                 "recommendation",
                 name="support_one_per_supporter_per_recommendation",
             ),
+            models.UniqueConstraint(
+                "on_chain_support_transaction",
+                name="support_onchain_transaction_unique",
+            ),
             models.CheckConstraint(
                 condition=Q(amount_lamports__gte=SUPPORT_AMOUNT_LAMPORTS),
                 name="support_amount_min_10m_lamports",

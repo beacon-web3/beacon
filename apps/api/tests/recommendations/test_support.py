@@ -30,8 +30,8 @@ class TestSupportPrepare:
 
     def test_prepare_returns_quote_and_hints_without_writes(self):
         rec = BookRecommendationFactory(recommendation_cycle_number=3)
-        for _ in range(2):
-            SupportFactory(recommendation=rec)
+        SupportFactory(recommendation=rec, supporter_number=1)
+        SupportFactory(recommendation=rec, supporter_number=2)
         supporter = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=supporter)
@@ -241,13 +241,13 @@ class TestSupportConfirmConcurrency:
     def test_two_simultaneous_confirms_get_distinct_numbers(self):
         rec = BookRecommendationFactory()
 
-        def attempt(results):
+        def attempt(results, index):
             supporter = AccountFactory()
             client = APIClient()
             client.force_authenticate(user=supporter)
             response = client.post(
                 f"/api/recommendations/{rec.id}/support/confirm/",
-                {"transaction_signature": "1" * 88},
+                {"transaction_signature": str(index + 1) * 88},
                 format="json",
             )
             results.append(
@@ -257,7 +257,10 @@ class TestSupportConfirmConcurrency:
             connections.close_all()
 
         results = []
-        threads = [threading.Thread(target=attempt, args=(results,)) for _ in range(2)]
+        threads = [
+            threading.Thread(target=attempt, args=(results, index))
+            for index in range(2)
+        ]
         for thread in threads:
             thread.start()
         for thread in threads:
@@ -269,3 +272,30 @@ class TestSupportConfirmConcurrency:
         assert len(set(numbers)) == 2
         assert Support.objects.filter(recommendation=rec).count() == 2
         assert sorted(numbers) == [1, 2]
+
+    @pytest.mark.django_db(transaction=True)
+    def test_same_user_concurrent_confirms_are_serialized(self):
+        """The one-support-per-supporter rule holds under same-user races."""
+        rec = BookRecommendationFactory()
+        supporter = AccountFactory()
+
+        def attempt(results):
+            client = APIClient()
+            client.force_authenticate(user=supporter)
+            response = client.post(
+                f"/api/recommendations/{rec.id}/support/confirm/",
+                {"transaction_signature": "1" * 88},
+                format="json",
+            )
+            results.append(response.status_code)
+            connections.close_all()
+
+        results = []
+        threads = [threading.Thread(target=attempt, args=(results,)) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+        assert sorted(results) == [201, 409]
+        assert Support.objects.filter(recommendation=rec).count() == 1

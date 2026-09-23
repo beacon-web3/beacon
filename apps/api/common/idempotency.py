@@ -112,15 +112,22 @@ class IdempotencyKeyMixin:
                     locked.save(update_fields=["status", "created_at"])
 
         try:
-            response = super().post(request, *args, **kwargs)
+            # The guarded mutation and the record completion commit in one
+            # transaction: a crash mid-request can no longer leave a committed
+            # mutation behind an IN_PROGRESS record that a later takeover
+            # would re-execute.
+            with transaction.atomic():
+                response = super().post(request, *args, **kwargs)
+                if 200 <= response.status_code < 300:
+                    record.status = IdempotencyRecord.Status.COMPLETED
+                    record.response_status = response.status_code
+                    record.response_body = json.dumps(response.data, default=str)
+                    record.save(
+                        update_fields=["status", "response_status", "response_body"]
+                    )
+                else:
+                    record.delete()
         except Exception:
             record.delete()
             raise
-        if 200 <= response.status_code < 300:
-            record.status = IdempotencyRecord.Status.COMPLETED
-            record.response_status = response.status_code
-            record.response_body = json.dumps(response.data, default=str)
-            record.save(update_fields=["status", "response_status", "response_body"])
-        else:
-            record.delete()
         return response

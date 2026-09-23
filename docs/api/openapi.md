@@ -312,9 +312,11 @@ Responses:
 ## Recommendation Lifecycle API
 
 The recommendation lifecycle API is registered under `/api/recommendations/`
-and `/api/accounts/`. Phase 1 (route scaffolding, serializer layer, throttles,
-idempotency infrastructure) is in place; endpoint handlers land in later
-phases of `plans/0018-recommendation-lifecycle-api.md`. Surface:
+and `/api/accounts/`. Phases 1-4 of
+`plans/0018-recommendation-lifecycle-api.md` are in place: CRUD, activation,
+support, bookmarks, curator follows, badges, and reputation/profile. Phase 5
+(duplicate reports, admin, throttle tests) and Phase 6 (cover art, profile
+fields) land in later phases. Surface:
 
 - `/api/recommendations/` — list, detail, recommend, reactivate, support
   (prepare + confirm), supports, stake (add/history), bookmark, badges,
@@ -329,12 +331,15 @@ are admin-only.
 
 ### Idempotency-Key
 
-Mutating `POST` endpoints that create records require a client-generated
-`Idempotency-Key` header. The backend persists a per-user SHA-256 hash of the
-key scoped to `(user, method, path, key)` plus the successful response. On
-replay the stored response is returned without re-execution; a concurrent
-in-flight request with the same key returns `409`; non-2xx responses are not
-cached. Cached responses expire after 1 hour and are opportunistically pruned.
+Mutating `POST` endpoints that create records accept an optional, recommended
+client-generated `Idempotency-Key` header (send one per logical operation;
+reusing a key within the cache window intentionally replays the stored
+response rather than re-executing). The backend persists a per-user SHA-256
+hash of the key scoped to `(user, method, path, key)` plus the successful
+response. On replay the stored response is returned without re-execution; a
+concurrent in-flight request with the same key returns `409`; non-2xx
+responses are not cached. Cached responses expire after 1 hour and are
+opportunistically pruned.
 
 ### Throttle scopes
 
@@ -344,6 +349,7 @@ Rates are configured per scope in `settings.RECOMMENDATION_THROTTLE_RATES`
 | Scope | Rate |
 |-------|------|
 | recommendation_create | 10/min |
+| recommendation_update | 10/min |
 | recommendation_act | 5/min |
 | recommendation_support | 20/min |
 | recommendation_stake | 5/min |

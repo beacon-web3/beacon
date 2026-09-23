@@ -49,6 +49,8 @@ Status values:
 | MVP backend hosting | Render free tier for Django, with Cloud Run as an alternative if Docker deployment and faster cold starts are preferred | Proposed | Needs provider account setup, environment configuration, and cold-start acceptance. |
 | MVP database hosting | Neon or Aiven free-tier managed PostgreSQL, selected before deployment | Proposed | Avoid disposable app-platform free databases for durable MVP data. |
 | Solana event monitoring host | Hybrid pull for MVP: frontend direct RPC reads for display; Django on-demand RPC verification at record time; no worker, indexer, cron, or WebSocket listener | Accepted | See `docs/decisions/0023-mvp-solana-event-monitoring-boundary.md`. A worker/indexer is added only via follow-up plan when history or real-time needs emerge. |
+| Cover image storage | Presigned PUT to an S3-compatible object store; cover bytes never pass through the API or PostgreSQL | Draft | Provider still open post-MVP: Cloudflare R2 (S3-compatible, 10 GB free, no egress fees, portable) versus Vercel Blob (500 MB free, ~4.5 MB max upload on Hobby, zero extra provider setup). See Open Question 5 in `plans/0018-recommendation-lifecycle-api.md`. |
+| Cover image limits | 5 MB max upload; jpg/png/webp only | Draft | Until uploads ship, `cover_image_url` / `avatar_url` are treated as unvalidated URL strings. Needs security review (SSRF, content-type) before implementation. |
 
 ## Maintenance Rules
 

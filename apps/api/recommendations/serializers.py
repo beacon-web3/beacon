@@ -101,28 +101,33 @@ class UpdateRecommendationSerializer(serializers.Serializer):
         if "author_names" in attrs:
             attrs["author_names_normalized"] = attrs["author_names"].lower()
 
-        if (
-            self.instance is not None
-            and self.instance.is_canonical
-            and "title" in attrs
-            and "author_names" in attrs
-            and BookRecommendation.objects.filter(
-                is_canonical=True,
-                title_normalized__iexact=attrs["title"],
-                author_names_normalized__iexact=attrs["author_names"],
-                page_type=attrs.get("page_type", self.instance.page_type),
+        # A PATCH may change only one of title/author_names/page_type. Merge
+        # changed values with the current instance so the canonical-work check
+        # runs for every update, not just full replaces.
+        if self.instance is not None and self.instance.is_canonical:
+            cand_title = attrs.get("title_normalized", self.instance.title_normalized)
+            cand_author = attrs.get(
+                "author_names_normalized", self.instance.author_names_normalized
             )
-            .exclude(pk=self.instance.pk)
-            .exists()
-        ):
-            raise serializers.ValidationError(
-                {
-                    "title": _(
-                        "A canonical recommendation for this title and author "
-                        "already exists."
-                    )
-                }
-            )
+            cand_page_type = attrs.get("page_type", self.instance.page_type)
+            if (
+                BookRecommendation.objects.filter(
+                    is_canonical=True,
+                    title_normalized__iexact=cand_title,
+                    author_names_normalized__iexact=cand_author,
+                    page_type=cand_page_type,
+                )
+                .exclude(pk=self.instance.pk)
+                .exists()
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "title": _(
+                            "A canonical recommendation for this title and author "
+                            "already exists."
+                        )
+                    }
+                )
         return attrs
 
 

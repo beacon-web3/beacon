@@ -42,6 +42,7 @@ env = environ.Env(
     RECOMMENDATION_FOLLOW_THROTTLE_RATE=(str, "10/min"),
     RECOMMENDATION_DUPLICATE_THROTTLE_RATE=(str, "5/min"),
     RECOMMENDATION_READ_THROTTLE_RATE=(str, "60/min"),
+    RECOMMENDATION_UPDATE_THROTTLE_RATE=(str, "10/min"),
     SESSION_COOKIE_SECURE=(bool, False),
     CSRF_COOKIE_SECURE=(bool, False),
     SECURE_SSL_REDIRECT=(bool, False),
@@ -92,6 +93,7 @@ AUTH_THROTTLE_RATES = {
 }
 RECOMMENDATION_THROTTLE_RATES = {
     "recommendation_create": env("RECOMMENDATION_CREATE_THROTTLE_RATE"),
+    "recommendation_update": env("RECOMMENDATION_UPDATE_THROTTLE_RATE"),
     "recommendation_act": env("RECOMMENDATION_ACT_THROTTLE_RATE"),
     "recommendation_support": env("RECOMMENDATION_SUPPORT_THROTTLE_RATE"),
     "recommendation_stake": env("RECOMMENDATION_STAKE_THROTTLE_RATE"),
@@ -100,6 +102,11 @@ RECOMMENDATION_THROTTLE_RATES = {
     "recommendation_duplicate": env("RECOMMENDATION_DUPLICATE_THROTTLE_RATE"),
     "recommendation_read": env("RECOMMENDATION_READ_THROTTLE_RATE"),
 }
+# Throttle state (SimpleRateThrottle) uses Django's default LocMem cache, which
+# is per-process. With multiple workers the effective rates multiply by the
+# worker count and reset on restart. Acceptable for the MVP single-process
+# deployment; configure a shared cache (e.g. Redis) before running multiple
+# gunicorn workers in production.
 GOOGLE_OAUTH_CLIENT_ID = env("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = env("GOOGLE_OAUTH_CLIENT_SECRET")
 GOOGLE_OAUTH_REDIRECT_URI = env("GOOGLE_OAUTH_REDIRECT_URI")

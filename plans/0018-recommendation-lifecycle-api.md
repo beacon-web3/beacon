@@ -236,6 +236,7 @@ Two serializer levels prevent leaking internal fields to unauthenticated users:
 | Endpoint | Throttle | Rate |
 |----------|----------|------|
 | `POST /api/recommendations/` | RecommendationCreateThrottle | 10/min |
+| `PATCH /api/recommendations/{id}/` | RecommendationUpdateThrottle | 10/min |
 | `POST /api/recommendations/{id}/recommend/` | RecommendationActThrottle | 5/min |
 | `POST /api/recommendations/{id}/reactivate/` | RecommendationActThrottle | 5/min |
 | `POST /api/recommendations/{id}/support/`, `.../support/confirm/` | RecommendationSupportThrottle | 20/min |
@@ -877,17 +878,17 @@ Implement `POST /api/recommendations/{id}/bookmark/`,
 
 Acceptance criteria:
 
-- [ ] `POST /recommendations/{id}/bookmark/` creates a bookmark (201).
-- [ ] `POST /recommendations/{id}/bookmark/` returns 409 if already bookmarked.
-- [ ] `DELETE /recommendations/{id}/bookmark/` removes bookmark (204).
-- [ ] `DELETE /recommendations/{id}/bookmark/` returns 404 if not bookmarked.
-- [ ] `GET /accounts/me/bookmarks/` returns current user's bookmarks.
-- [ ] All bookmark endpoints require authentication.
-- [ ] Each view has `@extend_schema` documentation.
+- [x] `POST /recommendations/{id}/bookmark/` creates a bookmark (201).
+- [x] `POST /recommendations/{id}/bookmark/` returns 409 if already bookmarked.
+- [x] `DELETE /recommendations/{id}/bookmark/` removes bookmark (204).
+- [x] `DELETE /recommendations/{id}/bookmark/` returns 404 if not bookmarked.
+- [x] `GET /accounts/me/bookmarks/` returns current user's bookmarks.
+- [x] All bookmark endpoints require authentication.
+- [x] Each view has `@extend_schema` documentation.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_bookmarks.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_bookmarks.py -v`
 
 Files likely touched:
 
@@ -911,18 +912,18 @@ since they're under `/accounts/`, with URL patterns in
 
 Acceptance criteria:
 
-- [ ] `POST /accounts/{username}/follow/` creates a follow (201).
-- [ ] `POST /accounts/{username}/follow/` returns 400 for self-follow.
-- [ ] `POST /accounts/{username}/follow/` returns 409 if already following.
-- [ ] `DELETE /accounts/{username}/follow/` removes follow (204).
-- [ ] `GET /accounts/{username}/followers/` returns paginated follower list.
-- [ ] `GET /accounts/{username}/following/` returns paginated following list.
-- [ ] Follow/unfollow require authentication.
-- [ ] Follower/following lists are publicly readable.
+- [x] `POST /accounts/{username}/follow/` creates a follow (201).
+- [x] `POST /accounts/{username}/follow/` returns 400 for self-follow.
+- [x] `POST /accounts/{username}/follow/` returns 409 if already following.
+- [x] `DELETE /accounts/{username}/follow/` removes follow (204).
+- [x] `GET /accounts/{username}/followers/` returns paginated follower list.
+- [x] `GET /accounts/{username}/following/` returns paginated following list.
+- [x] Follow/unfollow require authentication.
+- [x] Follower/following lists are publicly readable.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/accounts/test_follow.py -v`
+- [x] Tests pass: `pytest apps/api/tests/accounts/test_follow.py -v`
 
 Files likely touched:
 
@@ -943,15 +944,15 @@ account-scoped route is registered in `accounts/account_urls.py`.
 
 Acceptance criteria:
 
-- [ ] `GET /recommendations/{id}/badges/` returns badges for a recommendation.
-- [ ] `GET /accounts/{username}/badges/` returns badges earned by a user.
-- [ ] Badge response includes `tier`, `earned_at`, and `recommendation` fields.
-- [ ] Both endpoints are publicly readable.
-- [ ] Returns empty list if no badges earned.
+- [x] `GET /recommendations/{id}/badges/` returns badges for a recommendation.
+- [x] `GET /accounts/{username}/badges/` returns badges earned by a user.
+- [x] Badge response includes `tier`, `earned_at`, and `recommendation` fields.
+- [x] Both endpoints are publicly readable.
+- [x] Returns empty list if no badges earned.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_badges.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_badges.py -v`
 
 Files likely touched:
 
@@ -971,17 +972,17 @@ URL patterns in `accounts/account_urls.py`.
 
 Acceptance criteria:
 
-- [ ] `GET /accounts/{username}/reputation/` returns paginated reputation
+- [x] `GET /accounts/{username}/reputation/` returns paginated reputation
   event history.
-- [ ] `GET /accounts/{username}/profile/` returns `display_name`,
+- [x] `GET /accounts/{username}/profile/` returns `display_name`,
   `reputation_score`, `badge_count`.
-- [ ] Both endpoints return 404 for nonexistent users.
-- [ ] Both endpoints are publicly readable.
-- [ ] `reputation_score` returns the raw field value (no aggregation).
+- [x] Both endpoints return 404 for nonexistent users.
+- [x] Both endpoints are publicly readable.
+- [x] `reputation_score` returns the raw field value (no aggregation).
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/accounts/test_reputation.py -v`
+- [x] Tests pass: `pytest apps/api/tests/accounts/test_reputation.py -v`
 
 Files likely touched:
 
@@ -995,10 +996,10 @@ Estimated scope: Small.
 
 ### Checkpoint: Auxiliary Endpoints
 
-- [ ] Bookmarks, follows, badges, and reputation endpoints work end-to-end.
-- [ ] Self-follow is rejected.
-- [ ] Permission checks pass: auth-required for mutations, public for reads.
-- [ ] Pagination works on all list endpoints.
+- [x] Bookmarks, follows, badges, and reputation endpoints work end-to-end.
+- [x] Self-follow is rejected.
+- [x] Permission checks pass: auth-required for mutations, public for reads.
+- [x] Pagination works on all list endpoints.
 
 ### Phase 5: Duplicate Reports and Admin
 
@@ -1080,14 +1081,14 @@ the specification.
 
 Acceptance criteria:
 
-- [ ] Every mutating endpoint has throttle classes applied.
-- [ ] Tests verify 429 response when rate limit is exceeded.
-- [ ] Read-only endpoints use the public read throttle (60/min).
-- [ ] Throttle rates match the rate limiting table in this plan.
+- [x] Every mutating endpoint has throttle classes applied.
+- [x] Tests verify 429 response when rate limit is exceeded.
+- [x] Read-only endpoints use the public read throttle (60/min).
+- [x] Throttle rates match the rate limiting table in this plan.
 
 Verification:
 
-- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_throttles.py -v`
+- [x] Tests pass: `pytest apps/api/tests/recommendations/test_throttles.py -v`
 
 Files likely touched:
 
@@ -1106,6 +1107,94 @@ Estimated scope: Medium.
 - [ ] `manage.py test` passes for all recommendation endpoint tests.
 - [ ] OpenAPI schema generates correctly for all new endpoints.
 - [ ] No regressions in existing auth endpoint tests.
+
+### Phase 6: Cover Art and Profile Images (reserve fields)
+
+Add optional, nullable image URL fields to recommendations (cover art) and user
+profiles (profile picture) so the schema is ready for imagery. This phase only
+adds the fields and exposes them on read/write endpoints — no upload plumbing.
+
+The upload feature is deferred until after MVP (see Open Question 5). Until
+then, the fields are plain URL strings with no storage-URL validation and no
+requirement that values be Beacon-hosted; that validation lands together with
+the upload feature so existing values are not wrongly rejected.
+
+#### Task 17: Recommendation cover image
+
+Add an optional `cover_image_url` field to `BookRecommendation` and expose it
+through the recommendation serializers.
+
+Acceptance criteria:
+
+- [ ] `BookRecommendation.cover_image_url` is a nullable, blank-by-default
+  `URLField` with `max_length=2048` (object-store public URLs outgrow the
+  default 200-char limit).
+- [ ] Migration generated by `makemigrations`.
+- [ ] `RecommendationSummarySerializer` and `RecommendationDetailSerializer`
+  include `cover_image_url` (null when not set).
+- [ ] `RecommendationCreateSerializer` and `UpdateRecommendationSerializer`
+  accept an optional `cover_image_url` and store it.
+- [ ] `GET /api/recommendations/` list response includes `cover_image_url`
+  (null when not set).
+
+Verification:
+
+- [ ] Tests pass: `pytest apps/api/tests/recommendations/test_cover_image.py -v`
+- [ ] `uv run python manage.py makemigrations --check --dry-run` shows no
+  pending changes.
+
+Files likely touched:
+
+- `apps/api/recommendations/models.py` (add field)
+- `apps/api/recommendations/migrations/` (new migration)
+- `apps/api/recommendations/serializers.py` (summary, detail, create, update)
+- `apps/api/tests/recommendations/test_cover_image.py` (new)
+
+Dependencies: Task 5.
+
+Estimated scope: Small.
+
+#### Task 18: User profile picture
+
+Add an optional `avatar_url` field to the user account model and expose it in
+profile serializers.
+
+Acceptance criteria:
+
+- [ ] `Account.avatar_url` is a nullable, blank-by-default `URLField` with
+  `max_length=2048` (same reason as Task 17).
+- [ ] Migration generated by `makemigrations`.
+- [ ] `ProfileSerializer` includes `avatar_url` (null when not set).
+- [ ] `AccountRefSerializer` includes `avatar_url` so nested creator/current
+  recommender/follower/followee/badge responses carry it.
+- [ ] `GET /api/accounts/{username}/profile/` returns `avatar_url`.
+- [ ] No self-update endpoint in this task; a profile edit path ships with
+  the upload feature (see Open Question 5).
+
+Verification:
+
+- [ ] Tests pass: `pytest apps/api/tests/accounts/test_avatar.py -v`
+- [ ] `uv run python manage.py makemigrations --check --dry-run` shows no
+  pending changes.
+
+Files likely touched:
+
+- `apps/api/accounts/models.py` (add field)
+- `apps/api/accounts/migrations/` (new migration)
+- `apps/api/recommendations/serializers.py` (`AccountRefSerializer`,
+  `ProfileSerializer`)
+- `apps/api/tests/accounts/test_avatar.py` (new)
+
+Dependencies: Task 5, Task 13.
+
+Estimated scope: Small.
+
+### Checkpoint: Media Fields
+
+- [ ] Cover art and profile picture fields exist, are nullable/optional, and
+  are exposed on all relevant read and write endpoints.
+- [ ] No file upload infrastructure was added.
+- [ ] Existing tests still pass unchanged.
 
 ## Risks And Mitigations
 
@@ -1163,3 +1252,22 @@ implement the formula.
 
 *When to revisit:* If OFFSET performance matters at scale, add `?cursor=`
 as an alternative parameter. Both can coexist.
+
+**Question 5:** Where should cover art and profile images be hosted, and who
+sets them?
+
+*Answer (partial):* The schema fields are added now as reserve
+(`BookRecommendation.cover_image_url`, `Account.avatar_url`), optional and
+nullable, with no upload infrastructure. The upload feature is deferred until
+after MVP: presigned PUT to an S3-compatible object store (works on the
+current Vercel Hobby + Neon free tier because file bytes never pass through
+the API or Postgres — serverless filesystem is ephemeral and Postgres is not
+blob storage).
+
+*Still open (post-MVP, with the upload feature):* Concrete provider and
+limits. Recommended: Cloudflare R2 (S3-compatible, 10 GB free, no egress
+fees, portable — consistent with the no-provider-lock-in decision in plan
+0015). Alternative: Vercel Blob (500 MB free, ~4.5 MB max upload on Hobby;
+Vercel-specific but zero extra provider setup). Proposed limits: 5 MB max,
+jpg/png/webp only. Until uploads ship, the URL fields are unvalidated strings;
+storage-URL validation lands with the upload feature.

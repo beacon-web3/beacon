@@ -68,3 +68,13 @@ class RecommendationReadThrottle(RecommendationRateThrottle):
     """Public read endpoints."""
 
     scope = "recommendation_read"
+
+
+class RecommendationUpdateThrottle(RecommendationRateThrottle):
+    """PATCH /api/recommendations/{id}/ — metadata update.
+
+    Mirrors the create rate (10/min): both mutate the recommendation, and
+    keeping the same rate avoids a new policy number.
+    """
+
+    scope = "recommendation_update"

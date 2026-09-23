@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Max, Q
 from django.shortcuts import get_object_or_404
@@ -16,12 +18,16 @@ from rest_framework.views import APIView
 from common.idempotency import IdempotencyKeyMixin
 from recommendations.models import (
     SUPPORT_AMOUNT_LAMPORTS,
+    Bookmark,
     BookRecommendation,
     RecommenderParticipant,
     Support,
 )
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import (
+    BadgeSerializer,
+    BookmarkReadSerializer,
+    BookmarkSerializer,
     CreateRecommendationSerializer,
     ReactivateSerializer,
     RecommendationDetailSerializer,
@@ -45,10 +51,14 @@ from recommendations.throttles import (
     RecommendationReadThrottle,
     RecommendationStakeThrottle,
     RecommendationSupportThrottle,
+    RecommendationUpdateThrottle,
 )
 
-# Placeholder views for later Plan 0018 phases. Permission and throttle classes
-# reflect the plan's rate/permission matrix so public reads stay public.
+# Placeholder views for later Plan 0018 phases (Phase 5 stake/duplicate-report
+# endpoints). Permission and throttle classes reflect the plan's rate/permission
+# matrix so public reads stay public.
+
+Account = get_user_model()
 
 SEARCH_MIN_LENGTH = 3
 ORDERING_CHOICES = {"-support_count", "created_at", "-created_at"}
@@ -162,17 +172,33 @@ class RecommendationCreateView(APIView):
         except IntegrityError:
             # DB unique constraint is the safety net for the serializer check;
             # a concurrent create of the same canonical work loses cleanly.
-            return Response(
-                {
-                    "title": [
-                        _(
-                            "A canonical recommendation for this title and "
-                            "author already exists."
-                        )
-                    ]
-                },
-                status=400,
-            )
+            # Only map that specific conflict to a 400; any other constraint
+            # failure is a real DB fault and must surface as a 500.
+            page_type = serializer.validated_data.get("page_type")
+            is_canonical = serializer.validated_data.get("is_canonical", False)
+            if (
+                is_canonical
+                and BookRecommendation.objects.filter(
+                    is_canonical=True,
+                    title_normalized=serializer.validated_data["title_normalized"],
+                    author_names_normalized=serializer.validated_data[
+                        "author_names_normalized"
+                    ],
+                    page_type=page_type,
+                ).exists()
+            ):
+                return Response(
+                    {
+                        "title": [
+                            _(
+                                "A canonical recommendation for this title and "
+                                "author already exists."
+                            )
+                        ]
+                    },
+                    status=400,
+                )
+            raise
         return Response(
             {"recommendation": RecommendationDetailSerializer(recommendation).data},
             status=201,
@@ -269,11 +295,9 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         queryset = self._filter_queryset(queryset, request.query_params)
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
-        if page is not None:
-            return paginator.get_paginated_response(
-                RecommendationSummarySerializer(page, many=True).data
-            )
-        return Response(RecommendationSummarySerializer(queryset, many=True).data)
+        return paginator.get_paginated_response(
+            RecommendationSummarySerializer(page, many=True).data
+        )
 
 
 class RecommendationUpdateView(APIView):
@@ -344,9 +368,13 @@ class RecommendationDetailView(RecommendationUpdateView):
     """GET detail (full for authenticated, summary for anonymous) / PATCH update."""
 
     permission_classes = [AllowAny]
-    # PATCH inherits the read throttle; the plan defines no dedicated update
-    # scope, so read (60/min) is the only rate applied here.
-    throttle_classes = [RecommendationReadThrottle]
+
+    def get_throttles(self):
+        # PATCH is a mutating endpoint with its own update scope (10/min,
+        # mirroring create) so metadata edits do not consume the read bucket.
+        if self.request.method == "PATCH":
+            return [RecommendationUpdateThrottle()]
+        return [RecommendationReadThrottle()]
 
     @extend_schema(
         summary="Retrieve a recommendation",
@@ -574,7 +602,12 @@ class SupportView(APIView):
             return Response(
                 {"detail": _("You already support this recommendation.")}, status=409
             )
-        supporter_number = recommendation.supports.count() + 1
+        supporter_number = (
+            recommendation.supports.aggregate(Max("supporter_number"))[
+                "supporter_number__max"
+            ]
+            or 0
+        ) + 1
         return Response(
             SupportPrepareEnvelopeSerializer(
                 instance={
@@ -627,8 +660,28 @@ class SupportConfirmBaseView(APIView):
                     "on_chain_support_account"
                 ),
             )
-            support.full_clean()
-            support.save()
+            try:
+                support.full_clean()
+                support.save()
+            except ValidationError:
+                # Clean() rejects missing on-chain fields; a 400 tells the
+                # client to fix its payload rather than surfacing a 500.
+                return Response(
+                    {"detail": _("Support could not be recorded.")},
+                    status=400,
+                )
+            except IntegrityError:
+                # Constraint safety net (duplicate signature / concurrent same
+                # supporter): the client can retry with a fresh signature.
+                return Response(
+                    {
+                        "detail": _(
+                            "Support was not recorded; the transaction signature "
+                            "may already be in use."
+                        )
+                    },
+                    status=409,
+                )
             now = timezone.now()
             recommendation.support_count += 1
             recommendation.last_support_at = now
@@ -715,11 +768,9 @@ class SupportListView(APIView):
         queryset = recommendation.supports.all().order_by("supporter_number")
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
-        if page is not None:
-            return paginator.get_paginated_response(
-                SupportReadSerializer(page, many=True).data
-            )
-        return Response(SupportReadSerializer(queryset, many=True).data)
+        return paginator.get_paginated_response(
+            SupportReadSerializer(page, many=True).data
+        )
 
 
 class StakeView(APIView):
@@ -735,31 +786,179 @@ class StakeHistoryView(APIView):
     throttle_classes = [RecommendationReadThrottle]
 
 
-class BookmarkView(APIView):
-    """Placeholder — POST create bookmark / DELETE remove, implemented in Phase 4."""
+class BookmarkToggleView(APIView):
+    """POST bookmark / DELETE remove — authenticated only."""
 
+    permission_classes = [IsAuthenticated]
     throttle_classes = [RecommendationBookmarkThrottle]
+
+    @extend_schema(
+        summary="Bookmark a recommendation",
+        description=(
+            "Authenticated only. Bookmarks the recommendation for the current user."
+        ),
+        request=BookmarkSerializer,
+        responses={
+            201: BookmarkReadSerializer,
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation not found."),
+            409: OpenApiResponse(description="Recommendation already bookmarked."),
+        },
+    )
+    def post(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        bookmark, created = Bookmark.objects.get_or_create(
+            account=request.user, recommendation=recommendation
+        )
+        if not created:
+            return Response(
+                {"detail": _("Recommendation already bookmarked.")}, status=409
+            )
+        return Response(
+            BookmarkReadSerializer(bookmark).data,
+            status=201,
+        )
+
+    @extend_schema(
+        summary="Remove a bookmark",
+        description="Authenticated only. Removes the current user's bookmark.",
+        responses={
+            204: OpenApiResponse(description="Bookmark removed."),
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation or bookmark not found."),
+        },
+    )
+    def delete(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        bookmark = get_object_or_404(
+            Bookmark, account=request.user, recommendation=recommendation
+        )
+        bookmark.delete()
+        return Response(status=204)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Bookmark a recommendation",
+        description=(
+            "Authenticated only. Bookmarks the recommendation for the current "
+            "user; idempotent when an Idempotency-Key header is supplied."
+        ),
+        request=BookmarkSerializer,
+        responses={
+            201: BookmarkReadSerializer,
+            403: OpenApiResponse(description="Not authenticated."),
+            404: OpenApiResponse(description="Recommendation not found."),
+            409: OpenApiResponse(
+                description="Already bookmarked, or idempotency key in use."
+            ),
+        },
+    ),
+)
+class BookmarkView(IdempotencyKeyMixin, BookmarkToggleView):
+    """POST /api/recommendations/{id}/bookmark/ — idempotent bookmark toggle."""
 
 
 class UserBookmarksView(APIView):
-    """Placeholder — GET current user's bookmarks, implemented in Phase 4."""
+    """GET current user's bookmarks — authenticated only."""
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     throttle_classes = [RecommendationReadThrottle]
+    pagination_class = RecommendationPagination
+
+    @extend_schema(
+        summary="List my bookmarks",
+        description=(
+            "Authenticated only. Returns the current user's bookmarks, newest first."
+        ),
+        parameters=[
+            OpenApiParameter(name="page", type=int, description="Page number."),
+            OpenApiParameter(
+                name="page_size", type=int, description="Page size (max 100)."
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Paginated list of bookmarks."),
+            403: OpenApiResponse(description="Not authenticated."),
+        },
+    )
+    def get(self, request):
+        queryset = (
+            request.user.bookmarks.all()
+            .select_related("recommendation__category")
+            .order_by("-created_at")
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(
+            BookmarkReadSerializer(page, many=True).data
+        )
 
 
 class RecommendationBadgeListView(APIView):
-    """Placeholder — GET badges for a recommendation, implemented in Phase 4."""
+    """GET badges for a recommendation (public) — paginated."""
 
     permission_classes = [AllowAny]
     throttle_classes = [RecommendationReadThrottle]
+    pagination_class = RecommendationPagination
+
+    @extend_schema(
+        summary="List recommendation badges",
+        description="Public endpoint. Returns badges earned for the recommendation.",
+        parameters=[
+            OpenApiParameter(name="page", type=int, description="Page number."),
+            OpenApiParameter(
+                name="page_size", type=int, description="Page size (max 100)."
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Paginated list of badges."),
+            404: OpenApiResponse(description="Recommendation not found."),
+        },
+    )
+    def get(self, request, id):
+        recommendation = get_object_or_404(BookRecommendation, id=id)
+        queryset = (
+            recommendation.badges.all()
+            .select_related("account", "recommendation__category")
+            .order_by("-earned_at")
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(BadgeSerializer(page, many=True).data)
 
 
 class AccountBadgeListView(APIView):
-    """Placeholder — GET badges for an account, implemented in Phase 4."""
+    """GET badges earned by an account (public) — paginated."""
 
     permission_classes = [AllowAny]
     throttle_classes = [RecommendationReadThrottle]
+    pagination_class = RecommendationPagination
+
+    @extend_schema(
+        summary="List account badges",
+        description="Public endpoint. Returns badges earned by the account.",
+        parameters=[
+            OpenApiParameter(name="page", type=int, description="Page number."),
+            OpenApiParameter(
+                name="page_size", type=int, description="Page size (max 100)."
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Paginated list of badges."),
+            404: OpenApiResponse(description="Account not found."),
+        },
+    )
+    def get(self, request, username):
+        account = get_object_or_404(Account, username=username)
+        queryset = (
+            account.badges.all()
+            .select_related("account", "recommendation__category")
+            .order_by("-earned_at")
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(BadgeSerializer(page, many=True).data)
 
 
 class DuplicateReportView(APIView):
