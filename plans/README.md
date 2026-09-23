@@ -59,6 +59,7 @@ Templates live in `plans/templates/`.
 | ID   | Plan | Status    |
 |------| --- |-----------|
 | 0018 | [Recommendation lifecycle API](0018-recommendation-lifecycle-api.md) | Draft |
+| 0019 | [Factory boy postgeneration deprecation](0019-factory-boy-postgeneration-deprecation.md) | Draft |
 
 ## Completed Plans
 
