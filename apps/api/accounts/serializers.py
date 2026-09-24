@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -15,6 +15,11 @@ from rest_framework import serializers
 from accounts.captcha import verify_captcha_token
 
 Account = get_user_model()
+
+# Precomputed hash of a throwaway password. Unknown-identifier logins run one
+# hash comparison against this so response time does not reveal whether an
+# identifier exists (user enumeration via timing).
+_UNKNOWN_ACCOUNT_DUMMY_HASH = make_password("beacon-unknown-account-dummy")
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -147,12 +152,20 @@ class SignupSerializer(CaptchaSerializer):
 
         if Account.objects.filter(email__iexact=attrs["email"]).exists():
             raise serializers.ValidationError(
-                {"email": _("An account with this email already exists.")}
+                {
+                    "non_field_errors": _(
+                        "An account with this email or username already exists."
+                    )
+                }
             )
 
         if Account.objects.filter(username__iexact=attrs["username"]).exists():
             raise serializers.ValidationError(
-                {"username": _("An account with this username already exists.")}
+                {
+                    "non_field_errors": _(
+                        "An account with this email or username already exists."
+                    )
+                }
             )
 
         return attrs
@@ -194,6 +207,10 @@ class LoginSerializer(CaptchaSerializer):
         )
 
         if account is None:
+            # Burn one hash comparison so timing matches a wrong-password login
+            # on an existing account; otherwise the fast path reveals whether
+            # the identifier exists.
+            check_password(password, _UNKNOWN_ACCOUNT_DUMMY_HASH)
             raise serializers.ValidationError(_("Invalid credentials.")) from None
 
         self.account = authenticate(username=account.username, password=password)

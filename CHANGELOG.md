@@ -8,6 +8,24 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Fixed
+
+- Auth hardening: signup duplicate errors no longer reveal whether an email or
+  username is already taken (single generic `non_field_errors` message), and
+  login for an unknown identifier now performs a dummy password-hash comparison
+  so response timing is comparable to a wrong-password login (preventing user
+  enumeration via response body or timing).
+
+### Changed
+
+- Refactored `apps/api/recommendations/views.py` (1,328 lines) and
+  `apps/api/accounts/views.py` (605 lines) into `views/` packages grouped by
+  concern (core/list, activation, support, stake, bookmarks, badges, duplicates
+  for recommendations; auth/session and social/read for accounts). All existing
+  `from <app>.views import ...` imports and test mock targets
+  (`accounts.views.transaction`, `accounts.views.send_mail`) are preserved via
+  `__init__.py` re-exports. No behavior or public API changes.
+
 ### Added
 
 - Recommendation lifecycle API Phase 6 (media fields): added `cover_image_url` (nullable, blank-by-default `URLField`, max_length=2048) to `BookRecommendation` and `avatar_url` (same contract, max_length=2048) to `Account`, with generated migrations; exposed `cover_image_url` on summary/detail/create/update serializers and the recommendation list endpoint, and `avatar_url` on `AccountRefSerializer`/`ProfileSerializer` (null when not set). No file upload infrastructure was added.

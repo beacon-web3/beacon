@@ -141,7 +141,7 @@ def test_signup_rejects_duplicate_email(api_client):
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "email" in response.data
+    assert "non_field_errors" in response.data
 
 
 @pytest.mark.django_db
@@ -165,7 +165,7 @@ def test_signup_rejects_duplicate_username_case_insensitively(api_client):
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "username" in response.data
+    assert "non_field_errors" in response.data
 
 
 @pytest.mark.django_db
