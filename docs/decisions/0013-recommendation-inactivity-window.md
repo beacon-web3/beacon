@@ -12,41 +12,53 @@ Accepted
 
 Beacon's hybrid recommendation lifecycle allows a canonical standalone book work
 or recognized series page to move from an active recommendation cycle to an
-inactive state, after which an eligible new recommender can reactivate it by
-locking at least the required `0.2 SOL` minimum.
+inactive state, after which any eligible user — including the original discoverer
+and prior reactivators — can reactivate it by locking at least the required
+`0.2 SOL` minimum.
 
 The MVP needs a concrete inactivity window before backend models, scheduled
 checks, API states, and user-facing reactivation copy can be implemented. That
-window should only begin after the active recommender has no locked SOL remaining
-on the recommendation. Because early MVP discovery and recommender competition
-are expected to be low, the window should avoid premature deactivation while
-still allowing stale recommendations to be revived.
+window should only begin when no recommender participant is active on the
+recommendation (recommender participants become inactive through reclaim or
+withdrawal). Because early MVP discovery and
+recommender competition are expected to be low, the window should avoid premature
+deactivation while still allowing stale recommendations to be revived.
 
 ## Decision
 
 For MVP, an active recommendation cycle becomes eligible for inactive status only
 after both conditions are true:
 
-- No recommender SOL remains locked on the active cycle.
+- No recommender participant is active on the cycle. A recommendation cycle is
+  live while a `RecommenderParticipant` is active (holding at least the `0.2
+  SOL` minimum); a participant becomes inactive through reclaim or withdrawal.
 - The cycle has `90 days` with no new support.
 
-Partial withdrawals do not start the inactivity window. For example, if a
+Partial withdrawals do not start the inactivity window, and the window only opens
+when no recommender participant is active. For example, if a
 recommender initially locks `1 SOL`, withdrawing `0.8 SOL` does not start the
 inactivity window because the required base stake, currently `0.2 SOL`, remains
-locked. The window can start only after the recommender withdraws all remaining
-locked SOL.
+locked with an active participant. The window can start only after all
+recommendation stake is reclaimed and no active recommender participant remains.
+
+Because the cycle is live while a `RecommenderParticipant` is active, a full
+withdrawal or reclaim by the active recommender makes that participant inactive,
+and the inactivity window is evaluated once no active participant holding at
+least the `0.2 SOL` minimum remains. While the cycle remains active, new users who
+are not part of the historical recommender set cannot stake into it and must wait
+for deactivation.
 
 The no-support window is measured from the later of the time when no recommender
-SOL remains locked on the active cycle or the latest valid support transaction on
-that cycle. Reactivation remains unavailable to new users until the page is
-inactive.
+participant is active on the cycle or the latest valid support transaction on
+that cycle. Reactivation remains unavailable until the page is inactive.
 
-The UI must warn a recommender before a withdrawal that would leave no SOL locked
-on the active cycle, because that action can start the inactivity window if no
-new support arrives.
+The UI must warn a recommender before a withdrawal that would leave no active
+recommender participant on the cycle, because that action can start the
+inactivity window if no new support arrives.
 
 This decision only resolves the inactivity trigger and duration. It does not
-resolve reward split formulas across historical recommenders.
+resolve exact reward split formulas across recommenders; the weighting principle
+is resolved by `0024-linear-reward-weighting-across-recommender-stake.md`.
 `0014-reactivation-moderation-policy.md` resolves the default reactivation
 moderation rule. `0015-minimum-recommender-stake-no-deposit-cap.md` resolves the
 MVP activation and reactivation minimum stake.
@@ -83,19 +95,22 @@ MVP activation and reactivation minimum stake.
 
 ## Consequences
 
-- Product copy can explain inactivity as zero locked recommender SOL plus `90
-  days with no new support`.
-- Backend lifecycle logic should store enough timestamps and locked stake state to
-  determine when an active cycle reaches zero locked recommender SOL and the
-  latest valid support transaction per active cycle.
+- Product copy can explain inactivity as no active recommender participant
+  (holding at least the `0.2 SOL` minimum) plus `90 days with no new support`.
+- Backend lifecycle logic should store enough timestamps and recommender
+  participant state to determine when a cycle reaches no active participant and
+  the latest valid support transaction per active cycle.
 - Withdrawal flows must distinguish partial withdrawals from full withdrawals and
-  warn users before a withdrawal that leaves no SOL locked.
+  warn users before a withdrawal that leaves no active recommender participant on
+  the cycle.
 - Scheduled jobs or admin workflows can mark eligible cycles inactive, but the
   exact automation mechanism remains an implementation detail.
 - Product and tokenomics docs should no longer list the inactivity duration as an
   unresolved question.
 - Historical recommender credit formulas and anti-whale controls remain
-  unresolved.
+  unresolved; the linear weighting principle is set by
+  `0024-linear-reward-weighting-across-recommender-stake.md`, but exact splits and
+  parameters are pending tokenomics simulation.
 
 ## Related Specs
 

@@ -121,6 +121,8 @@ class SignupSerializer(CaptchaSerializer):
 
     def validate_username(self, value: str) -> str:
         value = value.strip()
+        if value.lower() == "me":
+            raise serializers.ValidationError(_("This username is reserved."))
         self.username_validator(value)
 
         return value

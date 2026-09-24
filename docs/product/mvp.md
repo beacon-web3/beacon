@@ -58,10 +58,12 @@ candidate. If review rejects the candidate as duplicate or invalid, the locked S
 is not released immediately; it remains locked until the normal lock period ends.
 
 Each canonical page has at most one active recommendation cycle at a time. If no
-recommender SOL remains locked on the active cycle and the cycle has 90 days with
-no new support, it becomes eligible for inactive status. A new eligible user can
-then lock at least the required `0.2 SOL` minimum to reactivate the
-recommendation. Reactivation preserves the canonical page, discoverer credit,
+recommender participant is active on the cycle (participants become inactive
+through reclaim or withdrawal) and the cycle has 90 days with no new support, it
+becomes eligible for inactive status. Any eligible user can then lock at least
+the required `0.2 SOL` minimum to reactivate the recommendation — this includes
+the original discoverer and prior reactivators, who remain part of the historical
+recommender set. Reactivation preserves the canonical page, discoverer credit,
 previous supporters, badges, and recommender history.
 
 Reactivation does not require moderation review by default when the page is
@@ -90,19 +92,20 @@ future upvote/support credit, but additional stake must not rewrite past support
 credit, badges, discoverer credit, or reputation history.
 
 If extra locked SOL affects future upvote/support credit, rewards, ranking, or
-visibility, it must use diminishing returns rather than linear weighting. The
-exact curve and parameters remain unresolved.
+visibility, it is weighted linearly in proportion to each recommender's locked
+SOL share of the total locked recommender SOL on the recommendation, per ADR
+0024. Exact split and anti-whale parameters remain unresolved pending simulation.
 
 Users who have never activated or reactivated a page cannot stake into that page
 while it is active. They must wait until the current recommendation cycle becomes
 inactive and then reactivate it by locking at least the required `0.2 SOL`
 minimum.
 
-Partial stake withdrawals do not start the inactivity window while any
-recommender SOL remains locked, including the required base stake currently set
-at `0.2 SOL`. If a withdrawal would leave no SOL locked on the active cycle,
-Beacon must warn the recommender that the page can become inactive after 90 days
-with no new support.
+Partial stake withdrawals do not start the inactivity window while a
+recommender participant remains active, holding at least the required base stake
+currently set at `0.2 SOL`. If a withdrawal would leave no active recommender
+participant on the cycle, Beacon must warn the recommender that the page can
+become inactive after 90 days with no new support.
 
 Withdrawals must not leave a recommender locked balance above `0 SOL` but below
 `0.2 SOL`. A withdrawal that would cross below `0.2 SOL` must either be rejected
@@ -205,8 +208,9 @@ The MVP is successful if it demonstrates:
 
 ## Open Questions
 
-* What exact diminishing-returns curve, cap, or fixed staking window should apply
-  to additional historical recommender stake?
+* What exact reward-split parameters, caps, or fixed staking windows should apply
+  to additional historical recommender stake under the linear weighting in ADR
+  0024?
 * Should locked curator stake yield go entirely to the treasury or be split?
 * What exact duplicate-risk scoring and matching algorithm should be used?
 * What metadata source should be used for enrichment after canonical identity is

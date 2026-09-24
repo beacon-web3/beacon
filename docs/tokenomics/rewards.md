@@ -30,12 +30,15 @@ The curator stake is intended to:
 * Create a base of locked SOL that can potentially be staked.
 
 Each canonical recommendation page has at most one active recommendation cycle. A
-new user can activate or reactivate the recommendation only when the current
-cycle is inactive. For MVP, an active cycle becomes eligible for inactive status
-only after no recommender SOL remains locked and 90 days pass with no new
-support. The original discoverer and prior reactivators are historical
-recommenders and may lock additional SOL at any time to increase their share of
-future upvote/support credit.
+user can activate or reactivate the recommendation only when the current cycle is
+inactive — this includes the original discoverer and prior reactivators, who may
+reactivate a deactivated recommendation and remain part of the historical
+recommender set. For MVP, an active cycle becomes eligible for inactive status
+only after no active recommender participant remains and 90 days pass with no
+new support. The original
+discoverer and prior reactivators are historical recommenders and may lock
+additional SOL at any time to increase their share of future upvote/support
+credit.
 
 Additional stake affects future credit only. It must not rewrite past supporter
 cohorts, badge history, discoverer credit, or already-earned reputation.
@@ -45,8 +48,9 @@ remains locked, but withdrawals must not leave a recommender balance between
 
 Extra locked SOL must not be framed as guaranteed yield, guaranteed rewards, or
 uncapped influence. If additional stake affects future credit, rewards, ranking,
-or visibility, it must use diminishing returns rather than linear weighting. The
-exact curve and parameters remain unresolved.
+or visibility, it is weighted linearly in proportion to each recommender's locked
+SOL share of the total locked recommender SOL on the recommendation, per ADR
+0024. Exact split and anti-whale parameters remain unresolved pending simulation.
 
 ### Support Recommendation
 
@@ -195,9 +199,11 @@ Mitigations to evaluate:
 
 * What exact percentage should stay in treasury at each milestone?
 * How should the eligible recommender share be split among the original discoverer
-  and prior reactivators?
+  and prior reactivators? ADR 0024 resolves the weighting principle (linear share
+  by locked SOL), but exact pool splits and milestone thresholds are still open.
 * Should later stake additions increase visibility, future support-credit share,
   both, or neither?
-* What exact diminishing-returns curve, cap, or fixed staking window should apply
-  to additional historical recommender stake?
+* What exact reward-split parameters, caps, or fixed staking windows should apply
+  to additional historical recommender stake under the linear weighting in ADR
+  0024?
 * What parameters make self-farming economically unattractive?

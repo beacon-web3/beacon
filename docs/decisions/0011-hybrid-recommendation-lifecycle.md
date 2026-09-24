@@ -29,9 +29,11 @@ Beacon will use a hybrid recommendation lifecycle:
   Beacon page.
 - The first valid recommender receives permanent historical discoverer credit.
 - At any moment, a page has at most one active recommendation cycle.
-- A new user can lock at least the required `0.2 SOL` minimum to activate or
-  reactivate a recommendation only when the current recommendation cycle is
-  inactive.
+- Any eligible user can lock at least the required `0.2 SOL` minimum to activate
+  or reactivate a recommendation, but only when the current recommendation cycle
+  is inactive. This includes the original discoverer and prior reactivators:
+  they may reactivate a deactivated recommendation and become the active
+  recommender again while remaining part of the historical recommender set.
 - The user who activates or reactivates a recommendation becomes part of that
   page's historical recommender set.
 - The original discoverer and prior reactivators may lock additional SOL at any
@@ -40,8 +42,10 @@ Beacon will use a hybrid recommendation lifecycle:
   it while it is active; they must wait for deactivation.
 - Additional locked SOL affects future credit allocation only. It must not
   rewrite past support credit, badges, discoverer credit, or reputation history.
-- Extra locked SOL must use diminishing returns if it affects future credit,
-  rewards, ranking, or visibility.
+- Future upvote/support credit and reward share are distributed linearly in
+  proportion to each recommender's locked SOL relative to the total locked
+  recommender SOL held on the recommendation. See
+  `0024-linear-reward-weighting-across-recommender-stake.md`.
 - The exact credit-share and reward formulas remain unresolved pending tokenomics
   simulation and abuse review.
 
@@ -53,15 +57,17 @@ historical recommender stake rights are now part of the product model.
 page can represent a standalone book work or a recognized series.
 
 `0013-recommendation-inactivity-window.md` specifies the MVP inactivity rule as
-zero locked recommender SOL plus 90 days with no new support.
+no active recommender participant (participants become inactive through reclaim
+or withdrawal) plus 90 days with no new support.
 
 `0015-minimum-recommender-stake-no-deposit-cap.md` specifies the MVP minimum
-stake as `0.2 SOL` with no maximum deposit cap, while leaving credit weighting
-and anti-whale controls unresolved.
+stake as `0.2 SOL` with no maximum deposit cap.
 
-`0016-diminishing-returns-for-extra-recommender-stake.md` specifies that extra
-locked SOL must not map linearly to future influence; exact formulas remain
-unresolved.
+`0024-linear-reward-weighting-across-recommender-stake.md` specifies that future
+credit and reward share are weighted linearly by each recommender's locked SOL
+share, superseding the earlier `0016-diminishing-returns-for-extra-recommender-stake.md`
+position. Exact formula parameters remain unresolved pending tokenomics
+simulation.
 
 ## Alternatives Considered
 
@@ -95,8 +101,9 @@ unresolved.
   recommender participation, active/inactive state, and additional stake by
   historical recommenders.
 - Support/upvote history must remain immutable and tied to the time it happened.
-- Reward, visibility, and reputation formulas must follow the accepted
-  diminishing-returns principle instead of assuming linear stake influence.
+- Reward, visibility, and reputation formulas must follow the accepted linear
+  stake-weighting principle from `0024-linear-reward-weighting-across-recommender-stake.md`
+  instead of assuming diminishing returns or non-linear stake influence.
 - The lifecycle should continue to avoid language that frames support as a
   refundable vote, passive yield, or guaranteed return.
 

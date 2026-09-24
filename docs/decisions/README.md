@@ -44,7 +44,7 @@ Each record should include:
 | 0013 | [Recommendation inactivity window](0013-recommendation-inactivity-window.md) | Accepted |
 | 0014 | [Reactivation moderation policy](0014-reactivation-moderation-policy.md) | Accepted |
 | 0015 | [Minimum recommender stake with no deposit cap](0015-minimum-recommender-stake-no-deposit-cap.md) | Accepted |
-| 0016 | [Diminishing returns for extra recommender stake](0016-diminishing-returns-for-extra-recommender-stake.md) | Accepted |
+| 0016 | [Diminishing returns for extra recommender stake](0016-diminishing-returns-for-extra-recommender-stake.md) | Superseded by 0024 |
 | 0017 | [Recommender stake balance and top-up minimums](0017-recommender-stake-balance-and-top-up-minimums.md) | Accepted |
 | 0018 | [Fixed support contribution](0018-fixed-support-contribution.md) | Accepted |
 | 0019 | [Step-based milestone rewards](0019-step-based-milestone-rewards.md) | Accepted |
@@ -52,6 +52,7 @@ Each record should include:
 | 0021 | [Lead developer agent design](0021-lead-developer-design.md) | Accepted |
 | 0022 | [Planner agent design](0022-planner-agent-design.md) | Accepted |
 | 0023 | [MVP Solana event monitoring boundary](0023-mvp-solana-event-monitoring-boundary.md) | Accepted |
+| 0024 | [Linear reward weighting across recommender stake](0024-linear-reward-weighting-across-recommender-stake.md) | Accepted |
 
 ## Maintenance Rules
 

@@ -6,6 +6,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from recommendations.models import (
+    SUPPORT_AMOUNT_LAMPORTS,
     Badge,
     Bookmark,
     BookRecommendation,
@@ -21,6 +22,7 @@ from tests.recommendations.factories import (
     BadgeFactory,
     BookmarkFactory,
     BookRecommendationFactory,
+    CategoryFactory,
     CuratorFollowFactory,
     DuplicateReportFactory,
     RecommenderParticipantFactory,
@@ -434,7 +436,7 @@ class TestSupport:
             recommendation=rec,
             supporter_number=1,
         )
-        assert support.amount_lamports == 10_000_000
+        assert support.amount_lamports == SUPPORT_AMOUNT_LAMPORTS
 
     def test_supporter_protect_on_delete(self, account):
         rec = BookRecommendationFactory(creator=account)
@@ -749,3 +751,55 @@ class TestBookRecommendationOrdering:
         """BookRecommendation default ordering is ['-created_at']."""
         ordering = BookRecommendation._meta.ordering
         assert ordering == ["-created_at"]
+
+
+@pytest.mark.django_db
+class TestFactories:
+    """Factory defaults produce full_clean-valid instances (Plan 0018 Task 3)."""
+
+    @pytest.mark.parametrize(
+        "factory_cls",
+        [
+            AccountFactory,
+            CategoryFactory,
+            BookRecommendationFactory,
+            DuplicateReportFactory,
+            RecommenderParticipantFactory,
+            SupportFactory,
+            BookmarkFactory,
+            CuratorFollowFactory,
+            BadgeFactory,
+            ReputationEventFactory,
+        ],
+    )
+    def test_factory_creates_valid_instance(self, factory_cls):
+        """Defaults satisfy model constraints (full_clean passes)."""
+        instance = factory_cls()
+        instance.full_clean()
+
+    def test_book_recommendation_default_status_inactive(self, account):
+        rec = BookRecommendationFactory(creator=account)
+        assert rec.status == BookRecommendation.Status.INACTIVE
+
+    def test_book_recommendation_status_override(self, account):
+        rec = BookRecommendationFactory(creator=account, status="ACTIVE")
+        assert rec.status == BookRecommendation.Status.ACTIVE
+
+    def test_support_default_amount(self, account):
+        support = SupportFactory(supporter=account)
+        assert support.amount_lamports == SUPPORT_AMOUNT_LAMPORTS
+
+    def test_support_amount_override(self, account):
+        support = SupportFactory(supporter=account, amount_lamports=5_000_000_000)
+        assert support.amount_lamports == 5_000_000_000
+
+    def test_support_default_signature_is_88_char_base58(self):
+        support = SupportFactory()
+        assert len(support.on_chain_support_transaction) == 88
+        assert set(support.on_chain_support_transaction) <= set(
+            "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+        )
+
+    def test_recommender_participant_default_locked(self, account):
+        participant = RecommenderParticipantFactory(account=account)
+        assert participant.locked_amount_lamports == 200_000_000

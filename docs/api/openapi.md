@@ -309,13 +309,55 @@ Responses:
 * `429 Too Many Requests` when reset confirmation attempts exceed the configured
   throttle.
 
-## Recommendation Lifecycle (Planned)
+## Recommendation Lifecycle API
 
-API endpoints for the recommendation lifecycle will follow after the backend
-data model is approved and implemented. Planned surfaces include creating and
-reactivating canonical recommendation pages, managing recommender stake
-references, supporting/upvoting recommendations, bookmarking, following
-curators, listing badges, and reading reputation or profile summaries.
+The recommendation lifecycle API is registered under `/api/recommendations/`
+and `/api/accounts/`. All six phases of
+`plans/0018-recommendation-lifecycle-api.md` are in place: CRUD, activation,
+support, bookmarks, curator follows, badges, reputation/profile, duplicate
+reports with admin review, and reserved media fields. Surface:
 
-These endpoints are not yet implemented and will be documented here once
-designed.
+- `/api/recommendations/` — list, detail, recommend, reactivate, support
+  (prepare + confirm), supports, stake (add/history/reclaim), bookmark,
+  badges, report-duplicate, duplicate-reports (admin). Recommendation
+  summaries, details, and create/update payloads carry an optional
+  `cover_image_url` (null when not set).
+- `/api/accounts/` — `me/bookmarks/`, `{username}/follow/`, `/followers/`,
+  `/following/`, `/badges/`, `/reputation/`, `/profile/`. Account
+  references and profiles carry an optional `avatar_url` (null when not
+  set).
+
+Authentication is session-cookie based (CSRF required for mutations). Public
+reads (lists, profiles, badges, reputation, followers/following) accept
+anonymous requests; mutations require authentication; duplicate-reports lists
+are admin-only.
+
+### Idempotency-Key
+
+Mutating `POST` endpoints that create records accept an optional, recommended
+client-generated `Idempotency-Key` header (send one per logical operation;
+reusing a key within the cache window intentionally replays the stored
+response rather than re-executing). The backend persists a per-user SHA-256
+hash of the key scoped to `(user, method, path, key)` and a digest of the
+request body, plus the successful response. On replay the stored response is
+returned without re-execution; a
+concurrent in-flight request with the same key returns `409`; non-2xx
+responses are not cached. Cached responses expire after 1 hour and are
+opportunistically pruned.
+
+### Throttle scopes
+
+Rates are configured per scope in `settings.RECOMMENDATION_THROTTLE_RATES`
+(env-overridable via `RECOMMENDATION_*_THROTTLE_RATE`):
+
+| Scope | Rate |
+|-------|------|
+| recommendation_create | 10/min |
+| recommendation_update | 10/min |
+| recommendation_act | 5/min |
+| recommendation_support | 20/min |
+| recommendation_stake | 5/min |
+| recommendation_bookmark | 10/min |
+| recommendation_follow | 10/min |
+| recommendation_duplicate | 5/min |
+| recommendation_read | 60/min |

@@ -11,8 +11,9 @@ Accepted
 ## Context
 
 ADR 0015 accepts `0.2 SOL` as the minimum locked recommender stake for activating
-or reactivating a recommendation, with no maximum deposit cap. ADR 0016 accepts
-diminishing returns for any extra locked-SOL influence.
+or reactivating a recommendation, with no maximum deposit cap. ADR 0024 accepts
+linear locked-SOL share weighting for future credit and reward influence
+(superseding the earlier ADR 0016 diminishing-returns position).
 
 The remaining implementation question is how small locked balances and later
 top-ups should behave. If a recommender can leave dust balances below the
@@ -73,8 +74,8 @@ conditions if no recommender SOL remains locked on the active cycle.
 - Full-withdrawal warnings remain required because full withdrawal can contribute
   to inactive eligibility.
 - Ordinary supporters contributing `0.01 SOL` are unaffected by this rule.
-- Exact diminishing-returns curve, reward split, ranking effect, and cap policy
-  remain unresolved.
+- Exact reward split, ranking effect, and cap policy remain unresolved; the
+  weighting principle is linear locked-SOL share per ADR 0024.
 
 ## Related Specs
 
@@ -84,4 +85,5 @@ conditions if no recommender SOL remains locked on the active cycle.
 - `docs/tokenomics/rewards.md`
 - `docs/tokenomics/staking.md`
 - `docs/architecture/system-design.md`
-- `plans/0016-recommendation-lifecycle-data-model.md`
+- `docs/decisions/0024-linear-reward-weighting-across-recommender-stake.md`
+- `plans/completed/0016-recommendation-lifecycle-data-model.md`

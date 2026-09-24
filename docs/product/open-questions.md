@@ -27,9 +27,12 @@ implementation.
 ## Tokenomics
 
 - How should future upvote/support credit be split among the original discoverer
-  and prior reactivators?
-- What exact diminishing-returns curve, cap, or time-weighting rule should apply
-  to historical recommender stake additions?
+  and prior reactivators? The weighting principle (linear share by locked SOL) is
+  resolved by `docs/decisions/0024-linear-reward-weighting-across-recommender-stake.md`;
+  exact pool splits and parameters remain unresolved.
+- What exact reward-split parameters, caps, or time-weighting rules should apply
+  to historical recommender stake additions under the linear weighting in ADR
+  0024?
 - How should rewards behave when a recommendation stalls below the next
   milestone?
 - What anti-farming thresholds or delays should apply before rewards are paid?

@@ -53,5 +53,7 @@ urlpatterns = [
         name="redoc",
     ),
     path("api/auth/", include("accounts.urls")),
+    path("api/", include("recommendations.urls")),
+    path("api/accounts/", include("accounts.account_urls")),
     path("admin/", admin.site.urls),
 ]
