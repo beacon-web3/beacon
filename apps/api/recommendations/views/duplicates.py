@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import BookRecommendation, DuplicateReport
+from recommendations.models import DuplicateReport, Recommendation
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import (
     DuplicateReportCreateSerializer,
@@ -30,7 +30,7 @@ class DuplicateReportBaseView(APIView):
     """POST file a PENDING duplicate report against a recommendation."""
 
     def post(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         serializer = DuplicateReportCreateSerializer(
             data=request.data, context={"recommendation": recommendation}
         )
@@ -174,11 +174,10 @@ class DuplicateReportListView(APIView):
         },
     )
     def get(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
-        queryset = recommendation.duplicate_reports.select_related(
-            "reporter",
-            "recommendation__category",
-            "suspected_duplicate_of__category",
+        recommendation = get_object_or_404(Recommendation, id=id)
+        queryset = recommendation.duplicate_reports.select_related("reporter")
+        queryset = queryset.prefetch_related(
+            "recommendation__categories", "suspected_duplicate_of__categories"
         )
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)

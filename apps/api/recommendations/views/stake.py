@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import BookRecommendation
+from recommendations.models import Recommendation
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import (
     RecommendationEnvelopeSerializer,
@@ -35,13 +35,13 @@ class StakeBaseView(APIView):
     Both operations lock the parent recommendation row with
     ``select_for_update()`` and only mutate the caller's
     ``RecommenderParticipant`` locked balance. Lifecycle state (``is_active``
-    for top-ups, ``BookRecommendation.status``, ``current_recommender``,
+    for top-ups, ``Recommendation.status``, ``current_recommender``,
     ``recommendation_cycle_number``) is never changed here — positions are
     opened exclusively through recommend/reactivate (Plan 0018).
     """
 
     def _locked_recommendation(self, id):
-        return get_object_or_404(BookRecommendation.objects.select_for_update(), id=id)
+        return get_object_or_404(Recommendation.objects.select_for_update(), id=id)
 
     @extend_schema(
         summary="Reclaim recommender stake",
@@ -227,7 +227,7 @@ class StakeHistoryView(APIView):
         },
     )
     def get(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         queryset = recommendation.recommender_participants.order_by(
             "reactivation_number"
         )

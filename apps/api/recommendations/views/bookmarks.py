@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import Bookmark, BookRecommendation
+from recommendations.models import Bookmark, Recommendation
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import BookmarkReadSerializer, BookmarkSerializer
 from recommendations.throttles import (
@@ -42,7 +42,7 @@ class BookmarkToggleView(APIView):
         },
     )
     def post(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         bookmark, created = Bookmark.objects.get_or_create(
             account=request.user, recommendation=recommendation
         )
@@ -65,7 +65,7 @@ class BookmarkToggleView(APIView):
         },
     )
     def delete(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         bookmark = get_object_or_404(
             Bookmark, account=request.user, recommendation=recommendation
         )
@@ -121,7 +121,7 @@ class UserBookmarksView(APIView):
     def get(self, request):
         queryset = (
             request.user.bookmarks.all()
-            .select_related("recommendation__category")
+            .prefetch_related("recommendation__categories")
             .order_by("-created_at")
         )
         paginator = self.pagination_class()

@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import SUPPORT_AMOUNT_LAMPORTS, BookRecommendation, Support
+from recommendations.models import SUPPORT_AMOUNT_LAMPORTS, Recommendation, Support
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import (
     SupportConfirmSerializer,
@@ -61,7 +61,7 @@ class SupportView(APIView):
         },
     )
     def post(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         if Support.objects.filter(
             supporter=request.user, recommendation=recommendation
         ).exists():
@@ -98,7 +98,7 @@ class SupportConfirmBaseView(APIView):
         serializer.is_valid(raise_exception=True)
         with transaction.atomic():
             recommendation = get_object_or_404(
-                BookRecommendation.objects.select_for_update(), id=id
+                Recommendation.objects.select_for_update(), id=id
             )
             if Support.objects.filter(
                 supporter=request.user, recommendation=recommendation
@@ -153,14 +153,14 @@ class SupportConfirmBaseView(APIView):
             recommendation.last_support_at = now
             update_fields = ["support_count", "last_support_at", "updated_at"]
             if (
-                recommendation.status == BookRecommendation.Status.INACTIVE
+                recommendation.status == Recommendation.Status.INACTIVE
                 and recommendation.recommender_participants.filter(
                     is_active=True
                 ).exists()
             ):
                 # Support-during-INACTIVE transition: an active recommender
                 # stake means the recommendation is live again.
-                recommendation.status = BookRecommendation.Status.ACTIVE
+                recommendation.status = Recommendation.Status.ACTIVE
                 recommendation.activated_at = now
                 recommendation.deactivated_at = None
                 update_fields += ["status", "activated_at", "deactivated_at"]
@@ -230,7 +230,7 @@ class SupportListView(APIView):
         },
     )
     def get(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         queryset = recommendation.supports.all().order_by("supporter_number")
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)

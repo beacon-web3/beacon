@@ -1,10 +1,10 @@
 import pytest
 from rest_framework.test import APIClient
 
-from recommendations.models import BookRecommendation, RecommenderParticipant
+from recommendations.models import Recommendation, RecommenderParticipant
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
     RecommenderParticipantFactory,
 )
 
@@ -19,7 +19,7 @@ class TestReactivate:
 
     def _seed_reactivatable(self, **overrides):
         recommender = AccountFactory()
-        rec = BookRecommendationFactory(
+        rec = RecommendationFactory(
             status=overrides.pop("status", "INACTIVE"),
             recommendation_cycle_number=overrides.pop("recommendation_cycle_number", 2),
             current_recommender=overrides.pop("current_recommender", None),
@@ -84,7 +84,7 @@ class TestReactivate:
         assert response.data["detail"]
 
     def test_reactivate_rejects_first_activation(self):
-        rec = BookRecommendationFactory()  # cycle number 0, INACTIVE
+        rec = RecommendationFactory()  # cycle number 0, INACTIVE
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -126,4 +126,4 @@ class TestReactivate:
             ).count()
             == 1
         )
-        assert BookRecommendation.objects.get(pk=rec.id).status == "ACTIVE"
+        assert Recommendation.objects.get(pk=rec.id).status == "ACTIVE"

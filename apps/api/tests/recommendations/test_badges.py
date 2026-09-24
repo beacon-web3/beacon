@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from tests.recommendations.factories import (
     AccountFactory,
     BadgeFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -15,7 +15,7 @@ class TestRecommendationBadges:
         return f"/api/recommendations/{recommendation_id}/badges/"
 
     def test_list_is_public(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         BadgeFactory(recommendation=rec)
 
         response = APIClient().get(self._url(rec.id))
@@ -25,7 +25,7 @@ class TestRecommendationBadges:
         assert response.data["count"] == 1
 
     def test_list_includes_required_fields(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         BadgeFactory(recommendation=rec, tier="SILVER")
 
         response = APIClient().get(self._url(rec.id))
@@ -37,7 +37,7 @@ class TestRecommendationBadges:
         assert row["tier"] == "SILVER"
 
     def test_list_empty_when_no_badges(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().get(self._url(rec.id))
 

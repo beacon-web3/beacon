@@ -9,9 +9,33 @@ from django.db.models.functions import Lower
 SUPPORT_AMOUNT_LAMPORTS = 10_000_000
 
 
+class ContentType(models.TextChoices):
+    """Discriminates the kind of content a recommendation describes.
+
+    The MVP focuses on books (``BOOK``); the other values reserve the split
+    for future content types (movies, series, podcasts, games, apps, tech).
+    """
+
+    BOOK = "BOOK", "Book"
+    MOVIE = "MOVIE", "Movie"
+    SERIES = "SERIES", "Series"
+    PODCAST = "PODCAST", "Podcast"
+    GAME = "GAME", "Game"
+    APP = "APP", "Application"
+    TECH = "TECH", "Tech"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
+    # Reserves future content-type scoping: null means the category applies to
+    # all content types (e.g. a genre like "Fantasy").
+    content_type = models.CharField(
+        max_length=20,
+        choices=ContentType.choices,
+        blank=True,
+        null=True,
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -23,7 +47,12 @@ class Category(models.Model):
         return self.name
 
 
-class BookRecommendation(models.Model):
+class Recommendation(models.Model):
+    # Alias so model code/tests can use Recommendation.ContentType like the
+    # other nested choices classes; the class itself lives at module level
+    # because Category (defined above) also references it.
+    ContentType = ContentType
+
     class PageType(models.TextChoices):
         STANDALONE_WORK = "STANDALONE_WORK", "Standalone Work"
         RECOGNIZED_SERIES = "RECOGNIZED_SERIES", "Recognized Series"
@@ -48,23 +77,35 @@ class BookRecommendation(models.Model):
         on_delete=models.PROTECT,
         related_name="created_recommendations",
     )
+    content_type = models.CharField(
+        max_length=20, choices=ContentType.choices, default=ContentType.BOOK
+    )
     page_type = models.CharField(max_length=20, choices=PageType.choices)
     title = models.TextField()
     title_normalized = models.TextField()
-    author_names = models.TextField()
-    author_names_normalized = models.TextField()
+    creator_names = models.TextField()
+    creator_names_normalized = models.TextField()
     description = models.TextField(blank=True, default="")
     external_reference_url = models.URLField(blank=True, null=True)
     # Reserved schema field (Plan 0018 Phase 6): stores a client-provided cover
     # image URL; no upload infrastructure yet.
     cover_image_url = models.URLField(max_length=2048, blank=True, null=True)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="recommendations",
+    categories = models.ManyToManyField(
+        Category, blank=True, related_name="recommendations"
     )
+    # Generic per-content-type metadata; free-form for future content types
+    # (external identifiers, season/volume info, etc.).
+    metadata = models.JSONField(default=dict, blank=True)
+    # Reserved fields for future content types (movies, series, podcasts,
+    # games, apps, tech). Kept optional so the MVP stays books-only while the
+    # schema reserves the split.
+    release_year = models.PositiveIntegerField(blank=True, null=True)
+    language = models.CharField(max_length=50, blank=True, default="")
+    runtime_minutes = models.PositiveIntegerField(blank=True, null=True)
+    season_count = models.PositiveIntegerField(blank=True, null=True)
+    episode_count = models.PositiveIntegerField(blank=True, null=True)
+    platform = models.CharField(max_length=100, blank=True, default="")
+    edition_format = models.CharField(max_length=100, blank=True, default="")
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.INACTIVE
     )
@@ -100,7 +141,7 @@ class BookRecommendation(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        # title_normalized and author_names_normalized are denormalized copies
+        # title_normalized and creator_names_normalized are denormalized copies
         # kept in sync by the API serializers (Plan 0018). The Lower() wrapper
         # in the unique constraint is a safety net: if rows are inserted via
         # raw SQL or migrations without normalizing, the constraint still
@@ -108,10 +149,10 @@ class BookRecommendation(models.Model):
         constraints = [
             models.UniqueConstraint(
                 Lower("title_normalized"),
-                Lower("author_names_normalized"),
+                Lower("creator_names_normalized"),
                 "page_type",
                 condition=Q(is_canonical=True),
-                name="bookrecommendation_canonical_work_unique",
+                name="recommendation_canonical_work_unique",
             ),
         ]
         indexes = [
@@ -128,8 +169,8 @@ class BookRecommendation(models.Model):
                 name="bookrec_creator_created_idx",
             ),
             models.Index(
-                fields=["category", "status", "-support_count"],
-                name="bookrec_cat_status_support_idx",
+                fields=["content_type", "status", "-support_count"],
+                name="bookrec_ct_status_support_idx",
             ),
             models.Index(
                 fields=["last_support_at"],
@@ -144,15 +185,15 @@ class BookRecommendation(models.Model):
                 name="bookrec_review_status_idx",
             ),
             models.Index(
-                fields=["title_normalized", "author_names_normalized", "page_type"],
+                fields=["title_normalized", "creator_names_normalized", "page_type"],
                 name="bookrec_norm_lookup_idx",
             ),
         ]
 
     def __str__(self) -> str:
         title = self.title or "Untitled"
-        author = self.author_names or "Unknown author"
-        return f"{title} by {author}"
+        creator = self.creator_names or "Unknown creator"
+        return f"{title} by {creator}"
 
 
 class DuplicateReport(models.Model):
@@ -167,7 +208,7 @@ class DuplicateReport(models.Model):
         related_name="duplicate_reports_filed",
     )
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.CASCADE,
         related_name="duplicate_reports",
     )
@@ -175,7 +216,7 @@ class DuplicateReport(models.Model):
     # which preserves audit trail. If the suspected duplicate is removed, the
     # report still links to the reporting recommendation for moderator review.
     suspected_duplicate_of = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -227,7 +268,7 @@ class RecommenderParticipant(models.Model):
         related_name="recommender_participations",
     )
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.CASCADE,
         related_name="recommender_participants",
     )
@@ -288,7 +329,7 @@ class Support(models.Model):
         related_name="supports_given",
     )
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.CASCADE,
         related_name="supports",
     )
@@ -383,7 +424,7 @@ class Bookmark(models.Model):
         related_name="bookmarks",
     )
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.CASCADE,
         related_name="bookmarks_by_users",
     )
@@ -467,7 +508,7 @@ class Badge(models.Model):
         related_name="badges",
     )
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.CASCADE,
         related_name="badges",
     )
@@ -525,7 +566,7 @@ class ReputationEvent(models.Model):
     # The API layer documents when negative points are awarded.
     points = models.DecimalField(max_digits=12, decimal_places=2)
     recommendation = models.ForeignKey(
-        BookRecommendation,
+        Recommendation,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

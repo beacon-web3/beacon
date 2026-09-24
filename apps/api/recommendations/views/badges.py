@@ -10,7 +10,7 @@ from drf_spectacular.utils import (
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
-from recommendations.models import BookRecommendation
+from recommendations.models import Recommendation
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import BadgeSerializer
 from recommendations.throttles import RecommendationReadThrottle
@@ -40,10 +40,11 @@ class RecommendationBadgeListView(APIView):
         },
     )
     def get(self, request, id):
-        recommendation = get_object_or_404(BookRecommendation, id=id)
+        recommendation = get_object_or_404(Recommendation, id=id)
         queryset = (
             recommendation.badges.all()
-            .select_related("account", "recommendation__category")
+            .select_related("account")
+            .prefetch_related("recommendation__categories")
             .order_by("-earned_at")
         )
         paginator = self.pagination_class()
@@ -76,7 +77,8 @@ class AccountBadgeListView(APIView):
         account = get_object_or_404(Account, username=username)
         queryset = (
             account.badges.all()
-            .select_related("account", "recommendation__category")
+            .select_related("account")
+            .prefetch_related("recommendation__categories")
             .order_by("-earned_at")
         )
         paginator = self.pagination_class()

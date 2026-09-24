@@ -222,8 +222,8 @@ The backend does not:
 
 Two serializer levels prevent leaking internal fields to unauthenticated users:
 
-- **Summary serializer** (list endpoints, public): `id`, `title`, `author_names`,
-  `page_type`, `status`, `support_count`, `category`, `created_at`.
+- **Summary serializer** (list endpoints, public): `id`, `title`, `creator_names`,
+  `page_type`, `status`, `support_count`, `categories`, `created_at`.
   Excludes: `current_recommender`, `on_chain_*` fields, `duplicate_risk_status`,
   `review_status`, `creator`.
 - **Detail serializer** (detail endpoints, authenticated): All model fields
@@ -288,17 +288,17 @@ When a support is confirmed against an INACTIVE recommendation
 1. Create the `Support` record with the next `supporter_number` (computed
    inside the locked block) and the client's on-chain transaction signature
    (required by `Support.clean()`).
-2. Increment `BookRecommendation.support_count`.
-3. Set `BookRecommendation.last_support_at` to now.
+2. Increment `Recommendation.support_count`.
+3. Set `Recommendation.last_support_at` to now.
 4. If the recommendation has an existing `RecommenderParticipant` with
-   `is_active=True`: set `BookRecommendation.status` to `ACTIVE`,
+   `is_active=True`: set `Recommendation.status` to `ACTIVE`,
    set `activated_at` to now, clear `deactivated_at`.
 5. If no active `RecommenderParticipant` exists: the recommendation stays
    INACTIVE (support is recorded but the cycle is not activated — a
    recommender must stake to activate).
 
 All four steps run inside a single `transaction.atomic()` block with
-`select_for_update()` on the `BookRecommendation` row. The prepare call
+`select_for_update()` on the `Recommendation` row. The prepare call
 (`POST .../support/`) performs no writes.
 
 ## Response Formats
@@ -311,11 +311,11 @@ All four steps run inside a single `transaction.atomic()` block with
     {
       "id": 1,
       "title": "Dune",
-      "author_names": "Frank Herbert",
+      "creator_names": "Frank Herbert",
       "page_type": "STANDALONE_WORK",
       "status": "ACTIVE",
       "support_count": 42,
-      "category": { "id": 1, "name": "Science Fiction", "slug": "sci-fi" },
+      "categories": [ { "id": 1, "name": "Science Fiction", "slug": "sci-fi" } ],
       "created_at": "2026-01-15T10:00:00Z"
     }
   ],
@@ -332,7 +332,7 @@ All four steps run inside a single `transaction.atomic()` block with
   "recommendation": {
     "id": 1,
     "title": "Dune",
-    "author_names": "Frank Herbert",
+    "creator_names": "Frank Herbert",
     "page_type": "STANDALONE_WORK",
     "status": "ACTIVE",
     "is_canonical": true,
@@ -491,7 +491,7 @@ Acceptance criteria:
 - [x] `DuplicateReportCreateSerializer` input accepts optional `suspected_duplicate_of`
   (integer recommendation id) and optional `reason` (string).
 - [x] `CreateRecommendationSerializer` writes `title_normalized` /
-  `author_names_normalized` as lowercased copies of `title` / `author_names`
+  `creator_names_normalized` as lowercased copies of `title` / `creator_names`
   (models keep them in sync via serializers per Plan 0018).
 
 Verification:
@@ -578,7 +578,7 @@ Estimated scope: Medium.
 
 Extend `apps/api/tests/recommendations/factories.py` to cover all 9
 recommendation models. Factories already exist for `Category`,
-`BookRecommendation`, `DuplicateReport`, `RecommenderParticipant`, `Support`,
+`Recommendation`, `DuplicateReport`, `RecommenderParticipant`, `Support`,
 `Bookmark`, `CuratorFollow`, `Badge`, and `ReputationEvent`; extend or adjust
 them so every factory creates a valid instance with sensible defaults and
 supports overrides for critical fields (status, amounts, etc.).
@@ -587,7 +587,7 @@ Acceptance criteria:
 
 - [x] Each factory creates a valid model instance with sensible defaults.
 - [x] Factories support overrides for all critical fields (status, amounts, etc.).
-- [x] `BookRecommendationFactory` default status is INACTIVE.
+- [x] `RecommendationFactory` default status is INACTIVE.
 - [x] `SupportFactory` default `amount_lamports` is 10,000,000.
 - [x] `RecommenderParticipantFactory` default `locked_amount_lamports` is
   200,000,000.
@@ -714,13 +714,13 @@ with `is_active=True`, sets `current_recommender`, increments
 Acceptance criteria:
 
 - [x] `POST /recommendations/{id}/recommend/` creates a `RecommenderParticipant`.
-- [x] `BookRecommendation.status` changes from INACTIVE to ACTIVE.
-- [x] `BookRecommendation.current_recommender` is set to the requesting user.
-- [x] `BookRecommendation.recommendation_cycle_number` increments.
-- [x] `BookRecommendation.activated_at` is set.
+- [x] `Recommendation.status` changes from INACTIVE to ACTIVE.
+- [x] `Recommendation.current_recommender` is set to the requesting user.
+- [x] `Recommendation.recommendation_cycle_number` increments.
+- [x] `Recommendation.activated_at` is set.
 - [x] Returns 400 if recommendation is already ACTIVE.
 - [x] Returns 400 if user already has an active participant on this recommendation.
-- [x] Uses `select_for_update()` on `BookRecommendation` for concurrency safety.
+- [x] Uses `select_for_update()` on `Recommendation` for concurrency safety.
 - [x] Response includes `solana_hints` with program ID, PDA seeds, amount.
 - [x] Operation runs inside `transaction.atomic()`.
 
@@ -750,11 +750,11 @@ Acceptance criteria:
 
 - [x] `POST /recommendations/{id}/reactivate/` creates a new
   `RecommenderParticipant` with incremented `reactivation_number`.
-- [x] `BookRecommendation.status` changes to ACTIVE.
-- [x] `BookRecommendation.deactivated_at` is cleared.
+- [x] `Recommendation.status` changes to ACTIVE.
+- [x] `Recommendation.deactivated_at` is cleared.
 - [x] Returns 400 if recommendation is already ACTIVE.
 - [x] Returns 400 if `recommendation_cycle_number == 0` (use recommend instead).
-- [x] Uses `select_for_update()` on `BookRecommendation`.
+- [x] Uses `select_for_update()` on `Recommendation`.
 - [x] Response includes `solana_hints`.
 - [x] Runs inside `transaction.atomic()`.
 
@@ -784,13 +784,13 @@ Prepare:
 - Performs no database writes.
 
 Confirm (inside `transaction.atomic()` with `select_for_update()` on the
-`BookRecommendation` row):
+`Recommendation` row):
 
 - Re-checks the one-support-per-supporter rule (409 on duplicate).
 - Creates the `Support` record with the next `supporter_number`, the fixed
   amount, the current `recommendation_cycle_number`, and the client's
   `transaction_signature` (satisfying `Support.clean()`).
-- Increments `BookRecommendation.support_count`, updates `last_support_at`.
+- Increments `Recommendation.support_count`, updates `last_support_at`.
 - Applies the Support-During-INACTIVE state transition (see State Transitions).
 - Idempotent via the `Idempotency-Key` header (replay returns the same support).
 
@@ -807,7 +807,7 @@ Acceptance criteria:
   Ed25519 `transaction_signature` (87-88 chars; 400 otherwise).
 - [x] `supporter_number` is sequenced atomically (no duplicates under
   concurrency).
-- [x] `BookRecommendation.support_count` is incremented and `last_support_at`
+- [x] `Recommendation.support_count` is incremented and `last_support_at`
   is updated at confirm.
 - [x] Support confirm during INACTIVE with active recommender transitions to
   ACTIVE; without active recommender stays INACTIVE.
@@ -1047,7 +1047,7 @@ Acceptance criteria:
 
 - [x] `POST /recommendations/{id}/stake/` is top-up only: requires an existing
   `RecommenderParticipant` for the caller (400 if none) and never changes
-  `is_active`, `BookRecommendation.status`, `current_recommender`, or
+  `is_active`, `Recommendation.status`, `current_recommender`, or
   `recommendation_cycle_number`.
 - [x] Validates minimum top-up: 50,000,000 lamports above the existing
   qualifying balance (activation minimums are enforced by recommend/reactivate).
@@ -1061,7 +1061,7 @@ Acceptance criteria:
 - [x] `GET /recommendations/{id}/stake/history/` returns paginated
   `RecommenderParticipant` history ordered by `reactivation_number`.
 - [x] Both mutating endpoints return `solana_hints` in the response.
-- [x] Uses `select_for_update()` on parent `BookRecommendation`.
+- [x] Uses `select_for_update()` on parent `Recommendation`.
 
 Verification:
 
@@ -1126,12 +1126,12 @@ the upload feature so existing values are not wrongly rejected.
 
 #### Task 17: Recommendation cover image
 
-Add an optional `cover_image_url` field to `BookRecommendation` and expose it
+Add an optional `cover_image_url` field to `Recommendation` and expose it
 through the recommendation serializers.
 
 Acceptance criteria:
 
-- [x] `BookRecommendation.cover_image_url` is a nullable, blank-by-default
+- [x] `Recommendation.cover_image_url` is a nullable, blank-by-default
   `URLField` with `max_length=2048` (object-store public URLs outgrow the
   default 200-char limit).
 - [x] Migration generated by `makemigrations`.
@@ -1205,8 +1205,8 @@ Estimated scope: Small.
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Concurrent supporter_number race condition | High | Use `select_for_update()` on `BookRecommendation` before computing next `supporter_number`. |
-| Concurrent is_active toggles for recommender participants | Medium | Use `select_for_update()` on parent `BookRecommendation` row. |
+| Concurrent supporter_number race condition | High | Use `select_for_update()` on `Recommendation` before computing next `supporter_number`. |
+| Concurrent is_active toggles for recommender participants | Medium | Use `select_for_update()` on parent `Recommendation` row. |
 | On-chain state drift from backend cache | Medium | Backend stores on-chain references as cache only; source of truth remains Solana programs. |
 | Premature reward formula implementation | High | Store raw amounts only; aggregation formula is an open question. |
 | Support-during-INACTIVE state transition complexity | Medium | Implement inside `transaction.atomic()` with clear branching logic. Test both paths (with and without active recommender). |
@@ -1262,7 +1262,7 @@ as an alternative parameter. Both can coexist.
 sets them?
 
 *Answer (partial):* The schema fields are added now as reserve
-(`BookRecommendation.cover_image_url`, `Account.avatar_url`), optional and
+(`Recommendation.cover_image_url`, `Account.avatar_url`), optional and
 nullable, with no upload infrastructure. The upload feature is deferred until
 after MVP: presigned PUT to an S3-compatible object store (works on the
 current Vercel Hobby + Neon free tier because file bytes never pass through

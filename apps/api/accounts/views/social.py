@@ -202,7 +202,7 @@ class ReputationView(APIView):
         target = get_object_or_404(Account, username=username)
         queryset = (
             target.reputation_events.all()
-            .select_related("recommendation__category")
+            .prefetch_related("recommendation__categories")
             .order_by("-created_at")
         )
         paginator = self.pagination_class()

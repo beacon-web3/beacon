@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import BookRecommendation, RecommenderParticipant
+from recommendations.models import Recommendation, RecommenderParticipant
 from recommendations.serializers import (
     ReactivateSerializer,
     RecommendationEnvelopeSerializer,
@@ -39,9 +39,9 @@ class ActivationBaseView(APIView):
         amount_lamports = serializer.validated_data["amount_lamports"]
         with transaction.atomic():
             recommendation = get_object_or_404(
-                BookRecommendation.objects.select_for_update(), id=id
+                Recommendation.objects.select_for_update(), id=id
             )
-            if recommendation.status == BookRecommendation.Status.ACTIVE:
+            if recommendation.status == Recommendation.Status.ACTIVE:
                 return Response(
                     {"detail": _("This recommendation is already active.")}, status=400
                 )
@@ -103,7 +103,7 @@ class ActivationBaseView(APIView):
                     },
                     status=400,
                 )
-            recommendation.status = BookRecommendation.Status.ACTIVE
+            recommendation.status = Recommendation.Status.ACTIVE
             recommendation.current_recommender = request.user
             recommendation.recommendation_cycle_number += 1
             recommendation.activated_at = now

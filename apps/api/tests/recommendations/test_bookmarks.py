@@ -9,7 +9,7 @@ from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 from common.idempotency import STALE_IN_PROGRESS_SECONDS, key_hash_for
 from common.models import IdempotencyRecord
 from recommendations.models import Bookmark
-from tests.recommendations.factories import AccountFactory, BookRecommendationFactory
+from tests.recommendations.factories import AccountFactory, RecommendationFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -21,14 +21,14 @@ class TestBookmarkCreate:
         return f"/api/recommendations/{recommendation_id}/bookmark/"
 
     def test_create_bookmark_requires_auth(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().post(self._url(rec.id))
 
         assert response.status_code == 403
 
     def test_create_bookmark(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -38,7 +38,7 @@ class TestBookmarkCreate:
         assert response.data["recommendation"]["id"] == rec.id
 
     def test_create_duplicate_bookmark_returns_409(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         account = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=account)
@@ -57,7 +57,7 @@ class TestBookmarkCreate:
         assert response.status_code == 404
 
     def test_create_bookmark_is_idempotent_with_key(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         account = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=account)
@@ -75,7 +75,7 @@ class TestBookmarkDelete:
         return f"/api/recommendations/{recommendation_id}/bookmark/"
 
     def test_delete_bookmark_requires_auth(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().delete(self._url(rec.id))
 
@@ -85,7 +85,7 @@ class TestBookmarkDelete:
         account = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=account)
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client.post(f"/api/recommendations/{rec.id}/bookmark/")
 
         response = client.delete(self._url(rec.id))
@@ -93,7 +93,7 @@ class TestBookmarkDelete:
         assert response.status_code == 204
 
     def test_delete_unbookmarked_returns_404(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -123,7 +123,7 @@ class TestUserBookmarksList:
         account = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=account)
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client.post(f"/api/recommendations/{rec.id}/bookmark/")
 
         response = client.get(self._url())
@@ -137,12 +137,12 @@ class TestUserBookmarksList:
         account = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=account)
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client.post(f"/api/recommendations/{rec.id}/bookmark/")
         other = AccountFactory()
         other_client = APIClient()
         other_client.force_authenticate(user=other)
-        other_rec = BookRecommendationFactory()
+        other_rec = RecommendationFactory()
         other_client.post(f"/api/recommendations/{other_rec.id}/bookmark/")
 
         response = client.get(self._url())
@@ -179,7 +179,7 @@ class TestIdempotencyStaleTakeover:
         return record
 
     def test_stale_in_progress_is_taken_over_and_completed(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         user = AccountFactory()
         key = "bookmark-stale-key"
         url = f"/api/recommendations/{rec.id}/bookmark/"

@@ -4,7 +4,7 @@ Also holds the shared Solana placeholder helpers and list-filter constants
 used by the other view modules.
 """
 
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.idempotency import IdempotencyKeyMixin
-from recommendations.models import SUPPORT_AMOUNT_LAMPORTS, BookRecommendation
+from recommendations.models import SUPPORT_AMOUNT_LAMPORTS, Recommendation
 from recommendations.pagination import RecommendationPagination
 from recommendations.serializers import (
     CreateRecommendationSerializer,
@@ -77,7 +77,7 @@ LIST_FILTER_PARAMETERS = [
     OpenApiParameter(
         name="search",
         type=str,
-        description="Search title or author names. Minimum 3 characters; "
+        description="Search title or creator names. Minimum 3 characters; "
         "shorter queries return an empty result set.",
     ),
     OpenApiParameter(
@@ -141,10 +141,14 @@ class RecommendationCreateView(APIView):
     def post(self, request):
         serializer = CreateRecommendationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # M2M cannot be passed to objects.create(); assign after the row exists.
+        category_ids = serializer.validated_data.pop("categories", [])
         try:
-            recommendation = BookRecommendation.objects.create(
-                creator=request.user, **serializer.validated_data
-            )
+            with transaction.atomic():
+                recommendation = Recommendation.objects.create(
+                    creator=request.user, **serializer.validated_data
+                )
+                recommendation.categories.set(category_ids)
         except IntegrityError:
             # DB unique constraint is the safety net for the serializer check;
             # a concurrent create of the same canonical work loses cleanly.
@@ -154,11 +158,11 @@ class RecommendationCreateView(APIView):
             is_canonical = serializer.validated_data.get("is_canonical", False)
             if (
                 is_canonical
-                and BookRecommendation.objects.filter(
+                and Recommendation.objects.filter(
                     is_canonical=True,
                     title_normalized=serializer.validated_data["title_normalized"],
-                    author_names_normalized=serializer.validated_data[
-                        "author_names_normalized"
+                    creator_names_normalized=serializer.validated_data[
+                        "creator_names_normalized"
                     ],
                     page_type=page_type,
                 ).exists()
@@ -168,7 +172,7 @@ class RecommendationCreateView(APIView):
                         "title": [
                             _(
                                 "A canonical recommendation for this title and "
-                                "author already exists."
+                                "creator already exists."
                             )
                         ]
                     },
@@ -227,7 +231,7 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         if page_type := params.get("page_type"):
             queryset = queryset.filter(page_type=page_type)
         if category_slug := params.get("category"):
-            queryset = queryset.filter(category__slug=category_slug)
+            queryset = queryset.filter(categories__slug=category_slug)
         if risk := params.get("duplicate_risk_status"):
             queryset = queryset.filter(duplicate_risk_status=risk)
         if review := params.get("review_status"):
@@ -248,7 +252,7 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         if search is not None:
             if len(search) >= SEARCH_MIN_LENGTH:
                 queryset = queryset.filter(
-                    Q(title__icontains=search) | Q(author_names__icontains=search)
+                    Q(title__icontains=search) | Q(creator_names__icontains=search)
                 )
             else:
                 # Short queries (including an empty `?search=`) return an empty
@@ -273,9 +277,7 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         },
     )
     def get(self, request):
-        queryset = BookRecommendation.objects.select_related(
-            "category", "creator", "current_recommender"
-        )
+        queryset = Recommendation.objects.prefetch_related("categories")
         queryset = self._filter_queryset(queryset, request.query_params)
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
@@ -306,8 +308,8 @@ class RecommendationUpdateView(APIView):
     )
     def patch(self, request, id):
         recommendation = get_object_or_404(
-            BookRecommendation.objects.select_related(
-                "category", "creator", "current_recommender"
+            Recommendation.objects.prefetch_related(
+                "categories", "creator", "current_recommender"
             ),
             id=id,
         )
@@ -322,7 +324,7 @@ class RecommendationUpdateView(APIView):
             )
         if (
             recommendation.recommendation_cycle_number > 0
-            or recommendation.status != BookRecommendation.Status.INACTIVE
+            or recommendation.status != Recommendation.Status.INACTIVE
         ):
             return Response(
                 {
@@ -338,11 +340,14 @@ class RecommendationUpdateView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         if serializer.validated_data:
+            category_ids = serializer.validated_data.pop("categories", None)
             for field, value in serializer.validated_data.items():
                 setattr(recommendation, field, value)
             # auto_now fields only persist when listed in update_fields.
             update_fields = [*serializer.validated_data.keys(), "updated_at"]
             recommendation.save(update_fields=update_fields)
+            if category_ids is not None:
+                recommendation.categories.set(category_ids)
         return Response(
             {"recommendation": RecommendationDetailSerializer(recommendation).data}
         )
@@ -374,8 +379,8 @@ class RecommendationDetailView(RecommendationUpdateView):
     )
     def get(self, request, id):
         recommendation = get_object_or_404(
-            BookRecommendation.objects.select_related(
-                "category", "creator", "current_recommender"
+            Recommendation.objects.prefetch_related(
+                "categories", "creator", "current_recommender"
             ),
             id=id,
         )

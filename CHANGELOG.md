@@ -8,6 +8,20 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ## Unreleased
 
+### Changed
+
+- Made the recommendation model content-type-agnostic ahead of future non-book
+  media: `BookRecommendation` was renamed to `Recommendation`; `author_names`
+  became `creator_names`; the single `category` FK became a `categories` M2M
+  (with `content_type` scoping on `Category`); added a `content_type`
+  discriminator (default `BOOK`), a generic `metadata` JSON field, and reserved
+  optional fields (`release_year`, `language`, `runtime_minutes`,
+  `season_count`, `episode_count`, `platform`, `edition_format`). The
+  recommendation list/detail/create/update API contract was updated to match
+  (`creator_names`, `content_type`, `categories`). The `bookrec_cat_status_support_idx`
+  index was replaced with `bookrec_ct_status_support_idx`; the remaining
+  `bookrec_*` index names are kept unchanged for now to avoid migration churn.
+
 ### Fixed
 
 - Auth hardening: signup duplicate errors no longer reveal whether an email or

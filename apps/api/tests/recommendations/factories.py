@@ -6,10 +6,10 @@ from recommendations.models import (
     SUPPORT_AMOUNT_LAMPORTS,
     Badge,
     Bookmark,
-    BookRecommendation,
     Category,
     CuratorFollow,
     DuplicateReport,
+    Recommendation,
     RecommenderParticipant,
     ReputationEvent,
     Support,
@@ -52,17 +52,18 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     slug = factory.Sequence(lambda n: f"category-{n}")
 
 
-class BookRecommendationFactory(factory.django.DjangoModelFactory):
+class RecommendationFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = BookRecommendation
+        model = Recommendation
 
     creator = factory.SubFactory(AccountFactory)
-    page_type = BookRecommendation.PageType.STANDALONE_WORK
+    content_type = Recommendation.ContentType.BOOK
+    page_type = Recommendation.PageType.STANDALONE_WORK
     title = factory.Sequence(lambda n: f"Book Title {n}")
     title_normalized = factory.LazyAttribute(lambda o: o.title.lower())
-    author_names = factory.Sequence(lambda n: f"Author {n}")
-    author_names_normalized = factory.LazyAttribute(lambda o: o.author_names.lower())
-    status = BookRecommendation.Status.INACTIVE
+    creator_names = factory.Sequence(lambda n: f"Creator {n}")
+    creator_names_normalized = factory.LazyAttribute(lambda o: o.creator_names.lower())
+    status = Recommendation.Status.INACTIVE
     is_canonical = False
 
 
@@ -71,7 +72,7 @@ class DuplicateReportFactory(factory.django.DjangoModelFactory):
         model = DuplicateReport
 
     reporter = factory.SubFactory(AccountFactory)
-    recommendation = factory.SubFactory(BookRecommendationFactory)
+    recommendation = factory.SubFactory(RecommendationFactory)
     suspected_duplicate_of = None
     status = DuplicateReport.Status.PENDING
 
@@ -81,7 +82,7 @@ class RecommenderParticipantFactory(factory.django.DjangoModelFactory):
         model = RecommenderParticipant
 
     account = factory.SubFactory(AccountFactory)
-    recommendation = factory.SubFactory(BookRecommendationFactory)
+    recommendation = factory.SubFactory(RecommendationFactory)
     locked_amount_lamports = 200_000_000
     initial_lock_at = factory.LazyFunction(timezone.now)
     is_active = False
@@ -92,7 +93,7 @@ class SupportFactory(factory.django.DjangoModelFactory):
         model = Support
 
     supporter = factory.SubFactory(AccountFactory)
-    recommendation = factory.SubFactory(BookRecommendationFactory)
+    recommendation = factory.SubFactory(RecommendationFactory)
     supporter_number = factory.Sequence(lambda n: n + 1)
     amount_lamports = SUPPORT_AMOUNT_LAMPORTS
     recommendation_cycle_number = 0
@@ -105,7 +106,7 @@ class BookmarkFactory(factory.django.DjangoModelFactory):
         model = Bookmark
 
     account = factory.SubFactory(AccountFactory)
-    recommendation = factory.SubFactory(BookRecommendationFactory)
+    recommendation = factory.SubFactory(RecommendationFactory)
 
 
 class CuratorFollowFactory(factory.django.DjangoModelFactory):
@@ -121,7 +122,7 @@ class BadgeFactory(factory.django.DjangoModelFactory):
         model = Badge
 
     account = factory.SubFactory(AccountFactory)
-    recommendation = factory.SubFactory(BookRecommendationFactory)
+    recommendation = factory.SubFactory(RecommendationFactory)
     tier = Badge.Tier.BRONZE
     earned_at = factory.LazyFunction(timezone.now)
 
