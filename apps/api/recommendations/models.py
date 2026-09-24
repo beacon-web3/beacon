@@ -55,6 +55,9 @@ class BookRecommendation(models.Model):
     author_names_normalized = models.TextField()
     description = models.TextField(blank=True, default="")
     external_reference_url = models.URLField(blank=True, null=True)
+    # Reserved schema field (Plan 0018 Phase 6): stores a client-provided cover
+    # image URL; no upload infrastructure yet.
+    cover_image_url = models.URLField(max_length=2048, blank=True, null=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,

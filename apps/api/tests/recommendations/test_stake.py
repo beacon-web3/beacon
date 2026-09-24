@@ -101,7 +101,7 @@ class TestStakeAdd:
         assert hints["amount_lamports"] == MIN_TOP_UP
         assert hints["pda_seeds"] == ["stake", str(rec.id), user.username]
 
-    def test_top_up_never_activates_a_dormant_position(self):
+    def test_rejects_top_up_on_inactive_position(self):
         user = AccountFactory()
         rec = BookRecommendationFactory(
             status="INACTIVE", recommendation_cycle_number=1
@@ -118,14 +118,14 @@ class TestStakeAdd:
             self._url(rec.id), {"amount_lamports": MIN_ACTIVATION_STAKE}, format="json"
         )
 
-        assert response.status_code == 200
+        # A reclaimed/dormant position cannot be topped up: positions are only
+        # opened through recommend or reactivate (mirrors reclaim's
+        # is_active=True requirement).
+        assert response.status_code == 400
+        assert response.data["detail"]
         participant.refresh_from_db()
-        assert participant.locked_amount_lamports == MIN_ACTIVATION_STAKE
+        assert participant.locked_amount_lamports == 0
         assert participant.is_active is False
-        rec.refresh_from_db()
-        assert rec.status == BookRecommendation.Status.INACTIVE
-        assert rec.current_recommender is None
-        assert rec.recommendation_cycle_number == 1
 
     def test_rejects_amount_below_minimum(self):
         user = AccountFactory()
@@ -143,8 +143,14 @@ class TestStakeAdd:
     def test_rejects_top_up_leaving_dust_balance(self):
         user = AccountFactory()
         rec = BookRecommendationFactory()
+        # A zeroed-but-active participant is the only DB-legal state where a
+        # top-up can land below the 0.2 SOL activation floor (the dust guard
+        # at the serializer level protects it; the DB constraint allows 0).
         participant = RecommenderParticipantFactory(
-            account=user, recommendation=rec, is_active=False, locked_amount_lamports=0
+            account=user,
+            recommendation=rec,
+            is_active=True,
+            locked_amount_lamports=0,
         )
         client = self._authed_client(user)
 

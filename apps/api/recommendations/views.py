@@ -11,6 +11,7 @@ from drf_spectacular.utils import (
     extend_schema,
     extend_schema_view,
 )
+from rest_framework.exceptions import ValidationError as ApiValidationError
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -259,8 +260,15 @@ class RecommendationListView(IdempotencyKeyMixin, RecommendationCreateView):
         if creator_username := params.get("creator"):
             queryset = queryset.filter(creator__username=creator_username)
         if is_canonical := params.get("is_canonical"):
-            if is_canonical in ("true", "false"):
-                queryset = queryset.filter(is_canonical=is_canonical == "true")
+            if is_canonical not in ("true", "false"):
+                raise ApiValidationError(
+                    {
+                        "is_canonical": _(
+                            "must be one of 'true' or 'false' when provided."
+                        )
+                    }
+                )
+            queryset = queryset.filter(is_canonical=is_canonical == "true")
         search = params.get("search")
         if search is not None:
             if len(search) >= SEARCH_MIN_LENGTH:
@@ -862,7 +870,9 @@ class StakeBaseView(APIView):
         with transaction.atomic():
             recommendation = self._locked_recommendation(id)
             participant = (
-                recommendation.recommender_participants.filter(account=request.user)
+                recommendation.recommender_participants.filter(
+                    account=request.user, is_active=True
+                )
                 .order_by("-reactivation_number", "-created_at")
                 .first()
             )

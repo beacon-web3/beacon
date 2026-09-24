@@ -19,6 +19,12 @@ Account = get_user_model()
 MIN_ACTIVATION_STAKE_LAMPORTS = 200_000_000
 MIN_TOP_UP_LAMPORTS = 50_000_000
 
+# Ceiling for any lamport amount accepted by the API: both
+# RecommenderParticipant.locked_amount_lamports and Support.amount_lamports are
+# BigIntegerField columns, so an unbounded IntegerField would overflow at the
+# database and surface as an unhandled 500.
+MAX_LAMPORTS_AMOUNT = 2**63 - 1
+
 BASE58_SIGNATURE_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{87,88}$"
 BASE58_ACCOUNT_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{1,64}$"
 
@@ -26,7 +32,7 @@ BASE58_ACCOUNT_REGEX = r"^[1-9A-HJ-NP-Za-km-z]{1,64}$"
 class AccountRefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ["username", "display_name"]
+        fields = ["username", "display_name", "avatar_url"]
         read_only_fields = fields
 
 
@@ -47,7 +53,12 @@ class CreateRecommendationSerializer(serializers.Serializer):
     description = serializers.CharField(
         required=False, allow_blank=True, max_length=5000
     )
-    external_reference_url = serializers.URLField(required=False, allow_null=True)
+    external_reference_url = serializers.URLField(
+        required=False, allow_null=True, max_length=200
+    )
+    cover_image_url = serializers.URLField(
+        required=False, allow_null=True, max_length=2048
+    )
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), required=False, allow_null=True
     )
@@ -55,8 +66,10 @@ class CreateRecommendationSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if "title" in attrs:
+            attrs["title"] = " ".join(attrs["title"].split())
             attrs["title_normalized"] = attrs["title"].lower()
         if "author_names" in attrs:
+            attrs["author_names"] = " ".join(attrs["author_names"].split())
             attrs["author_names_normalized"] = attrs["author_names"].lower()
 
         if (
@@ -90,15 +103,22 @@ class UpdateRecommendationSerializer(serializers.Serializer):
     description = serializers.CharField(
         required=False, allow_blank=True, max_length=5000
     )
-    external_reference_url = serializers.URLField(required=False, allow_null=True)
+    external_reference_url = serializers.URLField(
+        required=False, allow_null=True, max_length=200
+    )
+    cover_image_url = serializers.URLField(
+        required=False, allow_null=True, max_length=2048
+    )
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), required=False, allow_null=True
     )
 
     def validate(self, attrs):
         if "title" in attrs:
+            attrs["title"] = " ".join(attrs["title"].split())
             attrs["title_normalized"] = attrs["title"].lower()
         if "author_names" in attrs:
+            attrs["author_names"] = " ".join(attrs["author_names"].split())
             attrs["author_names_normalized"] = attrs["author_names"].lower()
 
         # A PATCH may change only one of title/author_names/page_type. Merge
@@ -133,23 +153,38 @@ class UpdateRecommendationSerializer(serializers.Serializer):
 
 class RecommendSerializer(serializers.Serializer):
     amount_lamports = serializers.IntegerField(
-        min_value=MIN_ACTIVATION_STAKE_LAMPORTS, default=MIN_ACTIVATION_STAKE_LAMPORTS
+        min_value=MIN_ACTIVATION_STAKE_LAMPORTS,
+        max_value=MAX_LAMPORTS_AMOUNT,
+        default=MIN_ACTIVATION_STAKE_LAMPORTS,
     )
 
 
 class ReactivateSerializer(serializers.Serializer):
     amount_lamports = serializers.IntegerField(
-        min_value=MIN_ACTIVATION_STAKE_LAMPORTS, default=MIN_ACTIVATION_STAKE_LAMPORTS
+        min_value=MIN_ACTIVATION_STAKE_LAMPORTS,
+        max_value=MAX_LAMPORTS_AMOUNT,
+        default=MIN_ACTIVATION_STAKE_LAMPORTS,
     )
 
 
 class StakeAddSerializer(serializers.Serializer):
-    amount_lamports = serializers.IntegerField(min_value=MIN_TOP_UP_LAMPORTS)
+    amount_lamports = serializers.IntegerField(
+        min_value=MIN_TOP_UP_LAMPORTS, max_value=MAX_LAMPORTS_AMOUNT
+    )
 
     def validate(self, attrs):
         existing = self.context.get("existing_locked_lamports")
         if existing is not None:
             total = existing + attrs["amount_lamports"]
+            if total > MAX_LAMPORTS_AMOUNT:
+                raise serializers.ValidationError(
+                    {
+                        "amount_lamports": _(
+                            "Adding this stake would exceed the maximum "
+                            "supported stake balance."
+                        )
+                    }
+                )
             if 0 < total < MIN_ACTIVATION_STAKE_LAMPORTS:
                 raise serializers.ValidationError(
                     {
@@ -231,6 +266,7 @@ class RecommendationSummarySerializer(serializers.ModelSerializer):
             "status",
             "support_count",
             "category",
+            "cover_image_url",
             "created_at",
         ]
         read_only_fields = fields
@@ -253,6 +289,7 @@ class RecommendationDetailSerializer(serializers.ModelSerializer):
             "author_names_normalized",
             "description",
             "external_reference_url",
+            "cover_image_url",
             "category",
             "status",
             "is_canonical",
@@ -278,6 +315,7 @@ class RecommendationDetailSerializer(serializers.ModelSerializer):
             "author_names_normalized",
             "description",
             "external_reference_url",
+            "cover_image_url",
             "status",
             "is_canonical",
             "duplicate_risk_status",
@@ -394,7 +432,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ["display_name", "reputation_score", "badge_count"]
+        fields = ["display_name", "reputation_score", "badge_count", "avatar_url"]
         read_only_fields = fields
 
     def get_badge_count(self, obj) -> int:

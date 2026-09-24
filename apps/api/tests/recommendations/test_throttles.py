@@ -163,8 +163,10 @@ class TestReadThrottle(ThrottleTestMixin):
 class TestScopeKeysAreConfigured:
     """Every scope used by a throttle class must exist in settings.
 
-    A missing/typo'd key makes DRF's parse_rate(None) return (0, 1), which
-    silently denies all traffic. This test catches that before deploy.
+    A missing/typo'd key makes DRF's parse_rate(None) return (None, None),
+    which the stock throttle treats as unlimited — silently disabling rate
+    limiting. Our override fails closed by raising ImproperlyConfigured, and
+    this test catches a missing key before deploy.
     """
 
     @pytest.mark.parametrize(
@@ -189,8 +191,20 @@ class TestScopeKeysAreConfigured:
         assert rate is not None, (
             f"scope {scope!r} missing from RECOMMENDATION_THROTTLE_RATES"
         )
-        # A missing/typo'd key makes DRF's parse_rate return (0, 1), which
-        # silently denies all traffic. Assert the rate parses to >0 requests.
+        # Assert the rate parses to >0 requests (DRF scopes count as "n/unit").
         num_requests, duration = SimpleRateThrottle.parse_rate(SimpleRateThrottle, rate)
         assert num_requests > 0
         assert duration > 0
+
+    def test_missing_scope_fails_closed(self):
+        from django.core.exceptions import ImproperlyConfigured
+
+        from recommendations.throttles import RecommendationRateThrottle
+
+        class _MissingScopeThrottle(RecommendationRateThrottle):
+            scope = "recommendation_missing"
+
+        # __init__ calls get_rate(), which must fail closed on a missing scope
+        # instead of returning None (DRF treats None as unlimited).
+        with pytest.raises(ImproperlyConfigured):
+            _MissingScopeThrottle()

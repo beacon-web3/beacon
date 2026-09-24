@@ -10,10 +10,16 @@ Changelog. Use date-based entries until formal versioning starts.
 
 ### Added
 
+- Recommendation lifecycle API Phase 6 (media fields): added `cover_image_url` (nullable, blank-by-default `URLField`, max_length=2048) to `BookRecommendation` and `avatar_url` (same contract, max_length=2048) to `Account`, with generated migrations; exposed `cover_image_url` on summary/detail/create/update serializers and the recommendation list endpoint, and `avatar_url` on `AccountRefSerializer`/`ProfileSerializer` (null when not set). No file upload infrastructure was added.
 - Recommendation lifecycle API Phase 1 foundation: URL routing for
   `/api/recommendations/` and `/api/accounts/`, serializer layer, per-endpoint
   throttle scopes (env-configurable), and idempotency infrastructure
   (`Idempotency-Key` support with hashed key storage, replay, and TTL).
+- Recommendation lifecycle API Phase 2 recommendation CRUD:
+  `GET /api/recommendations/` (paginated list with filtering and search),
+  `GET /api/recommendations/{id}/` (detail), `POST /api/recommendations/`
+  (create), and `PATCH /api/recommendations/{id}/` (update), including
+  canonical-work uniqueness protections.
 - Recommendation lifecycle API Phase 3 activation endpoints:
   `POST /api/recommendations/{id}/recommend/` activates an inactive
   recommendation for its first cycle — enforces the `0.2 SOL` minimum recommender
@@ -32,6 +38,12 @@ Changelog. Use date-based entries until formal versioning starts.
   ACTIVE when an active `RecommenderParticipant` exists, otherwise stays
   INACTIVE). Added `GET /api/recommendations/{id}/supports/` to list supporters
   publicly, ordered by `supporter_number`.
+- Recommendation lifecycle API Phase 4 bookmarks, curator follows, badges,
+  and reputation: `POST`/`DELETE /api/recommendations/{id}/bookmark/` with
+  `GET /api/accounts/me/bookmarks/`; `POST`/`DELETE
+  /api/accounts/{username}/follow/` plus followers/following lists;
+  recommendation badge awards; and public account reputation/profile
+  endpoints.
 - Recommendation lifecycle API Phase 5 duplicate report and stake endpoints:
   `POST /api/recommendations/{id}/report-duplicate/` files a PENDING
   `DuplicateReport` (optional `suspected_duplicate_of` and `reason`, 409 on

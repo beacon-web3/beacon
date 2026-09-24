@@ -63,6 +63,7 @@ class TestRecommendationSummarySerializer:
             "status",
             "support_count",
             "category",
+            "cover_image_url",
             "created_at",
         }
 
@@ -95,7 +96,7 @@ class TestRecommendationDetailSerializer:
     def test_creator_nested_with_username_and_display_name(self):
         rec = BookRecommendationFactory()
         data = RecommendationDetailSerializer(rec).data
-        assert set(data["creator"]) == {"username", "display_name"}
+        assert set(data["creator"]) == {"username", "display_name", "avatar_url"}
         assert data["creator"]["username"] == rec.creator.username
 
     def test_current_recommender_nested(self):
@@ -189,6 +190,53 @@ class TestCreateRecommendationSerializer:
         )
         assert serializer.is_valid(), serializer.errors
 
+    def test_collapses_and_strips_title_author_whitespace(self):
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(
+                title="  Dune   Messiah  ", author_names="  Frank   Herbert  "
+            )
+        )
+        assert serializer.is_valid(), serializer.errors
+        assert serializer.validated_data["title"] == "Dune Messiah"
+        assert serializer.validated_data["author_names"] == "Frank Herbert"
+        assert serializer.validated_data["title_normalized"] == "dune messiah"
+        assert serializer.validated_data["author_names_normalized"] == "frank herbert"
+
+    def test_whitespace_variants_collide_on_canonical_check(self):
+        BookRecommendationFactory(
+            title="Dune Messiah",
+            author_names="Frank Herbert",
+            title_normalized="dune messiah",
+            author_names_normalized="frank herbert",
+            page_type="STANDALONE_WORK",
+            is_canonical=True,
+        )
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(
+                title="Dune   Messiah ",
+                author_names="  Frank  Herbert",
+                is_canonical=True,
+            )
+        )
+        assert not serializer.is_valid()
+        assert "title" in serializer.errors
+
+    def test_rejects_external_reference_url_over_model_cap(self):
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(
+                external_reference_url="https://example.com/" + "x" * 200
+            )
+        )
+        assert not serializer.is_valid()
+        assert "external_reference_url" in serializer.errors
+
+    def test_rejects_cover_image_url_over_model_cap(self):
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(cover_image_url="https://example.com/" + "x" * 2048)
+        )
+        assert not serializer.is_valid()
+        assert "cover_image_url" in serializer.errors
+
 
 class TestUpdateRecommendationSerializer:
     def test_partial_title_injects_title_normalized_only(self):
@@ -256,6 +304,20 @@ class TestUpdateRecommendationSerializer:
         )
         assert serializer.is_valid(), serializer.errors
 
+    def test_rejects_external_reference_url_over_model_cap(self):
+        serializer = UpdateRecommendationSerializer(
+            data={"external_reference_url": "https://example.com/" + "x" * 200}
+        )
+        assert not serializer.is_valid()
+        assert "external_reference_url" in serializer.errors
+
+    def test_rejects_cover_image_url_over_model_cap(self):
+        serializer = UpdateRecommendationSerializer(
+            data={"cover_image_url": "https://example.com/" + "x" * 2048}
+        )
+        assert not serializer.is_valid()
+        assert "cover_image_url" in serializer.errors
+
 
 class TestRecommendSerializer:
     def test_defaults_to_minimum_stake(self):
@@ -272,6 +334,11 @@ class TestRecommendSerializer:
         serializer = RecommendSerializer(data={"amount_lamports": 10_000_000_000})
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data["amount_lamports"] == 10_000_000_000
+
+    def test_rejects_amount_over_database_integer_ceiling(self):
+        serializer = RecommendSerializer(data={"amount_lamports": 2**63})
+        assert not serializer.is_valid()
+        assert "amount_lamports" in serializer.errors
 
 
 class TestReactivateSerializer:
@@ -295,6 +362,14 @@ class TestStakeAddSerializer:
     def test_accepts_top_up_minimum(self):
         serializer = StakeAddSerializer(data={"amount_lamports": 50_000_000})
         assert serializer.is_valid(), serializer.errors
+
+    def test_rejects_total_balance_over_database_integer_ceiling(self):
+        serializer = StakeAddSerializer(
+            data={"amount_lamports": 2**63 - 1},
+            context={"existing_locked_lamports": 1},
+        )
+        assert not serializer.is_valid()
+        assert "amount_lamports" in serializer.errors
 
     def test_amount_required(self):
         serializer = StakeAddSerializer(data={})
@@ -443,7 +518,11 @@ class TestDuplicateReportCreateSerializer:
 class TestOutputSerializers:
     def test_account_ref_fields(self):
         account = AccountFactory()
-        assert set(AccountRefSerializer(account).data) == {"username", "display_name"}
+        assert set(AccountRefSerializer(account).data) == {
+            "username",
+            "display_name",
+            "avatar_url",
+        }
 
     def test_category_fields(self):
         category = CategoryFactory()
@@ -508,7 +587,12 @@ class TestOutputSerializers:
         account = AccountFactory()
         BadgeFactory.create_batch(2, account=account)
         data = ProfileSerializer(account).data
-        assert set(data) == {"display_name", "reputation_score", "badge_count"}
+        assert set(data) == {
+            "display_name",
+            "reputation_score",
+            "badge_count",
+            "avatar_url",
+        }
         assert data["badge_count"] == 2
 
     def test_duplicate_report_read_fields(self):

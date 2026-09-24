@@ -31,7 +31,17 @@ class AccountFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: f"user{n}")
     display_name = factory.Sequence(lambda n: f"User {n}")
     is_active = True
-    password = factory.PostGenerationMethodCall("set_password", "testpass123")
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        # PostGenerationMethodCall is deprecated in factory_boy 4: it would
+        # stop persisting the hashed value. Hash explicitly on create (plan
+        # 0019); build-strategy callers keep the raw value for inspection.
+        if create:
+            self.set_password(extracted or "testpass123")
+            self.save(update_fields=["password"])
+        else:
+            self.password = extracted or "testpass123"
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):

@@ -45,6 +45,7 @@ class TestRecommendationList:
             "status",
             "support_count",
             "category",
+            "cover_image_url",
             "created_at",
         }
 
@@ -131,13 +132,14 @@ class TestRecommendationList:
         assert response.data["count"] == 1
         assert response.data["results"][0]["id"] == canonical.id
 
-    def test_list_is_canonical_invalid_value_is_ignored(self):
+    def test_list_is_canonical_invalid_value_is_rejected(self):
         _create_recommendation(title="Canonical Work")
         _create_recommendation(title="Non Canonical Work", is_canonical=False)
 
         response = APIClient().get(LIST_URL, {"is_canonical": "maybe"})
 
-        assert response.data["count"] == 2
+        assert response.status_code == 400
+        assert "is_canonical" in response.data
 
     def test_list_search_matches_title_and_author(self):
         _create_recommendation(title="The Power Broker", author_names="Robert Caro")

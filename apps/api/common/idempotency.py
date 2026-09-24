@@ -15,23 +15,26 @@ IN_PROGRESS_DETAIL = "A request with this Idempotency-Key is already in progress
 
 
 def key_hash_for(request, key):
-    """SHA-256 digest scoped to user, method, path and key.
+    """SHA-256 digest scoped to user, method, path, key and request body.
 
     Raw keys are never persisted, and a key reused against a different
-    endpoint or method resolves to a different record.
+    endpoint, method, or payload resolves to a different record — so replaying
+    a key with a changed body executes the new mutation instead of silently
+    returning the cached first response.
     """
+    body = json.dumps(request.data, sort_keys=True, default=str)
     return hashlib.sha256(
-        f"{request.user.pk}:{request.method}:{request.path}:{key}".encode()
+        f"{request.user.pk}:{request.method}:{request.path}:{key}:{body}".encode()
     ).hexdigest()
 
 
 class IdempotencyKeyMixin:
     """Idempotency-Key support for POST views.
 
-    A successful (2xx) response is cached per (user, method, path, key hash)
-    and replayed for duplicate requests. Non-2xx responses are not cached so
-    the client can retry with a fresh key. Concurrent in-flight requests with
-    the same key return 409.
+    A successful (2xx) response is cached per (user, method, path, key, body
+    hash) and replayed for duplicate requests. Non-2xx responses are not
+    cached so the client can retry with a fresh key. Concurrent in-flight
+    requests with the same key return 409.
     """
 
     def post(self, request, *args, **kwargs):

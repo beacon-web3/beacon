@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.utils import timezone
+from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 
@@ -168,7 +169,7 @@ class TestIdempotencyStaleTakeover:
         force_authenticate(request, user=user)
         record = IdempotencyRecord.objects.create(
             user=user,
-            key_hash=key_hash_for(Request(request), key),
+            key_hash=key_hash_for(Request(request, parsers=[JSONParser()]), key),
             status=IdempotencyRecord.Status.IN_PROGRESS,
         )
         # Age the record beyond the stale window so the next request takes over.
@@ -191,6 +192,9 @@ class TestIdempotencyStaleTakeover:
         assert response.status_code == 201
         assert Bookmark.objects.filter(account=user, recommendation=rec).count() == 1
         stored = IdempotencyRecord.objects.get(
-            user=user, key_hash=key_hash_for(Request(response.wsgi_request), key)
+            user=user,
+            key_hash=key_hash_for(
+                Request(response.wsgi_request, parsers=[JSONParser()]), key
+            ),
         )
         assert stored.status == IdempotencyRecord.Status.COMPLETED

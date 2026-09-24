@@ -5,6 +5,7 @@ import pytest
 from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -82,7 +83,12 @@ def _authed_request(user, method="post", key=None, path="/"):
 
 
 def _record_for(user, key, path="/"):
-    request = Request(_authed_request(user, key=key, path=path))
+    # The bare Request wrapper has no parser classes by default; give it
+    # JSONParser so key_hash_for can read request.data (body-digested hash).
+    request = Request(
+        _authed_request(user, key=key, path=path),
+        parsers=[JSONParser()],
+    )
     return key_hash_for(request, key)
 
 
@@ -229,6 +235,27 @@ def test_same_key_different_paths_are_independent():
     assert first.status_code == status.HTTP_201_CREATED
     assert second.status_code == status.HTTP_201_CREATED
     assert IdempotencyRecord.objects.filter(user=user).count() == 2
+
+
+def test_same_key_different_bodies_are_independent():
+    user = AccountFactory()
+    _calls["n"] = 0
+    view = _CountingStubView.as_view()
+
+    first = view(_authed_request(user, key="key-1"))
+    second = view(_request_with_body(user, "key-1", {"amount": 5}))
+
+    # Replaying a key with a changed body must execute the mutation again,
+    # never silently return the cached first response.
+    assert _calls["n"] == 2
+    assert first.data == second.data == {"ok": True}
+    assert IdempotencyRecord.objects.filter(user=user).count() == 2
+
+
+def _request_with_body(user, key, body):
+    request = factory.post("/", body, HTTP_IDEMPOTENCY_KEY=key, format="json")
+    force_authenticate(request, user=user)
+    return request
 
 
 def test_expired_completed_record_is_re_executed():

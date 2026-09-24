@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework.throttling import SimpleRateThrottle
 
 
@@ -11,7 +12,14 @@ class RecommendationRateThrottle(SimpleRateThrottle):
     """
 
     def get_rate(self):
-        return getattr(settings, "RECOMMENDATION_THROTTLE_RATES", {}).get(self.scope)
+        rate = getattr(settings, "RECOMMENDATION_THROTTLE_RATES", {}).get(self.scope)
+        if rate is None:
+            # Fail closed: DRF treats a None rate as unlimited, which would
+            # silently disable throttling on a typo'd or missing config key.
+            raise ImproperlyConfigured(
+                f"No RECOMMENDATION_THROTTLE_RATES entry for scope {self.scope!r}"
+            )
+        return rate
 
     def get_cache_key(self, request, view):
         user = getattr(request, "user", None)
