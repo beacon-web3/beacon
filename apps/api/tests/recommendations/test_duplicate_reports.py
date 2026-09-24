@@ -4,8 +4,8 @@ from rest_framework.test import APIClient
 from recommendations.models import DuplicateReport
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
     DuplicateReportFactory,
+    RecommendationFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -16,7 +16,7 @@ class TestDuplicateReportCreate:
         return f"/api/recommendations/{recommendation_id}/report-duplicate/"
 
     def test_requires_authentication(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().post(self._url(rec.id), {}, format="json")
 
@@ -32,7 +32,7 @@ class TestDuplicateReportCreate:
         assert response.status_code == 404
 
     def test_creates_pending_report_with_empty_body(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         reporter = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=reporter)
@@ -51,8 +51,8 @@ class TestDuplicateReportCreate:
         assert report.reason == ""
 
     def test_accepts_optional_reason_and_suspected_duplicate(self):
-        rec = BookRecommendationFactory()
-        original = BookRecommendationFactory()
+        rec = RecommendationFactory()
+        original = RecommendationFactory()
         reporter = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=reporter)
@@ -72,7 +72,7 @@ class TestDuplicateReportCreate:
         assert report.reason == "Same ISBN."
 
     def test_rejects_self_reference(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -87,7 +87,7 @@ class TestDuplicateReportCreate:
         assert DuplicateReport.objects.count() == 0
 
     def test_rejects_unknown_suspected_duplicate(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -101,7 +101,7 @@ class TestDuplicateReportCreate:
         assert "suspected_duplicate_of" in response.data
 
     def test_conflict_when_already_filed_for_this_recommendation(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         reporter = AccountFactory()
         DuplicateReportFactory(reporter=reporter, recommendation=rec)
         client = APIClient()
@@ -113,9 +113,9 @@ class TestDuplicateReportCreate:
         assert DuplicateReport.objects.filter(reporter=reporter).count() == 1
 
     def test_conflict_when_same_suspected_pair_reused(self):
-        original = BookRecommendationFactory()
-        first_target = BookRecommendationFactory()
-        second_target = BookRecommendationFactory()
+        original = RecommendationFactory()
+        first_target = RecommendationFactory()
+        second_target = RecommendationFactory()
         reporter = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=reporter)
@@ -142,7 +142,7 @@ class TestDuplicateReportCreate:
 
         from django.db import IntegrityError
 
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         reporter = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=reporter)
@@ -169,7 +169,7 @@ class TestDuplicateReportCreate:
         )
 
     def test_is_idempotent_with_key(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -200,7 +200,7 @@ class TestDuplicateReportList:
         return f"/api/recommendations/{recommendation_id}/duplicate-reports/"
 
     def test_admin_can_list_reports(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         report = DuplicateReportFactory(recommendation=rec)
         admin = AccountFactory(is_staff=True)
         client = APIClient()
@@ -214,7 +214,7 @@ class TestDuplicateReportList:
         assert response.data["results"][0]["status"] == "PENDING"
 
     def test_non_admin_forbidden(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         DuplicateReportFactory(recommendation=rec)
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
@@ -224,7 +224,7 @@ class TestDuplicateReportList:
         assert response.status_code == 403
 
     def test_anonymous_forbidden(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         DuplicateReportFactory(recommendation=rec)
 
         response = APIClient().get(self._url(rec.id))
@@ -241,7 +241,7 @@ class TestDuplicateReportList:
         assert response.status_code == 404
 
     def test_empty_list_when_no_reports(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         admin = AccountFactory(is_staff=True)
         client = APIClient()
         client.force_authenticate(user=admin)
@@ -257,7 +257,7 @@ class TestDuplicateReportList:
 
         from django.utils import timezone
 
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         older = DuplicateReportFactory(
             recommendation=rec,
             created_at=timezone.now() - timedelta(minutes=5),

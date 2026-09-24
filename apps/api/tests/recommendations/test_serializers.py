@@ -1,6 +1,6 @@
 import pytest
 
-from recommendations.models import BookRecommendation
+from recommendations.models import Recommendation
 from recommendations.serializers import (
     AccountRefSerializer,
     BadgeSerializer,
@@ -36,10 +36,10 @@ from tests.recommendations.factories import (
     AccountFactory,
     BadgeFactory,
     BookmarkFactory,
-    BookRecommendationFactory,
     CategoryFactory,
     CuratorFollowFactory,
     DuplicateReportFactory,
+    RecommendationFactory,
     RecommenderParticipantFactory,
     ReputationEventFactory,
     SupportFactory,
@@ -53,22 +53,23 @@ VALID_ACCOUNT = "1" * 64
 
 class TestRecommendationSummarySerializer:
     def test_fields_match_public_contract(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         data = RecommendationSummarySerializer(rec).data
         assert set(data) == {
             "id",
             "title",
-            "author_names",
+            "creator_names",
+            "content_type",
             "page_type",
             "status",
             "support_count",
-            "category",
+            "categories",
             "cover_image_url",
             "created_at",
         }
 
     def test_excludes_internal_fields(self):
-        rec = BookRecommendationFactory(current_recommender=AccountFactory())
+        rec = RecommendationFactory(current_recommender=AccountFactory())
         data = RecommendationSummarySerializer(rec).data
         for excluded in (
             "current_recommender",
@@ -81,27 +82,28 @@ class TestRecommendationSummarySerializer:
             assert excluded not in data
 
     def test_category_nested(self):
-        rec = BookRecommendationFactory(category=CategoryFactory())
+        rec = RecommendationFactory()
+        rec.categories.add(CategoryFactory())
         data = RecommendationSummarySerializer(rec).data
-        assert set(data["category"]) == {"id", "name", "slug"}
+        assert set(data["categories"][0]) == {"id", "name", "slug"}
 
 
 class TestRecommendationDetailSerializer:
     def test_includes_all_model_fields(self):
-        rec = BookRecommendationFactory(current_recommender=AccountFactory())
+        rec = RecommendationFactory(current_recommender=AccountFactory())
         data = RecommendationDetailSerializer(rec).data
-        model_fields = {f.name for f in BookRecommendation._meta.concrete_fields}
+        model_fields = {f.name for f in Recommendation._meta.concrete_fields}
         assert model_fields <= set(data)
 
     def test_creator_nested_with_username_and_display_name(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         data = RecommendationDetailSerializer(rec).data
         assert set(data["creator"]) == {"username", "display_name", "avatar_url"}
         assert data["creator"]["username"] == rec.creator.username
 
     def test_current_recommender_nested(self):
         recommender = AccountFactory()
-        rec = BookRecommendationFactory(current_recommender=recommender)
+        rec = RecommendationFactory(current_recommender=recommender)
         data = RecommendationDetailSerializer(rec).data
         assert data["current_recommender"]["username"] == recommender.username
 
@@ -110,7 +112,7 @@ class TestCreateRecommendationSerializer:
     def valid_data(self, **overrides):
         data = {
             "title": "Dune",
-            "author_names": "Frank Herbert",
+            "creator_names": "Frank Herbert",
             "page_type": "STANDALONE_WORK",
             "description": "A desert planet epic.",
         }
@@ -125,7 +127,7 @@ class TestCreateRecommendationSerializer:
         serializer = CreateRecommendationSerializer(data=self.valid_data())
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data["title_normalized"] == "dune"
-        assert serializer.validated_data["author_names_normalized"] == "frank herbert"
+        assert serializer.validated_data["creator_names_normalized"] == "frank herbert"
 
     def test_is_canonical_defaults_to_false(self):
         serializer = CreateRecommendationSerializer(data=self.valid_data())
@@ -143,7 +145,7 @@ class TestCreateRecommendationSerializer:
         serializer = CreateRecommendationSerializer(data={})
         assert not serializer.is_valid()
         assert "title" in serializer.errors
-        assert "author_names" in serializer.errors
+        assert "creator_names" in serializer.errors
         assert "page_type" in serializer.errors
 
     def test_optional_fields_accepted(self):
@@ -151,25 +153,25 @@ class TestCreateRecommendationSerializer:
         serializer = CreateRecommendationSerializer(
             data=self.valid_data(
                 external_reference_url="https://openlibrary.org/book/1",
-                category=category.id,
+                categories=[category.id],
             )
         )
         assert serializer.is_valid(), serializer.errors
-        assert serializer.validated_data["category"] == category
+        assert serializer.validated_data["categories"] == [category]
 
     def test_rejects_duplicate_canonical_work_case_insensitively(self):
-        BookRecommendationFactory(
+        RecommendationFactory(
             title="dune",
-            author_names="frank herbert",
+            creator_names="frank herbert",
             title_normalized="dune",
-            author_names_normalized="frank herbert",
+            creator_names_normalized="frank herbert",
             page_type="STANDALONE_WORK",
             is_canonical=True,
         )
         serializer = CreateRecommendationSerializer(
             data=self.valid_data(
                 title="DUNE",
-                author_names="Frank Herbert",
+                creator_names="Frank Herbert",
                 is_canonical=True,
             )
         )
@@ -177,44 +179,44 @@ class TestCreateRecommendationSerializer:
         assert "title" in serializer.errors
 
     def test_allows_duplicate_when_not_canonical(self):
-        BookRecommendationFactory(
+        RecommendationFactory(
             title="dune",
-            author_names="frank herbert",
+            creator_names="frank herbert",
             title_normalized="dune",
-            author_names_normalized="frank herbert",
+            creator_names_normalized="frank herbert",
             page_type="STANDALONE_WORK",
             is_canonical=False,
         )
         serializer = CreateRecommendationSerializer(
-            data=self.valid_data(title="Dune", author_names="Frank Herbert")
+            data=self.valid_data(title="Dune", creator_names="Frank Herbert")
         )
         assert serializer.is_valid(), serializer.errors
 
     def test_collapses_and_strips_title_author_whitespace(self):
         serializer = CreateRecommendationSerializer(
             data=self.valid_data(
-                title="  Dune   Messiah  ", author_names="  Frank   Herbert  "
+                title="  Dune   Messiah  ", creator_names="  Frank   Herbert  "
             )
         )
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data["title"] == "Dune Messiah"
-        assert serializer.validated_data["author_names"] == "Frank Herbert"
+        assert serializer.validated_data["creator_names"] == "Frank Herbert"
         assert serializer.validated_data["title_normalized"] == "dune messiah"
-        assert serializer.validated_data["author_names_normalized"] == "frank herbert"
+        assert serializer.validated_data["creator_names_normalized"] == "frank herbert"
 
     def test_whitespace_variants_collide_on_canonical_check(self):
-        BookRecommendationFactory(
+        RecommendationFactory(
             title="Dune Messiah",
-            author_names="Frank Herbert",
+            creator_names="Frank Herbert",
             title_normalized="dune messiah",
-            author_names_normalized="frank herbert",
+            creator_names_normalized="frank herbert",
             page_type="STANDALONE_WORK",
             is_canonical=True,
         )
         serializer = CreateRecommendationSerializer(
             data=self.valid_data(
                 title="Dune   Messiah ",
-                author_names="  Frank  Herbert",
+                creator_names="  Frank  Herbert",
                 is_canonical=True,
             )
         )
@@ -237,21 +239,55 @@ class TestCreateRecommendationSerializer:
         assert not serializer.is_valid()
         assert "cover_image_url" in serializer.errors
 
+    def test_rejects_duplicate_category_ids(self):
+        category = CategoryFactory()
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(categories=[category.id, category.id])
+        )
+        assert not serializer.is_valid()
+        assert "categories" in serializer.errors
+
+    def test_rejects_category_scoped_to_other_content_type(self):
+        category = CategoryFactory(content_type=Recommendation.ContentType.MOVIE)
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(categories=[category.id])
+        )
+        assert not serializer.is_valid()
+        assert "categories" in serializer.errors
+
+    def test_accepts_category_scoped_to_book_or_unscoped(self):
+        book_scoped = CategoryFactory(content_type=Recommendation.ContentType.BOOK)
+        unscoped = CategoryFactory(content_type=None)
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(categories=[book_scoped.id, unscoped.id])
+        )
+        assert serializer.is_valid(), serializer.errors
+
+    def test_rejects_read_only_content_type_and_metadata(self):
+        serializer = CreateRecommendationSerializer(
+            data=self.valid_data(
+                content_type=Recommendation.ContentType.MOVIE, metadata={"x": 1}
+            )
+        )
+        assert not serializer.is_valid()
+        assert "content_type" in serializer.errors
+        assert "metadata" in serializer.errors
+
 
 class TestUpdateRecommendationSerializer:
     def test_partial_title_injects_title_normalized_only(self):
         serializer = UpdateRecommendationSerializer(data={"title": "New Title"})
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data["title_normalized"] == "new title"
-        assert "author_names_normalized" not in serializer.validated_data
+        assert "creator_names_normalized" not in serializer.validated_data
 
-    def test_partial_author_injects_author_names_normalized_only(self):
+    def test_partial_author_injects_creator_names_normalized_only(self):
         serializer = UpdateRecommendationSerializer(
-            data={"author_names": "Ursula K Le Guin"}
+            data={"creator_names": "Ursula K Le Guin"}
         )
         assert serializer.is_valid(), serializer.errors
         assert (
-            serializer.validated_data["author_names_normalized"] == "ursula k le guin"
+            serializer.validated_data["creator_names_normalized"] == "ursula k le guin"
         )
         assert "title_normalized" not in serializer.validated_data
 
@@ -266,41 +302,41 @@ class TestUpdateRecommendationSerializer:
         assert "page_type" in serializer.errors
 
     def test_rejects_collision_with_other_canonical_work(self):
-        BookRecommendationFactory(
+        RecommendationFactory(
             title="dune",
-            author_names="frank herbert",
+            creator_names="frank herbert",
             title_normalized="dune",
-            author_names_normalized="frank herbert",
+            creator_names_normalized="frank herbert",
             page_type="STANDALONE_WORK",
             is_canonical=True,
         )
-        instance = BookRecommendationFactory(
+        instance = RecommendationFactory(
             title="other",
-            author_names="someone else",
+            creator_names="someone else",
             title_normalized="other",
-            author_names_normalized="someone else",
+            creator_names_normalized="someone else",
             page_type="STANDALONE_WORK",
             is_canonical=True,
         )
         serializer = UpdateRecommendationSerializer(
             instance=instance,
-            data={"title": "DUNE", "author_names": "Frank Herbert"},
+            data={"title": "DUNE", "creator_names": "Frank Herbert"},
         )
         assert not serializer.is_valid()
         assert "title" in serializer.errors
 
     def test_allows_updating_same_canonical_work(self):
-        instance = BookRecommendationFactory(
+        instance = RecommendationFactory(
             title="dune",
-            author_names="frank herbert",
+            creator_names="frank herbert",
             title_normalized="dune",
-            author_names_normalized="frank herbert",
+            creator_names_normalized="frank herbert",
             page_type="STANDALONE_WORK",
             is_canonical=True,
         )
         serializer = UpdateRecommendationSerializer(
             instance=instance,
-            data={"title": "Dune Revised", "author_names": "Frank Herbert"},
+            data={"title": "Dune Revised", "creator_names": "Frank Herbert"},
         )
         assert serializer.is_valid(), serializer.errors
 
@@ -317,6 +353,28 @@ class TestUpdateRecommendationSerializer:
         )
         assert not serializer.is_valid()
         assert "cover_image_url" in serializer.errors
+
+    def test_update_rejects_category_scoped_to_other_content_type(self):
+        instance = RecommendationFactory()
+        category = CategoryFactory(content_type=Recommendation.ContentType.MOVIE)
+        serializer = UpdateRecommendationSerializer(
+            instance=instance, data={"categories": [category.id]}, partial=True
+        )
+        assert not serializer.is_valid()
+        assert "categories" in serializer.errors
+
+    def test_update_accepts_category_matching_instance_content_type(self):
+        instance = RecommendationFactory()
+        category = CategoryFactory(content_type=Recommendation.ContentType.BOOK)
+        serializer = UpdateRecommendationSerializer(
+            instance=instance, data={"categories": [category.id]}, partial=True
+        )
+        assert serializer.is_valid(), serializer.errors
+
+    def test_update_rejects_read_only_metadata_field(self):
+        serializer = UpdateRecommendationSerializer(data={"metadata": {}})
+        assert not serializer.is_valid()
+        assert "metadata" in serializer.errors
 
 
 class TestRecommendSerializer:
@@ -491,7 +549,7 @@ class TestDuplicateReportCreateSerializer:
         assert serializer.is_valid(), serializer.errors
 
     def test_accepts_existing_recommendation(self):
-        suspected = BookRecommendationFactory()
+        suspected = RecommendationFactory()
         serializer = DuplicateReportCreateSerializer(
             data={"suspected_duplicate_of": suspected.id, "reason": "same book"}
         )
@@ -506,7 +564,7 @@ class TestDuplicateReportCreateSerializer:
         assert "suspected_duplicate_of" in serializer.errors
 
     def test_rejects_self_reference_via_context(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         serializer = DuplicateReportCreateSerializer(
             data={"suspected_duplicate_of": rec.id},
             context={"recommendation": rec},
@@ -619,7 +677,7 @@ class TestEnvelopes:
         }
 
     def test_recommendation_envelope_represents_detail(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         data = RecommendationEnvelopeSerializer(instance={"recommendation": rec}).data
         assert data["recommendation"]["title"] == rec.title
         assert "recommender_participant" not in data
@@ -633,7 +691,7 @@ class TestEnvelopes:
         }
 
     def test_list_envelope_represents_results(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         data = RecommendationListEnvelopeSerializer(
             instance={
                 "results": [rec],
@@ -678,23 +736,24 @@ class TestEnvelopes:
 class TestCategoryModelIntegration:
     def test_summary_reads_category_relations(self):
         category = CategoryFactory()
-        rec = BookRecommendationFactory(category=category)
+        rec = RecommendationFactory()
+        rec.categories.add(category)
         data = RecommendationSummarySerializer(rec).data
-        assert data["category"]["id"] == category.id
+        assert data["categories"][0]["id"] == category.id
 
-    def test_detail_reads_null_category(self):
-        rec = BookRecommendationFactory(category=None)
+    def test_detail_reads_empty_categories(self):
+        rec = RecommendationFactory()
         data = RecommendationDetailSerializer(rec).data
-        assert data["category"] is None
+        assert data["categories"] == []
 
     def test_create_serializer_accepts_inactive_category(self):
         category = CategoryFactory(is_active=False)
         serializer = CreateRecommendationSerializer(
             data={
                 "title": "Book",
-                "author_names": "Author",
+                "creator_names": "Author",
                 "page_type": "STANDALONE_WORK",
-                "category": category.id,
+                "categories": [category.id],
             }
         )
         assert serializer.is_valid(), serializer.errors

@@ -49,9 +49,9 @@ class TestAvatar:
     def test_nested_creator_response_carries_avatar_url(self):
         creator = AccountFactory(avatar_url=AVATAR_URL)
         # A recommendation the creator made exposes avatar via AccountRef.
-        from tests.recommendations.factories import BookRecommendationFactory
+        from tests.recommendations.factories import RecommendationFactory
 
-        rec = BookRecommendationFactory(creator=creator)
+        rec = RecommendationFactory(creator=creator)
         client = APIClient()
         client.force_authenticate(user=creator)
 

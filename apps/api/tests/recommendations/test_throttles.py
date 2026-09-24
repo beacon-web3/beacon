@@ -8,7 +8,7 @@ from recommendations.serializers import (
 )
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
     RecommenderParticipantFactory,
 )
 
@@ -48,7 +48,7 @@ class TestCreateThrottle(ThrottleTestMixin):
         client.force_authenticate(user=user)
         payload = {
             "title": "A Throttled Book",
-            "author_names": "Throttle Author",
+            "creator_names": "Throttle Creator",
             "page_type": "standalone_work",
         }
         return client.post("/api/recommendations/", payload, format="json")
@@ -58,7 +58,7 @@ class TestUpdateThrottle(ThrottleTestMixin):
     scope = "recommendation_update"
 
     def _call(self, user):
-        rec = BookRecommendationFactory(creator=user)
+        rec = RecommendationFactory(creator=user)
         client = APIClient()
         client.force_authenticate(user=user)
         return client.patch(
@@ -70,7 +70,7 @@ class TestActThrottle(ThrottleTestMixin):
     scope = "recommendation_act"
 
     def _call(self, user):
-        rec = BookRecommendationFactory(creator=user)
+        rec = RecommendationFactory(creator=user)
         client = APIClient()
         client.force_authenticate(user=user)
         payload = {"amount_lamports": MIN_ACTIVATION_STAKE}
@@ -83,7 +83,7 @@ class TestSupportThrottle(ThrottleTestMixin):
     scope = "recommendation_support"
 
     def _call(self, user):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=user)
         payload = {"transaction_signature": VALID_SIGNATURE}
@@ -96,7 +96,7 @@ class TestBookmarkThrottle(ThrottleTestMixin):
     scope = "recommendation_bookmark"
 
     def _call(self, user):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=user)
         return client.post(f"/api/recommendations/{rec.id}/bookmark/")
@@ -106,7 +106,7 @@ class TestStakeThrottle(ThrottleTestMixin):
     scope = "recommendation_stake"
 
     def _call(self, user):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(account=user, recommendation=rec, is_active=True)
         client = APIClient()
         client.force_authenticate(user=user)
@@ -122,7 +122,7 @@ class TestStakeReclaimThrottle(ThrottleTestMixin):
     scope = "recommendation_stake"
 
     def _call(self, user):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(account=user, recommendation=rec, is_active=True)
         client = APIClient()
         client.force_authenticate(user=user)
@@ -133,7 +133,7 @@ class TestDuplicateThrottle(ThrottleTestMixin):
     scope = "recommendation_duplicate"
 
     def _call(self, user):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=user)
         return client.post(

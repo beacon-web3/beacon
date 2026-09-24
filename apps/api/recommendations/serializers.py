@@ -5,10 +5,10 @@ from rest_framework import serializers
 from recommendations.models import (
     Badge,
     Bookmark,
-    BookRecommendation,
     Category,
     CuratorFollow,
     DuplicateReport,
+    Recommendation,
     RecommenderParticipant,
     ReputationEvent,
     Support,
@@ -46,10 +46,44 @@ class CategorySerializer(serializers.ModelSerializer):
 # Input serializers
 
 
+class ReadOnlyRejectField(serializers.Field):
+    """Field that serializes on output but rejects any client-supplied value.
+
+    DRF's `read_only=True` silently ignores input instead of erroring; this
+    field turns an attempt to write a read-only attribute into a 400.
+    """
+
+    def to_internal_value(self, data):
+        raise serializers.ValidationError("This field is read-only.")
+
+
+def _validate_categories(value, recommendation_content_type):
+    """Shared guards for category payloads: no duplicate ids, type-scope match."""
+    if len(value) != len({category.pk for category in value}):
+        raise serializers.ValidationError(_("Duplicate category ids are not allowed."))
+    for category in value:
+        if (
+            category.content_type is not None
+            and category.content_type != recommendation_content_type
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Category %(slug)s is scoped to content type %(scope)s and "
+                    "cannot be used for a %(target)s recommendation."
+                )
+                % {
+                    "slug": category.slug,
+                    "scope": category.content_type,
+                    "target": recommendation_content_type,
+                }
+            )
+    return value
+
+
 class CreateRecommendationSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
-    author_names = serializers.CharField(max_length=255)
-    page_type = serializers.ChoiceField(choices=BookRecommendation.PageType.choices)
+    creator_names = serializers.CharField(max_length=255)
+    page_type = serializers.ChoiceField(choices=Recommendation.PageType.choices)
     description = serializers.CharField(
         required=False, allow_blank=True, max_length=5000
     )
@@ -59,34 +93,50 @@ class CreateRecommendationSerializer(serializers.Serializer):
     cover_image_url = serializers.URLField(
         required=False, allow_null=True, max_length=2048
     )
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), required=False, allow_null=True
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), many=True, required=False
     )
     is_canonical = serializers.BooleanField(default=False)
+    # The content-type discriminator and reserved fields are not writable yet:
+    # supplying them returns 400 instead of being silently dropped by the plain
+    # Serializer base. Content type is fixed to BOOK at create time; the
+    # reserved fields belong to future non-book create flows.
+    content_type = ReadOnlyRejectField(required=False)
+    metadata = ReadOnlyRejectField(required=False)
+    release_year = ReadOnlyRejectField(required=False)
+    language = ReadOnlyRejectField(required=False)
+    runtime_minutes = ReadOnlyRejectField(required=False)
+    season_count = ReadOnlyRejectField(required=False)
+    episode_count = ReadOnlyRejectField(required=False)
+    platform = ReadOnlyRejectField(required=False)
+    edition_format = ReadOnlyRejectField(required=False)
+
+    def validate_categories(self, value):
+        return _validate_categories(value, Recommendation.ContentType.BOOK)
 
     def validate(self, attrs):
         if "title" in attrs:
             attrs["title"] = " ".join(attrs["title"].split())
             attrs["title_normalized"] = attrs["title"].lower()
-        if "author_names" in attrs:
-            attrs["author_names"] = " ".join(attrs["author_names"].split())
-            attrs["author_names_normalized"] = attrs["author_names"].lower()
+        if "creator_names" in attrs:
+            attrs["creator_names"] = " ".join(attrs["creator_names"].split())
+            attrs["creator_names_normalized"] = attrs["creator_names"].lower()
 
         if (
             attrs.get("is_canonical")
             and "title" in attrs
-            and "author_names" in attrs
-            and BookRecommendation.objects.filter(
+            and "creator_names" in attrs
+            and Recommendation.objects.filter(
                 is_canonical=True,
                 title_normalized__iexact=attrs["title"],
-                author_names_normalized__iexact=attrs["author_names"],
+                creator_names_normalized__iexact=attrs["creator_names"],
                 page_type=attrs["page_type"],
             ).exists()
         ):
             raise serializers.ValidationError(
                 {
                     "title": _(
-                        "A canonical recommendation for this title and author "
+                        "A canonical recommendation for this title and creator "
                         "already exists."
                     )
                 }
@@ -96,9 +146,9 @@ class CreateRecommendationSerializer(serializers.Serializer):
 
 class UpdateRecommendationSerializer(serializers.Serializer):
     title = serializers.CharField(required=False, max_length=255)
-    author_names = serializers.CharField(required=False, max_length=255)
+    creator_names = serializers.CharField(required=False, max_length=255)
     page_type = serializers.ChoiceField(
-        choices=BookRecommendation.PageType.choices, required=False
+        choices=Recommendation.PageType.choices, required=False
     )
     description = serializers.CharField(
         required=False, allow_blank=True, max_length=5000
@@ -109,32 +159,46 @@ class UpdateRecommendationSerializer(serializers.Serializer):
     cover_image_url = serializers.URLField(
         required=False, allow_null=True, max_length=2048
     )
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), required=False, allow_null=True
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), many=True, required=False
     )
+    # Same read-only contract as the create serializer; see there for details.
+    content_type = ReadOnlyRejectField(required=False)
+    metadata = ReadOnlyRejectField(required=False)
+    release_year = ReadOnlyRejectField(required=False)
+    language = ReadOnlyRejectField(required=False)
+    runtime_minutes = ReadOnlyRejectField(required=False)
+    season_count = ReadOnlyRejectField(required=False)
+    episode_count = ReadOnlyRejectField(required=False)
+    platform = ReadOnlyRejectField(required=False)
+    edition_format = ReadOnlyRejectField(required=False)
+
+    def validate_categories(self, value):
+        target = getattr(self.instance, "content_type", Recommendation.ContentType.BOOK)
+        return _validate_categories(value, target)
 
     def validate(self, attrs):
         if "title" in attrs:
             attrs["title"] = " ".join(attrs["title"].split())
             attrs["title_normalized"] = attrs["title"].lower()
-        if "author_names" in attrs:
-            attrs["author_names"] = " ".join(attrs["author_names"].split())
-            attrs["author_names_normalized"] = attrs["author_names"].lower()
+        if "creator_names" in attrs:
+            attrs["creator_names"] = " ".join(attrs["creator_names"].split())
+            attrs["creator_names_normalized"] = attrs["creator_names"].lower()
 
-        # A PATCH may change only one of title/author_names/page_type. Merge
+        # A PATCH may change only one of title/creator_names/page_type. Merge
         # changed values with the current instance so the canonical-work check
         # runs for every update, not just full replaces.
         if self.instance is not None and self.instance.is_canonical:
             cand_title = attrs.get("title_normalized", self.instance.title_normalized)
-            cand_author = attrs.get(
-                "author_names_normalized", self.instance.author_names_normalized
+            cand_creator = attrs.get(
+                "creator_names_normalized", self.instance.creator_names_normalized
             )
             cand_page_type = attrs.get("page_type", self.instance.page_type)
             if (
-                BookRecommendation.objects.filter(
+                Recommendation.objects.filter(
                     is_canonical=True,
                     title_normalized__iexact=cand_title,
-                    author_names_normalized__iexact=cand_author,
+                    creator_names_normalized__iexact=cand_creator,
                     page_type=cand_page_type,
                 )
                 .exclude(pk=self.instance.pk)
@@ -143,7 +207,7 @@ class UpdateRecommendationSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     {
                         "title": _(
-                            "A canonical recommendation for this title and author "
+                            "A canonical recommendation for this title and creator "
                             "already exists."
                         )
                     }
@@ -228,7 +292,7 @@ class CuratorFollowSerializer(serializers.Serializer):
 
 class DuplicateReportCreateSerializer(serializers.Serializer):
     suspected_duplicate_of = serializers.PrimaryKeyRelatedField(
-        queryset=BookRecommendation.objects.all(), required=False, allow_null=True
+        queryset=Recommendation.objects.all(), required=False, allow_null=True
     )
     reason = serializers.CharField(
         required=False, allow_blank=True, default="", max_length=1000
@@ -254,18 +318,19 @@ class DuplicateReportCreateSerializer(serializers.Serializer):
 
 
 class RecommendationSummarySerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
-        model = BookRecommendation
+        model = Recommendation
         fields = [
             "id",
             "title",
-            "author_names",
+            "creator_names",
+            "content_type",
             "page_type",
             "status",
             "support_count",
-            "category",
+            "categories",
             "cover_image_url",
             "created_at",
         ]
@@ -275,22 +340,31 @@ class RecommendationSummarySerializer(serializers.ModelSerializer):
 class RecommendationDetailSerializer(serializers.ModelSerializer):
     creator = AccountRefSerializer(read_only=True)
     current_recommender = AccountRefSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
-        model = BookRecommendation
+        model = Recommendation
         fields = [
             "id",
             "creator",
+            "content_type",
             "page_type",
             "title",
             "title_normalized",
-            "author_names",
-            "author_names_normalized",
+            "creator_names",
+            "creator_names_normalized",
             "description",
             "external_reference_url",
             "cover_image_url",
-            "category",
+            "categories",
+            "metadata",
+            "release_year",
+            "language",
+            "runtime_minutes",
+            "season_count",
+            "episode_count",
+            "platform",
+            "edition_format",
             "status",
             "is_canonical",
             "duplicate_risk_status",
@@ -308,14 +382,23 @@ class RecommendationDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "content_type",
             "page_type",
             "title",
             "title_normalized",
-            "author_names",
-            "author_names_normalized",
+            "creator_names",
+            "creator_names_normalized",
             "description",
             "external_reference_url",
             "cover_image_url",
+            "metadata",
+            "release_year",
+            "language",
+            "runtime_minutes",
+            "season_count",
+            "episode_count",
+            "platform",
+            "edition_format",
             "status",
             "is_canonical",
             "duplicate_risk_status",

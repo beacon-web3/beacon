@@ -1,8 +1,8 @@
 import pytest
 from rest_framework.test import APIClient
 
-from recommendations.models import BookRecommendation
-from tests.recommendations.factories import AccountFactory, BookRecommendationFactory
+from recommendations.models import Recommendation
+from tests.recommendations.factories import AccountFactory, RecommendationFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -15,7 +15,7 @@ class TestCoverImageCreate:
     def _valid_payload(self, **overrides):
         payload = {
             "title": "The Power Broker",
-            "author_names": "Robert Caro",
+            "creator_names": "Robert Caro",
             "page_type": "STANDALONE_WORK",
         }
         payload.update(overrides)
@@ -29,7 +29,7 @@ class TestCoverImageCreate:
         response = client.post(LIST_URL, self._valid_payload(cover_image_url=COVER_URL))
 
         assert response.status_code == 201
-        rec = BookRecommendation.objects.get(pk=response.data["recommendation"]["id"])
+        rec = Recommendation.objects.get(pk=response.data["recommendation"]["id"])
         assert rec.cover_image_url == COVER_URL
         assert response.data["recommendation"]["cover_image_url"] == COVER_URL
 
@@ -41,7 +41,7 @@ class TestCoverImageCreate:
         response = client.post(LIST_URL, self._valid_payload())
 
         assert response.status_code == 201
-        rec = BookRecommendation.objects.get(pk=response.data["recommendation"]["id"])
+        rec = Recommendation.objects.get(pk=response.data["recommendation"]["id"])
         assert rec.cover_image_url is None
         assert response.data["recommendation"]["cover_image_url"] is None
 
@@ -62,7 +62,7 @@ class TestCoverImageUpdate:
         return f"/api/recommendations/{recommendation_id}/"
 
     def test_update_sets_cover_image_url(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -74,7 +74,7 @@ class TestCoverImageUpdate:
         assert response.data["recommendation"]["cover_image_url"] == COVER_URL
 
     def test_update_clears_cover_image_url(self):
-        rec = BookRecommendationFactory(cover_image_url=COVER_URL)
+        rec = RecommendationFactory(cover_image_url=COVER_URL)
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -89,7 +89,7 @@ class TestCoverImageUpdate:
 
 class TestCoverImageRead:
     def test_summary_serializer_includes_cover_image_url_null(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().get(LIST_URL)
 
@@ -99,7 +99,7 @@ class TestCoverImageRead:
         assert result["cover_image_url"] is None
 
     def test_summary_serializer_includes_cover_image_url_value(self):
-        rec = BookRecommendationFactory(cover_image_url=COVER_URL)
+        rec = RecommendationFactory(cover_image_url=COVER_URL)
 
         response = APIClient().get(LIST_URL)
 
@@ -109,7 +109,7 @@ class TestCoverImageRead:
         assert result["cover_image_url"] == COVER_URL
 
     def test_detail_serializer_includes_cover_image_url_null(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         creator = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=creator)
@@ -120,7 +120,7 @@ class TestCoverImageRead:
         assert response.data["recommendation"]["cover_image_url"] is None
 
     def test_detail_serializer_includes_cover_image_url_value(self):
-        rec = BookRecommendationFactory(cover_image_url=COVER_URL)
+        rec = RecommendationFactory(cover_image_url=COVER_URL)
         creator = AccountFactory()
         client = APIClient()
         client.force_authenticate(user=creator)

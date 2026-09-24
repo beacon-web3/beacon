@@ -4,10 +4,10 @@ import pytest
 from django.db import connections
 from rest_framework.test import APIClient
 
-from recommendations.models import BookRecommendation, RecommenderParticipant
+from recommendations.models import Recommendation, RecommenderParticipant
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
     RecommenderParticipantFactory,
 )
 
@@ -21,14 +21,14 @@ class TestRecommend:
         return f"/api/recommendations/{recommendation_id}/recommend/"
 
     def test_recommend_requires_authentication(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().post(self._url(rec.id), {}, format="json")
 
         assert response.status_code == 403
 
     def test_recommend_activates_recommendation(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -60,7 +60,7 @@ class TestRecommend:
         assert hints["amount_lamports"] == MIN_ACTIVATION_STAKE_LAMPORTS
 
     def test_recommend_accepts_explicit_amount(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -75,7 +75,7 @@ class TestRecommend:
         assert participant.locked_amount_lamports == 500_000_000
 
     def test_recommend_rejects_amount_below_minimum(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -90,7 +90,7 @@ class TestRecommend:
 
     def test_recommend_rejects_already_active(self):
         recommender = AccountFactory()
-        rec = BookRecommendationFactory(
+        rec = RecommendationFactory(
             status="ACTIVE",
             recommendation_cycle_number=1,
             current_recommender=recommender,
@@ -107,7 +107,7 @@ class TestRecommend:
         assert response.data["detail"]
 
     def test_recommend_rejects_user_with_active_participant(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(
             account=rec.creator, recommendation=rec, is_active=True
         )
@@ -120,7 +120,7 @@ class TestRecommend:
         assert RecommenderParticipant.objects.count() == 1
 
     def test_recommend_rejects_later_cycle(self):
-        rec = BookRecommendationFactory(
+        rec = RecommendationFactory(
             status="INACTIVE",
             recommendation_cycle_number=2,
             current_recommender=None,
@@ -136,9 +136,7 @@ class TestRecommend:
 
     def test_recommend_conflicts_when_active_participant_exists_for_another_user(self):
         existing = AccountFactory()
-        rec = BookRecommendationFactory(
-            status="INACTIVE", recommendation_cycle_number=0
-        )
+        rec = RecommendationFactory(status="INACTIVE", recommendation_cycle_number=0)
         RecommenderParticipantFactory(
             account=existing, recommendation=rec, is_active=True
         )
@@ -167,7 +165,7 @@ class TestRecommend:
         assert response.status_code == 404
 
     def test_recommend_is_idempotent_with_key(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=rec.creator)
 
@@ -185,13 +183,13 @@ class TestRecommend:
             == second.data["recommender_participant"]["id"]
         )
         assert RecommenderParticipant.objects.count() == 1
-        assert BookRecommendation.objects.get(pk=rec.id).status == "ACTIVE"
+        assert Recommendation.objects.get(pk=rec.id).status == "ACTIVE"
 
 
 class TestRecommendConcurrency:
     @pytest.mark.django_db(transaction=True)
     def test_two_simultaneous_recommends_single_winner(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         def attempt(results):
             user = AccountFactory()

@@ -3,21 +3,22 @@ from django.contrib import admin
 from .models import (
     Badge,
     Bookmark,
-    BookRecommendation,
     Category,
     CuratorFollow,
     DuplicateReport,
+    Recommendation,
     RecommenderParticipant,
     ReputationEvent,
     Support,
 )
 
 
-@admin.register(BookRecommendation)
-class BookRecommendationAdmin(admin.ModelAdmin):
+@admin.register(Recommendation)
+class RecommendationAdmin(admin.ModelAdmin):
     list_display = (
         "title",
-        "author_names",
+        "creator_names",
+        "content_type",
         "page_type",
         "status",
         "is_canonical",
@@ -32,18 +33,19 @@ class BookRecommendationAdmin(admin.ModelAdmin):
         "status",
         "is_canonical",
         "page_type",
+        "content_type",
         "duplicate_risk_status",
         "review_status",
-        "category",
+        "categories",
     )
     search_fields = (
         "title",
-        "author_names",
+        "creator_names",
         "creator__username",
     )
     readonly_fields = (
         "title_normalized",
-        "author_names_normalized",
+        "creator_names_normalized",
         "status",
         "is_canonical",
         "duplicate_risk_status",
@@ -59,17 +61,44 @@ class BookRecommendationAdmin(admin.ModelAdmin):
         "updated_at",
     )
     fieldsets = (
-        (None, {"fields": ("creator", "page_type", "title", "author_names")}),
+        (
+            None,
+            {
+                "fields": (
+                    "creator",
+                    "content_type",
+                    "page_type",
+                    "title",
+                    "creator_names",
+                )
+            },
+        ),
         (
             "Normalized Identifiers",
             {
-                "fields": ("title_normalized", "author_names_normalized"),
+                "fields": ("title_normalized", "creator_names_normalized"),
                 "classes": ("collapse",),
             },
         ),
         (
             "Content",
-            {"fields": ("description", "external_reference_url", "category")},
+            {"fields": ("description", "external_reference_url", "categories")},
+        ),
+        (
+            "Reserved (future content types)",
+            {
+                "fields": (
+                    "metadata",
+                    "release_year",
+                    "language",
+                    "runtime_minutes",
+                    "season_count",
+                    "episode_count",
+                    "platform",
+                    "edition_format",
+                ),
+                "classes": ("collapse",),
+            },
         ),
         (
             "Lifecycle State",
@@ -117,8 +146,8 @@ class BookRecommendationAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "is_active", "created_at")
-    list_filter = ("is_active",)
+    list_display = ("name", "slug", "content_type", "is_active", "created_at")
+    list_filter = ("is_active", "content_type")
     search_fields = ("name", "slug")
     readonly_fields = ("created_at",)
 

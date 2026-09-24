@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
     SupportFactory,
 )
 
@@ -15,7 +15,7 @@ class TestSupportList:
         return f"/api/recommendations/{recommendation_id}/supports/"
 
     def test_list_is_public(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         for _ in range(3):
             SupportFactory(recommendation=rec)
 
@@ -26,7 +26,7 @@ class TestSupportList:
         assert response.data["count"] == 3
 
     def test_list_is_ordered_by_supporter_number_ascending(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         supports = [SupportFactory(recommendation=rec) for _ in range(3)]
         expected_numbers = [s.supporter_number for s in supports]
 
@@ -37,7 +37,7 @@ class TestSupportList:
         assert actual_numbers == expected_numbers
 
     def test_list_includes_required_fields(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         SupportFactory(recommendation=rec)
 
         response = APIClient().get(self._url(rec.id))
@@ -52,7 +52,7 @@ class TestSupportList:
         }
 
     def test_list_supports_authenticated_requests(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         SupportFactory(recommendation=rec)
         client = APIClient()
         client.force_authenticate(user=AccountFactory())

@@ -5,8 +5,8 @@ from rest_framework.test import APIClient
 
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
     CategoryFactory,
+    RecommendationFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -16,7 +16,7 @@ LIST_URL = "/api/recommendations/"
 
 # Alias keeps call sites short while preserving factory_boy class methods
 # such as create_batch().
-_create_recommendation = BookRecommendationFactory
+_create_recommendation = RecommendationFactory
 
 
 class TestRecommendationList:
@@ -40,11 +40,12 @@ class TestRecommendationList:
         assert set(response.data["results"][0]) == {
             "id",
             "title",
-            "author_names",
+            "creator_names",
+            "content_type",
             "page_type",
             "status",
             "support_count",
-            "category",
+            "categories",
             "cover_image_url",
             "created_at",
         }
@@ -88,13 +89,29 @@ class TestRecommendationList:
     def test_list_filters_by_category_slug(self):
         books = CategoryFactory(name="Books", slug="books")
         films = CategoryFactory(name="Films", slug="films")
-        _create_recommendation(category=books)
-        _create_recommendation(category=films)
+        book_rec = _create_recommendation()
+        book_rec.categories.add(books)
+        film_rec = _create_recommendation()
+        film_rec.categories.add(films)
 
         response = APIClient().get(LIST_URL, {"category": "books"})
 
         assert response.data["count"] == 1
-        assert response.data["results"][0]["category"]["slug"] == "books"
+        assert response.data["results"][0]["categories"][0]["slug"] == "books"
+
+    def test_list_category_filter_does_not_inflate_count_with_multiple_categories(self):
+        books = CategoryFactory(name="Books", slug="books")
+        films = CategoryFactory(name="Films", slug="films")
+        multi_cat_rec = _create_recommendation()
+        multi_cat_rec.categories.add(books, films)
+        _create_recommendation().categories.add(films)
+
+        response = APIClient().get(
+            LIST_URL, {"category": "books", "ordering": "-support_count"}
+        )
+
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["id"] == multi_cat_rec.id
 
     def test_list_filters_by_duplicate_risk_status(self):
         _create_recommendation(duplicate_risk_status="HIGH_RISK")
@@ -141,9 +158,9 @@ class TestRecommendationList:
         assert response.status_code == 400
         assert "is_canonical" in response.data
 
-    def test_list_search_matches_title_and_author(self):
-        _create_recommendation(title="The Power Broker", author_names="Robert Caro")
-        _create_recommendation(title="Other Book", author_names="Someone Else")
+    def test_list_search_matches_title_and_creator(self):
+        _create_recommendation(title="The Power Broker", creator_names="Robert Caro")
+        _create_recommendation(title="Other Book", creator_names="Someone Else")
 
         response = APIClient().get(LIST_URL, {"search": "Power"})
         assert response.data["count"] == 1
@@ -152,7 +169,7 @@ class TestRecommendationList:
         assert response.data["count"] == 1
 
     def test_list_search_short_query_returns_empty_not_error(self):
-        _create_recommendation(title="The Power Broker", author_names="Robert Caro")
+        _create_recommendation(title="The Power Broker", creator_names="Robert Caro")
 
         response = APIClient().get(LIST_URL, {"search": "Po"})
 
@@ -161,7 +178,7 @@ class TestRecommendationList:
         assert response.data["results"] == []
 
     def test_list_search_empty_param_returns_empty(self):
-        _create_recommendation(title="The Power Broker", author_names="Robert Caro")
+        _create_recommendation(title="The Power Broker", creator_names="Robert Caro")
 
         response = APIClient().get(LIST_URL, {"search": ""})
 
@@ -201,7 +218,7 @@ class TestRecommendationList:
 
     def test_list_uses_select_related(self):
         creator = AccountFactory()
-        BookRecommendationFactory.create_batch(10, creator=creator)
+        RecommendationFactory.create_batch(10, creator=creator)
 
         with CaptureQueriesContext(connection) as ctx:
             response = APIClient().get(LIST_URL, {"page_size": 100})
@@ -244,8 +261,9 @@ class TestRecommendationDetail:
 
         assert response.status_code == 404
 
-    def test_detail_uses_select_related(self):
-        rec = _create_recommendation(category=CategoryFactory())
+    def test_detail_uses_prefetch_related(self):
+        rec = _create_recommendation()
+        rec.categories.add(CategoryFactory())
 
         client = APIClient()
         client.force_authenticate(user=rec.creator)
@@ -253,5 +271,5 @@ class TestRecommendationDetail:
             response = client.get(self._url(rec.id))
 
         assert response.status_code == 200
-        # Single query: creator, current_recommender and category are joined.
-        assert len(ctx.captured_queries) == 1
+        # Count + page + one prefetch for the categories M2M (no N+1).
+        assert len(ctx.captured_queries) <= 3

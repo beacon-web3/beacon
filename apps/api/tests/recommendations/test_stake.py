@@ -1,7 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 
-from recommendations.models import BookRecommendation, RecommenderParticipant
+from recommendations.models import Recommendation, RecommenderParticipant
 from recommendations.serializers import (
     MIN_ACTIVATION_STAKE_LAMPORTS as MIN_ACTIVATION_STAKE,
 )
@@ -10,7 +10,7 @@ from recommendations.serializers import (
 )
 from tests.recommendations.factories import (
     AccountFactory,
-    BookRecommendationFactory,
+    RecommendationFactory,
     RecommenderParticipantFactory,
 )
 
@@ -27,7 +27,7 @@ class TestStakeAdd:
         return client
 
     def test_requires_authentication(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().post(
             self._url(rec.id), {"amount_lamports": MIN_TOP_UP}, format="json"
@@ -45,7 +45,7 @@ class TestStakeAdd:
         assert response.status_code == 404
 
     def test_rejects_when_caller_has_no_position(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         # Another user holds the active position; the caller must still be
         # rejected (top-up is only for an existing position of the caller).
         other = AccountFactory()
@@ -65,7 +65,7 @@ class TestStakeAdd:
 
     def test_top_up_increments_locked_amount_without_lifecycle_changes(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory(
+        rec = RecommendationFactory(
             status="ACTIVE",
             recommendation_cycle_number=1,
             current_recommender=user,
@@ -93,7 +93,7 @@ class TestStakeAdd:
         assert participant.is_active is True
         assert participant.reactivation_number == 0
         rec.refresh_from_db()
-        assert rec.status == BookRecommendation.Status.ACTIVE
+        assert rec.status == Recommendation.Status.ACTIVE
         assert rec.recommendation_cycle_number == 1
         assert rec.current_recommender == user
         hints = response.data["solana_hints"]
@@ -103,9 +103,7 @@ class TestStakeAdd:
 
     def test_rejects_top_up_on_inactive_position(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory(
-            status="INACTIVE", recommendation_cycle_number=1
-        )
+        rec = RecommendationFactory(status="INACTIVE", recommendation_cycle_number=1)
         participant = RecommenderParticipantFactory(
             account=user,
             recommendation=rec,
@@ -129,7 +127,7 @@ class TestStakeAdd:
 
     def test_rejects_amount_below_minimum(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(account=user, recommendation=rec, is_active=True)
         client = self._authed_client(user)
 
@@ -142,7 +140,7 @@ class TestStakeAdd:
 
     def test_rejects_top_up_leaving_dust_balance(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         # A zeroed-but-active participant is the only DB-legal state where a
         # top-up can land below the 0.2 SOL activation floor (the dust guard
         # at the serializer level protects it; the DB constraint allows 0).
@@ -165,7 +163,7 @@ class TestStakeAdd:
 
     def test_is_idempotent_with_key(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         participant = RecommenderParticipantFactory(
             account=user, recommendation=rec, is_active=True
         )
@@ -196,7 +194,7 @@ class TestStakeReclaim:
         return f"/api/recommendations/{recommendation_id}/stake/"
 
     def test_requires_authentication(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
 
         response = APIClient().delete(self._url(rec.id))
 
@@ -211,7 +209,7 @@ class TestStakeReclaim:
         assert response.status_code == 404
 
     def test_rejects_when_no_participant_exists(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         client = APIClient()
         client.force_authenticate(user=AccountFactory())
 
@@ -222,7 +220,7 @@ class TestStakeReclaim:
 
     def test_rejects_when_position_is_not_active(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(account=user, recommendation=rec, is_active=False)
         client = APIClient()
         client.force_authenticate(user=user)
@@ -233,7 +231,7 @@ class TestStakeReclaim:
 
     def test_reclaim_zeroes_active_position(self):
         user = AccountFactory()
-        rec = BookRecommendationFactory(
+        rec = RecommendationFactory(
             status="ACTIVE",
             recommendation_cycle_number=1,
             current_recommender=user,
@@ -264,7 +262,7 @@ class TestStakeReclaim:
         rec.refresh_from_db()
         # Reclaim only mutates the participant row and clears the stale
         # current_recommender pointer; lifecycle status/cycle are untouched.
-        assert rec.status == BookRecommendation.Status.ACTIVE
+        assert rec.status == Recommendation.Status.ACTIVE
         assert rec.current_recommender is None
         assert rec.recommendation_cycle_number == 1
 
@@ -274,7 +272,7 @@ class TestStakeHistory:
         return f"/api/recommendations/{recommendation_id}/stake/history/"
 
     def test_public_and_ordered_by_reactivation_number(self):
-        rec = BookRecommendationFactory()
+        rec = RecommendationFactory()
         RecommenderParticipantFactory(
             recommendation=rec,
             reactivation_number=2,
